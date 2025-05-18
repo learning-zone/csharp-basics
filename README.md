@@ -75,25 +75,624 @@ Main features of C#:
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-### Q. What is object-oriented programming?
 ### Q. What are the different types of data types available in C#?
+
+C# offers a variety of data types categorized as value types, reference types, and pointer types. Value types store data directly, while reference types store memory addresses to the actual data. 
+
+```
+                    C# Data Type
+                        |
+        |-----------------------------------------------------------------------------|
+    Value Type                                                                  Reference Type
+        |                                                                             |
+|------------------|------------|-----------|                                         |
+|                  |            |           |                                         |
+Simple Types   Enum Types  Struct Type  Nullable Type                                 |
+                                                        |-----------------|-----------------|------------|
+                                                        |                 |                 |            |
+                                                      Class Types   Interface Types   Array Types  Delegate Types
+```
+
+**1. Value Types:**
+
+These store data directly and include:
+
+* **Integral types**: byte, sbyte, short, ushort, int, uint, long, ulong, char
+* **Floating-point types**: float, double
+* **Decimal type**: decimal
+* **Boolean type**: bool
+* **Structs**: Custom value types (e.g., DateTime, Guid)
+* **Enumerations**: enum
+
+**2. Reference Types:**
+
+These store references to the actual data:
+
+* **String**: string
+* **Objects**: object
+* **Arrays**: e.g., int[], string[]
+* **Class types**: Custom classes
+* **Delegates**
+* **Interfaces**
+
+**3. Pointer Types:**
+
+Used in unsafe code for direct memory manipulation (e.g., int*, char*).
+
+**4. Nullable Types:**
+
+Allow value types to represent null (e.g., int?, bool?).
+
+**Example:**
+
+```cs
+int number = 10;              // Value type
+string name = "Pradeep";      // Reference type
+int? age = null;              // Nullable value type
+int[] numbers = {10, 20, 30}; // Array (reference type)
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. Can primitive data types be stored in heap?
-### Q. Can you store multiple data types in System.Array?
-### Q. What is an extension method in C# and how is it implemented?
-### Q. What is a generic type in C# and why is it used?
-### Q. What is an anonymous method in C# and how is it used?
-### Q. What is a constructor in C# and what are its different types?
-### Q. What is the difference between a method and a function in C#?
-### Q. What is the Common Language Runtime (CLR) in C#?
-### Q. What is the purpose of namespaces in C#?
-### Q. What is the purpose of the `using` statement in C#?
-### Q. What are properties in C# and how are they used?
-### Q. What are the Arrays in C#.Net?
-### Q. What is the difference between the System.Array.CopyTo() and System.Array.Clone()?
-### Q. What is jagged array in C#.Net?
+
+Yes, primitive data types in C# (such as int, float, bool, etc.) are value types and are typically stored on the stack when used as local variables. However, they can be stored on the heap in certain scenarios:
+
+* **When they are part of a reference type** (e.g., fields in a class or elements in an array), the value type is stored on the heap as part of the object.
+
+* **When they are boxed** (i.e., converted to object or an interface type), the value is copied to the heap.
+
+**Example:**
+
+```cs
+int x = 10; // Stored on the stack
+
+object obj = x; // Boxing: x is copied to the heap
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. It is possible to store mixed datatypes such as int, string, float, char all in one array?
+
+Yes, you can store multiple data types in a `System.Array` if the array is declared as type `object[]` or `Array` (the base class). This is because all types in C# ultimately derive from `object`. However, this approach loses type safety and requires casting when retrieving values.
+
+**Example:**
+
+```cs
+object[] mixedArray = { 10, "Hi", 3.14, true };
+
+foreach (var item in mixedArray)
+{
+    Console.WriteLine(item);
+}
+```
+
+**Output:**
+
+```
+10
+Hi
+3.14
+True
+```
+
+**Note:**
+
+* Arrays like int[], string[], etc., can only store a single data type.
+* Using object[] allows mixed types, but it's generally better to use generic collections or tuples for type safety and clarity.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is an extension method in C# and how is it implemented?
+
+In C#, an extension method is a special type of static method that allows you to add functionality to existing types (classes, structs, interfaces) without modifying their source code. 
+
+It\'s implemented by defining a static method within a static class, with the first parameter specifying the type to be extended and prefixed with the `this` keyword. The result is that the extension method can be called as if it were an instance method of the extended type. 
+
+**Example:**
+
+```cs
+// Extension method for the string type
+public static class StringExtensions {
+    public static string Reverse(this string input) {
+        char[] chars = input.ToCharArray();
+        Array.Reverse(chars);
+        return new string(chars);
+    }
+}
+
+// Use the extension method
+public class Example {
+    public static void Main(string[] args) {
+        string text = "Hello";
+        string reversedText = text.Reverse(); // Call the extension method
+        Console.WriteLine(reversedText); // Output: olleH
+    }
+}
+```
+
+In this example, the `StringExtensions` class contains the `Reverse` extension method. The `this string input` part indicates that this method extends the `string` type. You can then call `text.Reverse()` just like a regular instance method of the `string` type,
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is a generic type in C# and why is it used?
+
+Generics are fundamental feature that enhances code reusability, type safety, and flexibility. They allow you to create classes, methods, delegates, and interfaces that work with different data types, making code more versatile and efficient.
+
+**Features:**
+
+* **Type Safety**: Generics allow you to write code that works with any data type while maintaining compile-time type checking.
+
+* **Code Reusability**: You can create classes and methods that work with different types without duplicating code.
+
+* **Performance**: Generics avoid the need for boxing/unboxing and type casting, which improves performance compared to non-generic collections.
+
+**Example:**
+
+```cs
+using System;
+
+// define a generics class named Employee
+public class Employee<T>
+{
+    // define a variable of type T 
+    public T data;
+
+    // define a constructor of the Employee class 
+    public Employee(T data)
+    {
+        this.data = data;
+        Console.WriteLine("Data: " + this.data);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        // create an instance with data type string 
+        Employee<string> employeeName = new Employee<string>("Pradeep Kumar");
+
+        // create an instance with data type int
+        Employee<int> employeeId = new Employee<int>(28);
+    }
+}
+```
+
+Output:
+
+```cs
+Data: Pradeep Kumar
+Data: 28
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is an anonymous method in C# and how is it used?
+
+An anonymous method is a named method without a name, defined using the delegate keyword. It\'s used for inline code, particularly when you need to create a delegate instance without explicitly defining a named method first. 
+
+Anonymous methods are helpful when you need a small, one-time-use method and don\'t want to clutter the code with a separate named method. 
+
+**Example:**
+
+```cs
+// Declare a delegate
+delegate void Greet(string name);
+
+class Program
+{
+    static void Main()
+    {
+        // Assign an anonymous method to the delegate
+        Greet greet = delegate(string name)
+        {
+            Console.WriteLine("Hello, " + name + "!");
+        };
+
+        greet("Pradeep"); // Output: Hello, Pradeep!
+    }
+}
+```
+
+**Usage:**
+
+* Anonymous methods are commonly used for event handling, callbacks, or passing logic as parameters.
+* They can access variables from the enclosing scope (closure).
+
+**Note:**
+
+Lambda expressions are a more concise way to achieve the same functionality as anonymous methods. Lambda expressions are generally preferred over anonymous methods in modern C# code. 
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the difference between a method and a function in C#?
+
+In C#, a function is always part of a class, making it a method. A function is a reusable block of code that can be called to perform a specific task. A method, in object-oriented programming, is associated with an object or class, often operating on the object\'s data or state. 
+
+* **Method**: A block of code that belongs to a class or object and performs a specific action. It can access and modify the state (fields/properties) of the class.
+
+* **Function**: A general term for a block of code that performs a task and returns a value. In C#, standalone functions (not part of a class) do not exist; all functions are methods.
+
+**Example:**
+
+```cs
+public class Calculator
+{
+    // This is a method
+    public int Add(int a, int b)
+    {
+        return a + b;
+    }
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the Common Language Runtime (CLR) in C#?
+
+The Common Language Runtime (CLR) is the core execution engine for the .NET Framework, including C# programs. It manages the execution, lifecycle, and resources of .NET applications. CLR provides a managed execution environment that handles tasks like memory allocation, security, exception handling etc.
+
+**Key Functions:**
+
+* **Execution and Management:** CLR manages the execution of .NET applications, ensuring they run smoothly and efficiently. 
+
+* **Memory Management:** CLR provides automatic garbage collection, freeing developers from manual memory management. 
+
+* **Security:** CLR enforces security policies and ensures that applications are protected from malicious code. 
+
+* **Exception Handling:** CLR handles exceptions and errors, preventing application crashes. 
+
+* **Cross-Language Interoperability:** CLR allows code written in different .NET languages to interoperate and share resources. 
+
+* **Just-In-Time (JIT) Compilation:** CLR uses JIT compilers to convert Common Intermediate Language (CIL) code to native machine code at runtime. 
+
+* **Metadata:** CLR uses metadata, which is information about the application\'s structure (types, objects, members, etc.), to manage the execution process. 
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the purpose of namespaces in C#?
+
+In C#, namespaces primarily serve two crucial purposes: organizing code and preventing naming conflicts. They provide a hierarchical structure for grouping related classes, interfaces, and other types, making code easier to read, maintain, and understand.
+
+**Features:**
+
+* **Avoiding Name Conflicts:** Namespaces help prevent naming collisions by distinguishing between types that may have the same name but are in different namespaces.
+
+* **Code Organization:** They provide a logical structure, making large codebases easier to manage and understand.
+
+* **Improved Readability:** By grouping related functionality, namespaces make code more readable and maintainable.
+
+* **Access Control:** Namespaces can help control the scope of class and method visibility.
+
+**Example:**
+
+```cs
+namespace MyCompany.Project.Utilities
+{
+    public class Logger
+    {
+        // Logger implementation
+    }
+}
+```
+
+You can then use the using directive to access types within a namespace:
+
+```cs
+using MyCompany.Project.Utilities;
+
+Logger logger = new Logger();
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the purpose of the `using` statement in C#?
+
+The `using` statement in C# is used to ensure that objects which consume unmanaged resources (like files, database connections, or network streams) are properly disposed of as soon as they are no longer needed. It provides a convenient syntax that automatically calls the `Dispose()` method on the object when the code block is exited, even if an exception occurs.
+
+**Purpose:**
+
+* Automatically releases resources held by an object implementing IDisposable.
+* Helps prevent resource leaks and improves application reliability.
+
+**Example:**
+
+```cs
+using (var file = new StreamReader("example.txt"))
+{
+    string content = file.ReadToEnd();
+    // file is automatically closed and disposed here
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What are properties in C# and how are they used?
+
+Properties in C# are special members that provide a flexible mechanism to read, write, or compute the values of private fields. Properties also support encapsulation and abstraction through "get" and "set" methods for accessing and modifying them.
+
+**Example:**
+
+```cs
+public class Person
+{
+    // Private field
+    private string name;
+
+    // Property with get and set
+    public string Name
+    {
+        get { return name; }
+        set { name = value; }
+    }
+
+    // Auto-implemented property
+    public int Age { get; set; }
+
+    // Read-only property
+    public string Info
+    {
+        get { return $"Name: {Name}, Age: {Age}"; }
+    }
+}
+
+// Use the extension method
+public class Example {
+    public static void Main(string[] args) {
+        var person = new Person();
+        person.Name = "Pradeep";
+        person.Age = 30;
+        Console.WriteLine(person.Info); // Output: Pradeep, Age 30
+    }
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What are the Arrays in C#.Net?
+
+In C#.NET, an **array** is a data structure that stores a fixed-size sequential collection of elements of the same type. Arrays are used to store multiple values in a single variable, instead of declaring separate variables for each value.
+
+**Key Points:**
+
+- Arrays are zero-indexed (the first element is at index 0).
+- All elements must be of the same type.
+- The size of an array is specified at the time of its creation and cannot be changed.
+
+**Example:**
+
+```cs
+// Declaration
+int[] numbers;
+
+// Initialization
+numbers = new int[5]; // Array of 5 integers
+
+// Declaration and initialization together
+string[] names = { "Alice", "Bob", "Charlie" };
+```
+
+**Types of Arrays:**
+
+**1. Single-Dimensional Array:**  
+   
+A linear array with one row of elements.
+
+```cs
+int[] arr = new int[3] { 10, 20, 30 };
+
+foreach(int num in arr) {
+    Console.WriteLine(num); // Output: 10, 20, 30
+}
+```
+
+**2. Multi-Dimensional Array:**  
+
+An array with more than one dimension (e.g., matrix).
+
+```cs
+int[,] matrix = new int[2, 3] { {1, 2, 3}, {4, 5, 6} };
+```
+
+**3. Jagged Array:**  
+
+An array of arrays, where each inner array can have a different length.
+
+```cs
+int[][] jagged = new int[2][];
+jagged[0] = new int[3] { 1, 2, 3 };
+jagged[1] = new int[2] { 4, 5 };
+```
+
+**Example:**
+
+```cs
+int[] numbers = { 5, 10, 15 };
+for (int i = 0; i < numbers.Length; i++)
+{
+    Console.WriteLine(numbers[i]);
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the difference between the System.Array.CopyTo() and System.Array.Clone()?
+
+The key difference between `System.Array.CopyTo()` and `System.Array.Clone()` lies in their purpose and how they create a copy of the array. `Array.CopyTo()` copies the elements of an array to a destination array, while `Array.Clone()` creates a new, independent array that is a shallow copy of the original. 
+
+**System.Array.CopyTo():**
+
+- Copies all elements of the current array to another existing array, starting at a specified index in the destination array.
+- Requires the destination array to be at least as large as the source array.
+- Performs a shallow copy (copies references for reference types, values for value types).
+
+**Example:**
+
+```cs
+int[] source = { 10, 20, 30 };
+int[] destination = new int[3];
+
+source.CopyTo(destination, 0); // Copy
+
+for (int i = 0; i < destination.Length; i++)
+{
+    Console.WriteLine(destination[i]); // Output: 10, 20, 30
+}
+```
+
+**System.Array.Clone():**
+
+- Creates a new array of the same type and length as the original and copies all elements into it.
+- Returns an object, so you usually need to cast it to the appropriate array type.
+- Also performs a shallow copy.
+
+**Example:**
+
+```cs
+int[] source = { 10, 20, 30 };
+int[] clone = (int[])source.Clone(); // Clone
+
+for (int i = 0; i < clone.Length; i++)
+{
+    Console.WriteLine(clone[i]); // Output: 10, 20, 30
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is jagged array in C#.Net?
+
+A jagged array in C#.NET is an array whose elements are arrays themselves, and these inner arrays can have different lengths. It is also known as an "array of arrays." 
+
+Unlike a multidimensional array (e.g., `int[,]`), a jagged array allows each row to have a different number of columns.
+
+**Example:**
+
+```cs
+// Declare a jagged array with 2 rows
+int[][] jaggedArray = new int[2][];
+
+// Initialize each row with different lengths
+jaggedArray[0] = new int[] { 10, 20, 30 };
+jaggedArray[1] = new int[] { 40, 50 };
+
+// Accessing elements
+Console.WriteLine(jaggedArray[0][1]); // Output: 20
+Console.WriteLine(jaggedArray[1][0]); // Output: 40
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. How can you sort the elements of the array in descending order?
+
+To sort the elements of an array in descending order in C#, you can use the Array.Sort method with a custom comparer, or use LINQ for a more concise approach.
+
+**Example:** Using `Array.Sort` with a comparer
+
+```cs
+int[] numbers = { 5, 2, 8, 1, 3 };
+Array.Sort(numbers, (a, b) => b.CompareTo(a)); // Sorts in descending order
+
+foreach (int num in numbers)
+{
+    Console.WriteLine(num); // Output: 8 5 3 2 1
+}
+```
+
+**Example:** Using LINQ
+
+```cs
+int[] numbers = { 5, 2, 8, 1, 3 };
+var descending = numbers.OrderByDescending(n => n).ToArray();
+
+foreach (int num in descending)
+{
+    Console.WriteLine(num); // Output: 8 5 3 2 1
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. What is the difference between `var` and `dynamic` types?
+
+The `var` and `dynamic` are keywords used for declaring variables, but they differ significantly in their approach to type checking and type inference. 
+
+`var` is used for implicit typing, where the compiler infers the variable\'s type from the initializer value, while `dynamic` is a type itself that bypasses compile-time type checking, making type verification occur at runtime. 
+
+**`var` (Implicit Typing):**
+
+* **Type inference**: The type of a `var` variable is determined by the compiler at compile time, based on the assigned value.
+* **Type safety**: Once assigned, the type cannot change, and all type checks are performed at compile time.
+* **Usage**: Useful for anonymous types or when the type is obvious from the right-hand side.
+
+**Example:**
+
+```cs
+var number = 10;        // number is inferred as int
+var name = "Pradeep";   // name is inferred as string
+// number = "Kumar";    // Compile-time error: cannot assign string to int
+```
+
+**`dynamic` (Dynamic Typing):**
+
+* **Runtime type resolution**: The type of a dynamic variable is determined at runtime, not at compile time.
+* **No compile-time type checking**: Errors related to type usage are only detected at runtime.
+* **Flexibility**: Allows operations that may not be valid at compile time, but can cause runtime exceptions if used incorrectly.
+* **Usage**: Useful when working with COM objects, dynamic languages, or reflection.
+
+**Example:**
+
+```cs
+dynamic value = 10;
+value = "Pradeep";     // Allowed: type can change at runtime
+
+Console.WriteLine(value.NonExistentMethod()); // Compiles, but throws runtime exception if method doesn't exist
+```
+
+**Key Differences:**
+
+|Feature        |var                |dynamic
+|---------------|-------------------|----------------
+|Type Checking  |Compile time       |Runtime
+|Type Determination |Inferred from initializer  |Determined at runtime
+|Type Changes   |Fixed after initialization     |Allowed to change at runtime
+|Error Detection   |Compile time| Runtime
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. What is a `struct` in C#?
 ### Q. What is the difference between `abstract` and `virtual` methods?
 ### Q. What is the difference between `out` and `ref` parameters?
@@ -108,6 +707,11 @@ Main features of C#:
 ### Q. What is an immutable string?
 ### Q. What is the JIT compiler process?
 ### Q. Explain the characteristics of value-type variables that are supported in the C# programming language.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. What is a parameter? Explain the new types of parameters introduced in C# 4.0.
 ### Q. Briefly explain the characteristics of reference-type variables that are supported in the C# programming language.
 ### Q. What are the different types of literals?
@@ -141,6 +745,8 @@ Main features of C#:
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
+
+
 
 ## # 2. OPERATORS
 
