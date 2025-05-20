@@ -1,5 +1,3 @@
-
-
 # C# Basics
 
 > *Click &#9733; if you like the project. Your contributions are heartily ♡ welcome.*
@@ -682,11 +680,11 @@ Console.WriteLine(value.NonExistentMethod()); // Compiles, but throws runtime ex
 
 **Key Differences:**
 
-|Feature        |var                |dynamic
+|Feature	    |var	            |dynamic
 |---------------|-------------------|----------------
-|Type Checking  |Compile time       |Runtime
-|Type Determination |Inferred from initializer  |Determined at runtime
-|Type Changes   |Fixed after initialization     |Allowed to change at runtime
+|Type Checking	|Compile time	    |Runtime
+|Type Determination	|Inferred from initializer	|Determined at runtime
+|Type Changes	|Fixed after initialization	    |Allowed to change at runtime
 |Error Detection   |Compile time| Runtime
 
 <div align="right">
@@ -694,64 +692,1198 @@ Console.WriteLine(value.NonExistentMethod()); // Compiles, but throws runtime ex
 </div>
 
 ### Q. What is a `struct` in C#?
+
+A struct (short for structure) is a data type that allows grouping related variables together into a single unit. It is similar to a class but is a value type, meaning that when you create an instance of a struct, the data itself is stored, not a reference to the data. 
+
+Structs are typically used for smaller, more lightweight data structures that are often copied rather than referenced. 
+
+**Differences from Classes:**
+
+* **Value Type:** Structs are stored on the stack (unless boxed or part of a reference type), and assignments copy the entire value.
+* **No Inheritance:** Structs cannot inherit from other structs or classes (except for interfaces).
+* **Default Constructor:** Structs cannot have a parameterless constructor (the compiler provides one automatically).
+* **Immutability:** Structs are often used for immutable data, though they can have mutable fields.
+
+**Example:**
+
+```cs
+public struct Point
+{
+    public int X;
+    public int Y;
+
+    public Point(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+}
+
+// Usage
+Point p1 = new Point(10, 20);
+Point p2 = p1; // p2 is a copy of p1
+p2.X = 30;     // p1.X remains 10
+
+Console.WriteLine(p1.X); // Output: 10
+Console.WriteLine(p2.X); // Output: 30
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. What is the difference between `abstract` and `virtual` methods?
+
+Abstract methods are declared without an implementation, requiring derived classes to provide one. Virtual methods, on the other hand, come with a default implementation that can be overridden by derived classes. 
+
+**Abstract Methods:**
+
+* An abstract method is declared in an abstract class, meaning it doesn\'t have a concrete implementation. 
+* Abstract classes, by definition, cannot be instantiated directly. 
+* Derived classes that inherit from an abstract class must provide a concrete implementation for all abstract methods to be instantiated. 
+* This forces derived classes to implement specific behavior related to the abstract method.
+
+**Virtual Methods:**
+
+* A virtual method has a default implementation in the base class. 
+* Derived classes can choose to override the virtual method, providing their own implementation. 
+* If a derived class does not override a virtual method, the base class\'s implementation will be used. 
+* Virtual methods enable polymorphism, allowing different object types to respond to the same method call in different ways. 
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. What is the difference between `out` and `ref` parameters?
-### Q. What is the purpose of the `nameof` operator in C#?
-### Q. What is the difference between `checked` and `unchecked` contexts?
-### Q. What is a `generic` in C#?
+
+The `out` and `ref` keywords are both used to pass arguments by reference to methods, but they have important differences:
+
+**ref parameter:**
+
+* The variable passed as `ref` must be initialized before it is passed to the method.
+* The method can read and modify the value.
+* Changes made to the parameter inside the method are reflected outside.
+
+**out parameter:**
+
+* The variable passed as `out` does not need to be initialized before being passed.
+* The method must assign a value to the `out` parameter before the method returns.
+* Used when a method needs to return multiple values.
+
+**Example:**
+
+```cs
+public class Program
+{
+    static void RefExample(ref int x)
+    {
+      x = x + 10;
+    }
+
+    static void OutExample(out int y)
+    {
+      y = 20; // Must assign before returning
+    }
+
+	public static void Main(string[] args)
+	{
+
+      // Using 'ref'
+      int a = 5;
+      RefExample(ref a); // a is now 15
+
+      // Using 'out'
+      int b;
+      OutExample(out b); // b is now 20
+
+      Console.WriteLine($"a = {a}"); // Output: a = 15
+      Console.WriteLine($"b = {b}"); // Output: b = 20
+	}
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. What is a `Tuple` in C#?
-### Q. What is a namespace in C#?
-### Q. How are primitive and objects stored in memory?
+
+A Tuple is a data structure that allows you to store a fixed number of elements, potentially of different types, in a single object. Tuples are useful for grouping related values without creating a custom class or struct.
+
+**Features:**
+
+* It allows us to represent multiple data into a single data set.
+* It returns multiple values from a method without using out parameter.
+* It can also store duplicate elements.
+* It allows us to pass multiple values to a method with the help of single parameters.
+
+**Example:**
+
+```cs
+```csharp
+// Creating a tuple with named elements
+var person = (Name: "Pradeep", Age: 28, IsEmployed: true);
+
+// Accessing tuple elements
+Console.WriteLine(person.Name);       // Output: Pradeep
+Console.WriteLine(person.Age);        // Output: 28
+Console.WriteLine(person.IsEmployed); // Output: True
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. Explain byval and byref?
-### Q. Differentiate between copy byvalue and copy byref?
+
+In C#, **byval** (by value) and **byref** (by reference) describe how arguments are passed to methods:
+
+**By Value (byval):**
+
+- The method receives a **copy** of the variable's value.
+- Changes made to the parameter inside the method **do not affect** the original variable.
+- This is the default behavior for method parameters in C#.
+
+**Example:**
+
+```cs
+void Increment(int x)
+{
+    x = x + 1;
+}
+
+int a = 10;
+Increment(a);
+Console.WriteLine(a); // Output: 10 (original value unchanged)
+```
+
+**By Reference (byref):**
+
+The method receives a reference to the original variable.
+Changes made to the parameter affect the original variable.
+In C#, use the ref or out keyword to pass by reference.
+
+**Example:**
+
+```cs
+void Increment(ref int x)
+{
+    x = x + 1;
+}
+
+int a = 10;
+Increment(ref a);
+Console.WriteLine(a); // Output: 11 (original value changed)
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. What is an immutable string?
+
+An **immutable string** in C# is a string whose value cannot be changed after it is created. When you modify a string (such as by concatenation, replacement, or other operations), a new string object is created in memory, and the original string remains unchanged.
+
+**Why are strings immutable?:**
+
+* **Thread Safety:** Immutable objects are inherently-safe because their state can\'t change after creation.
+* **Security:** Immutability ensures that once a string is created, it can not be tempered with, reducing the risk of injection attacks. For example security sensitive operation (e.g., file paths, URLs, Database queries).
+* **Hashing and Performance:** Since their value doesn\'t change, hash code remain constant, which is crucial for consistent lookups.
+
+**Example:**
+
+```cs
+string s1 = "Hello";
+string s2 = s1;
+s1 = s1 + " World"; // Creates a new string, s1 now points to "Hello World"
+Console.WriteLine(s2); // Output: Hello (s2 is unchanged)
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. What is the JIT compiler process?
+
+The JIT (Just-In-Time) compiler is a core component of the .NET runtime (CLR) that converts Intermediate Language (IL) code into native machine code at runtime, just before execution. This process is "just-in-time" because it only translates CIL code into native code when it's needed for execution
+
+**JIT Compiler Process:**
+
+* **Compilation to IL:** When you build a C# application, the source code is compiled into Intermediate Language (IL), not directly to machine code. This IL is platform-independent and stored in assemblies (.exe or .dll files).
+
+* **Loading and Execution:** When you run the application, the CLR loads the required assemblies and starts executing the code.
+
+* **JIT Compilation:** As methods are called for the first time, the JIT compiler translates the IL code of those methods into native machine code specific to the underlying CPU and operating system.
+
+* **Caching:** The native code generated by the JIT is cached in memory, so subsequent calls to the same method use the already-compiled native code, improving performance.
+
+* **Execution:** The CPU executes the native code directly.
+
+**Benefits:**
+
+* **Platform Independence:** IL code can run on any platform with a compatible CLR/JIT.
+* **Optimization:** JIT can optimize code at runtime based on the actual environment.
+* **Security:** JIT compilation allows for verification and security checks before execution.
+
+**Summary Diagram:**
+
+```js
+   Source Code
+      ↓
+   Compiler
+      ↓
+   IL Code (Assembly)
+      ↓
+   [At Runtime]
+      ↓
+   JIT Compiler
+      ↓
+   Native Machine Code
+      ↓
+   Execution by CPU
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. Explain the characteristics of value-type variables that are supported in the C# programming language.
+
+In C#, value-type variables hold their data directly in memory, unlike reference types which store a reference to the data. When assigned, value-type variables create a copy of the data, meaning changes to one variable do not affect others, except in cases where `ref` or `out` modifiers are used. 
+
+**Characteristics:**
+
+- **Direct Storage:** Value types store their data directly, not as a reference to another memory location.
+- **Stack Allocation:** Most value-type variables are allocated on the stack (unless they are part of a reference type or boxed), which allows for fast allocation and deallocation.
+- **No Null by Default:** Value types cannot be null unless they are declared as nullable (e.g., `int?`).
+- **Copy Semantics:** Assigning one value-type variable to another copies the value, not a reference. Changes to one variable do not affect the other.
+- **Predefined and User-Defined:** Value types include built-in types (such as `int`, `float`, `bool`, `char`, `struct`, and `enum`) and user-defined structs and enums.
+- **No Inheritance:** Value types cannot inherit from other types (except for interfaces), and they are implicitly sealed.
+- **Default Values:** Value types always have a default value (e.g., `0` for numeric types, `false` for `bool`).
+- **Boxing and Unboxing:** Value types can be "boxed" to be treated as objects (stored on the heap), and "unboxed" back to value types.
+
+**Example:**
+
+```cs
+int number = 42;           // Integral value type
+double price = 19.99;      // Floating-point value type
+bool isActive = true;      // Boolean value type
+char letter = 'A';         // Character value type
+DateTime today = DateTime.Now; // Struct (user-defined value type)
+```
+
+**Summary Table:**
+
+| Feature                | Value Type Example | Behavior                                      |
+|------------------------|-------------------|-----------------------------------------------|
+| Storage                | `int x = 5;`      | Stores value directly in variable             |
+| Assignment             | `int y = x;`      | Copies value, not reference                   |
+| Nullability            | `int? z = null;`  | Nullable only with `?` syntax                 |
+| Default Value          | `int x;`          | Defaults to `0`                               |
+| Inheritance            | `struct`          | Cannot inherit from another struct/class      |
+
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
 ### Q. What is a parameter? Explain the new types of parameters introduced in C# 4.0.
-### Q. Briefly explain the characteristics of reference-type variables that are supported in the C# programming language.
-### Q. What are the different types of literals?
-### Q. What is the main difference between sub-procedure and function?
-### Q. How to use extension methods?
-### Q. What is the difference between string and StringBuilder in C#?
-### Q. What is difference between late binding and early binding in C#?
-### Q. What is Indexer in C# .Net?
-### Q. What are the differences between Object, Var and Dynamic type?
-### Q. What is the difference between `IEnumerable` and `IQueryable`?
-### Q. What is the difference between managed and unmanaged code?
-### Q. What is Expression Trees In C#?
-### Q. What is an Object Pool in .Net?
-### Q. What are generics in C#.net?
-### Q. What is Serialization?
-### Q. Can you explain the difference between lazy and eager evaluation in C#?
-### Q. Mention the two major categories that distinctly classify the variables of C# programs.
-### Q. What is checked block and unchecked block?
-### Q. What is the difference between typeOf() and sizeOf()?
-### Q. What is widening and Narrowing?
-### Q. How to view an Assembly?
-### Q. What are MultiLingual Applications?
-### Q. What is the use of Codesnippets?
-### Q. What are dynamic type variables in C#? 
-### Q. Can you describe the process of code compilation in .NET?
-### Q. What are property Accessors?
-### Q. Can you return multiple values from a function in C#?
-### Q. In how many ways you can pass parameters to a method?
-### Q. What are Indexers in C#?
+
+A **parameter** in C# is a variable defined in a method, constructor, or indexer declaration that receives a value (called an argument) when the method is called. Parameters allow you to pass data into methods so they can operate on different values.
+
+C# 4.0 introduced two important features related to method parameters:
+
+**1. Optional Parameters:**
+
+* You can specify default values for parameters in a method declaration.
+* If the caller omits an argument, the default value is used
+
+**Example:**
+
+```cs
+void PrintMessage(string message, int repeat = 1)
+{
+    for (int i = 0; i < repeat; i++)
+        Console.WriteLine(message);
+}
+
+PrintMessage("Hello");      // Uses default repeat = 1
+PrintMessage("Hi", 3);      // repeat = 3
+
+// Output
+// Hello
+// Hi Hi Hi
+```
+
+**2. Named Parameters**
+
+* You can specify arguments by parameter name, regardless of their position.
+* This improves readability and allows you to skip optional parameters.
+
+**Example:**
+
+```cs
+void PrintMessage(string name, int age = 0, string city = "Unknown")
+{
+    Console.WriteLine($"{name}, {age}, {city}");
+}
+
+PrintMessage("Pradeep", city: "Bengaluru"); // age uses default value 0
+
+// Output
+// Pradeep, 0, Bengaluru
+```
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
+### Q. What are the different types of literals?
 
+In C#, **literals** are fixed values assigned directly to variables or constants in code. They represent constant values of various data types.
+
+**Types of literals in C#:**
+
+**1. Integer Literals**
+  - Represent whole numbers.
+  - Examples: `10`, `-42`, `0xFF` (hexadecimal), `0b1010` (binary), `123U` (unsigned), `123L` (long).
+  - Suffixes: `U` (unsigned), `L` (long), `UL` (unsigned long).
+
+**2. Floating-Point Literals**
+  - Represent real numbers (with decimals).
+  - Examples: `3.14`, `2.5e2` (scientific notation), `1.5F` (float), `2.7D` (double), `1.2M` (decimal).
+  - Suffixes: `F` or `f` (float), `D` or `d` (double), `M` or `m` (decimal).
+
+**3. Character Literals**
+  - Represent a single Unicode character, enclosed in single quotes.
+  - Examples: `'A'`, `'\n'`, `'\u0041'`.
+
+**4. String Literals**
+  - Represent a sequence of characters, enclosed in double quotes.
+  - Examples: `"Hello"`, `"C#\nBasics"`.
+  - **Verbatim string literals**: Start with `@` and preserve escape sequences and line breaks, e.g., `@"C:\Users\Name"`.
+
+**5. Boolean Literals**
+  - Represent logical values.
+  - Only two possible values: `true` and `false`.
+
+**6. Null Literal**
+  - Represents a null reference.
+  - Only one value: `null`.
+
+**Examples:**
+
+```cs
+int age = 25;                // Integer literal
+double pi = 3.14159;         // Floating-point literal
+char letter = 'A';           // Character literal
+string name = "Alice";       // String literal
+bool isActive = true;        // Boolean literal
+object obj = null;           // Null literal
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the main difference between sub-procedure and function?
+
+In C#, the main difference between a subroutine (which can be a Sub procedure in some languages) and a function is that a function returns a value, while a subroutine (or sub procedure) does not. 
+
+Both perform actions, but functions allow you to use their result elsewhere in your code, while subroutines/sub procedures simply execute and return control. 
+
+**Difference :**
+
+* **Function:** Returns a value to the caller. In C#, this is a method with a non-void return type.
+* **Sub-procedure:** Does not return a value. In C#, this is a method with a void return type.
+
+**Example:**
+
+```cs
+// Function: returns an int
+int Add(int a, int b)
+{
+    return a + b;
+}
+
+// Sub-procedure: returns nothing (void)
+void PrintSum(int a, int b)
+{
+    Console.WriteLine(a + b);
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the difference between string and StringBuilder in C#?
+
+In C#, `string` and `StringBuilder` both handle text, but string is immutable, and StringBuilder is mutable. This means that when you modify a string, a new string object is created, while with StringBuilder, you can modify the object in place without creating new objects. 
+
+**1. string:**
+
+- **Immutable:** Once created, a string cannot be changed. Any operation that appears to modify a string (such as concatenation or replacement) actually creates a new string object in memory.
+
+- **Performance:** Frequent modifications (like concatenation in loops) can lead to performance issues due to repeated allocations and garbage collection.
+
+- **Usage:** Best for scenarios where the text does not change often.
+
+**Example:**
+
+```cs
+string s = "Hello";
+s += " World"; // Creates a new string object
+```
+
+**2. StringBuilder:**
+
+* **Mutable:** Designed for scenarios where you need to modify the text repeatedly. Changes are made to the same object, avoiding unnecessary allocations.
+
+* **Performance:** More efficient for repeated modifications, such as appending or inserting text in loops.
+
+* **Usage:** Recommended when building or modifying large or dynamic strings.
+
+**Example:**
+
+```cs
+using System.Text;
+
+StringBuilder sb = new StringBuilder("Hello");
+sb.Append(" World"); // Modifies the existing object
+string result = sb.ToString();
+```
+
+**When to use which?**
+
+* Use `string` for simple, infrequent changes.
+* Use `StringBuilder` for complex or repeated string manipulations, especially in loops.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is difference between late binding and early binding in C#?
+
+In C#, early binding (also known as static binding) resolves method calls at compile time, while late binding (also known as dynamic binding) resolves method calls at runtime. 
+
+Early binding offers better performance and type safety due to compile-time checking, while late binding provides more flexibility but with potential runtime overhead, especially when using reflection, according to various sources. 
+
+**Early Binding:**
+
+* **Compilation Time:** The type of object and method to be called is determined at compile time.
+* **Type Safety:** The compiler performs type checking during compilation, catching errors early. 
+* **Performance:** Generally faster due to direct method resolution and less overhead at runtime. 
+
+**Example:** 
+
+```cs
+// Early binding example
+MyClass obj = new MyClass();
+obj.MyMethod(); // Compiler knows about MyMethod at compile time
+```
+
+**Late Binding:**
+
+* **Compilation Time:** The method or property to be invoked is determined at runtime.
+* **Type Safety:** Less type safety, more flexible, but slower due to runtime checks.
+* **Performance:** Potentially slower due to runtime lookups and potential overhead, especially with reflection. 
+
+**Example:**
+
+```cs
+// Late binding using dynamic
+dynamic obj = GetSomeObject();
+obj.MyMethod(); // Resolved at runtime
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is Indexer in C#?
+
+An indexer in C# is a special type of property that allows objects of a class or struct to be indexed just like arrays, using the square bracket `[]` syntax. Indexers enable you to access elements in an object using an index, making custom classes behave like collections.
+
+**Example:**
+
+```cs
+public class SampleCollection
+{
+    private string[] data = new string[5];
+
+    // Indexer declaration
+    public string this[int index]
+    {
+        get { return data[index]; }
+        set { data[index] = value; }
+    }
+}
+
+// Usage
+var collection = new SampleCollection();
+collection[0] = "Hello";
+Console.WriteLine(collection[0]); // Output: Hello
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What are the differences between Object, Var and Dynamic type?
+
+In C#, object, var and dynamic are three different ways to declare variables, each with distinct behaviors and use cases.
+
+**1. `object`**
+
+- **Description:** The base type of all types in C#. Any type (value or reference) can be assigned to an `object` variable.
+- **Type Checking:** Compile-time type is always `object`. You must cast to the actual type to access members.
+- **Type Safety:** Type checking is enforced at compile time, but you need explicit casting to use specific members.
+
+**Example:**
+
+```cs
+object obj = "Hello";
+// Console.WriteLine(obj.Length); // Error: 'object' does not contain 'Length'
+Console.WriteLine(((string)obj).Length); // OK after casting
+```
+
+**2. `var`:**
+
+* **Description:** Enables implicit typing. The compiler infers the type from the right-hand side at compile time.
+* **Type Checking:** Strongly typed at compile time. After initialization, the type cannot change.
+* **Type Safety:** Fully type-safe; errors are caught at compile time.
+
+**Example:**
+
+```cs
+var message = "Hello"; // message is string
+// message = 123; // Error: cannot assign int to string
+Console.WriteLine(message.Length); // OK
+```
+
+**3. `dynamic`:**
+
+* **Description:** Introduced in C# 4.0. Type checking is deferred until runtime.
+* **Type Checking:** No compile-time checking for member access; all checks happen at runtime.
+* **Type Safety:** Not type-safe; runtime errors may occur if members do not exist.
+
+**Example:**
+
+```cs
+dynamic value = "Hello";
+Console.WriteLine(value.Length); // OK at runtime
+value = 123;
+// Console.WriteLine(value.Length); // Runtime error: 'int' does not contain 'Length'
+```
+
+**Differences:** 
+
+| Feature         | object           | var                | dynamic           |
+|-----------------|------------------|--------------------|-------------------|
+| Type Resolution | Compile time     | Compile time (inferred) | Runtime      |
+| Type Safety     | Yes (with casting) | Yes              | No                |
+| Flexibility     | High (but verbose) | Medium           | Highest           |
+| Member Access   | Requires casting | Direct (after inference) | Direct (runtime) |
+| Use Case        | General base type, APIs | When type is obvious or anonymous types | Interop, dynamic scenarios |
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the difference between managed and unmanaged code?
+
+Managed code is code that runs under the control of the .NET Common Language Runtime (CLR). The CLR provides services such as automatic memory management (garbage collection), type safety, exception handling, and security. Examples include C# and VB.NET code compiled for the .NET runtime.
+
+Unmanaged code is code that runs directly on the operating system, outside the control of the CLR. It is responsible for its own memory management and resource cleanup. Examples include code written in C or C++ and compiled to native machine code, as well as COM components and Win32 API calls.
+
+**Key Differences:**
+
+| Managed Code                          | Unmanaged Code                      |
+|---------------------------------------|-------------------------------------|
+| Runs under CLR (.NET runtime)         | Runs directly on OS                 |
+| Automatic memory management (GC)      | Manual memory management            |
+| Type safety and security checks       | No built-in type safety             |
+| Exception handling by CLR             | Must handle exceptions manually     |
+| Platform-independent (via CLR)        | Platform-dependent                  |
+
+**Summary:**  
+
+Managed code is safer and easier to maintain, while unmanaged code offers more control and performance but requires careful resource management.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is an Object Pool in C#?
+
+An **Object Pool** in C# is a creational design pattern that improves performance by reusing objects instead of repeatedly creating and destroying them. It involves maintaining a pool of pre-initialized objects, readily available for use when needed. This reduces memory allocation and garbage collection overhead, leading to faster execution, especially when dealing with frequently created and destroyed objects.
+
+**Benefits:**
+
+- Reduces the overhead of frequent object creation and garbage collection.
+- Useful for objects like database connections, threads, or large memory buffers.
+- Helps improve performance and resource utilization.
+
+**Example:**
+
+```cs
+// Simple generic object pool example
+public class ObjectPool<T> where T : new()
+{
+    private readonly Stack<T> _objects = new Stack<T>();
+
+    public T GetObject()
+    {
+        return _objects.Count > 0 ? _objects.Pop() : new T();
+    }
+
+    public void ReturnObject(T item)
+    {
+        _objects.Push(item);
+    }
+}
+
+// Usage
+var pool = new ObjectPool<StringBuilder>();
+StringBuilder sb = pool.GetObject();
+sb.Append("Hello, Object Pool!");
+pool.ReturnObject(sb);
+```
+
+**.NET Built-in Support:**  
+
+.NET Core provides `System.Buffers.ObjectPool<T>` and `ArrayPool<T>` for pooling arrays and other objects.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. Explain the difference between lazy and eager evaluation in C#?
+
+In C#, lazy evaluation defers the execution of code until its result is actually needed, while eager evaluation executes code immediately upon encountering it
+
+**1. Eager Evaluation:** Values or expressions are computed immediately when they are assigned or called.
+
+**Example:** Standard variable assignments and most method calls.
+ 
+```cs
+int x = GetValue(); // GetValue() is called immediately
+```
+
+- **Pros:** Simple and predictable; useful when you always need the value.
+- **Cons:** Can waste resources if the value is expensive to compute and not always needed.
+
+**2. Lazy Evaluation:** Computation is deferred until the value is actually needed (accessed for the first time).
+
+**Example:** Using `Lazy<T>`, `IEnumerable<T>` with `yield return`, or LINQ queries.
+
+```cs
+Lazy<int> lazyValue = new Lazy<int>(() => GetValue());
+// GetValue() is not called until lazyValue.Value is accessed
+```
+
+```cs
+IEnumerable<int> GetNumbers()
+{
+    yield return 1;
+    yield return 2;
+}
+// Numbers are generated as you iterate
+```
+
+- **Pros:** Improves performance and resource usage when the value may not be needed.
+- **Cons:** Can make debugging harder; deferred exceptions.
+
+**Difference**
+
+| Aspect           | Eager Evaluation           | Lazy Evaluation                |
+|------------------|---------------------------|-------------------------------|
+| When evaluated   | Immediately               | On first use (on demand)      |
+| Example          | `int x = GetValue();`     | `Lazy<int> x = ...;`          |
+| Use cases        | Always-needed values      | Expensive/optional values     |
+| LINQ             | `.ToList()` (immediate)   | `.Where()` (deferred)         |
+
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. Mention the two major categories that distinctly classify the variables of C# programs.
+
+In C# programs, variables are primarily categorized into **value types** and **reference types**. Value types directly store the variable\'s value in memory, while reference types store a memory address (reference) to the value\'s location. 
+
+**Value Types:**
+
+These store the actual data directly in the memory location of the variable (Stack). Examples include `int`, `bool`, `float`, `enum`, and `struct` types. When a value type variable is copied, a new copy of the data is created, so changes to one variable don\'t affect others.
+
+**Reference Types:**
+
+These store a memory address to the location where the actual data is stored (Heap). Examples include `string`, `object`, `array`, and `class` types. When a reference type variable is copied, the copy contains the same memory address, meaning both variables point to the same data. Therefore, changes to the data through one reference will be reflected in the other. 
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is checked and unchecked block?
+
+In C#, the `checked` and `unchecked` blocks are used to control how the runtime handles arithmetic overflow for integral types (like `int`, `long`, etc.).
+
+- **checked block:** Forces the runtime to throw an `OverflowException` if an arithmetic operation results in a value outside the range of the data type.
+
+- **unchecked block:** Suppresses overflow checking, so if an overflow occurs, the result wraps around (default behavior in most cases).
+
+**Example:**
+
+```cs
+int max = int.MaxValue;
+
+try
+{
+    // Checked block: will throw OverflowException
+    checked
+    {
+        int result = max + 1;
+    }
+}
+catch (OverflowException)
+{
+    Console.WriteLine("Overflow detected!");
+}
+
+// Unchecked block: will not throw, wraps around
+unchecked
+{
+    int result = max + 1;
+    Console.WriteLine(result); // Output: -2147483648
+}
+```
+
+**When to use:**
+
+- Use `checked` when you want to ensure that overflows are caught and handled.
+- Use `unchecked` when performance is critical and you are sure overflows are not an issue.
+
+You can also use the `checked` and `unchecked` keywords as expressions:
+
+```cs
+int result = checked(max + 1);    // Throws OverflowException
+int result2 = unchecked(max + 1); // Wraps around
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the difference between typeOf() and sizeOf()?
+
+In C#, `typeof()` and `sizeof()` are two different operators used for different purposes:
+
+**1. `typeof()` Operator:**
+
+- Returns the `System.Type` object for a given type.
+- Used to get metadata information about a type at compile time.
+- Commonly used with reflection.
+
+**Example:**
+
+```cs
+Type t = typeof(int); // Gets the Type object for int
+Console.WriteLine(t.FullName); // Output: System.Int32
+```
+
+**2. `sizeof()` Operator:**
+
+- Returns the size (in bytes) of a value type.
+- Used to determine how much memory a type occupies.
+- Only works with primitive types (like int, char, float, etc.) unless used in an unsafe context.
+
+**Example:**
+
+```cs
+int size = sizeof(int); 
+Console.WriteLine(size); // Output: 4
+```
+
+**Summary Table:**
+
+| Operator | Purpose                        | Returns         | Usage Example        |
+|----------|--------------------------------|-----------------|----------------------|
+| typeof   | Get type metadata              | Type object     | typeof(int)          |
+| sizeof   | Get size in bytes (value types)| Integer (bytes) | sizeof(int)          |
+
+**Note:**  
+
+- `typeof()` works for all types (value and reference).
+- `sizeof()` works only for value types and may require `unsafe` context for custom structs.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is widening and Narrowing conversion in C#?
+
+Widening and narrowing conversions in C# refer to how values are converted between different data types, especially numeric types.
+
+**Widening Conversion (Implicit Conversion):**
+
+- Converts a value to a larger or more general type.
+- No data loss; safe and automatic.
+
+**Example:** `int` to `long`, `float` to `double`.
+
+```cs
+int a = 100;
+long b = a;      // Widening: int to long (implicit)
+float f = a;     // Widening: int to float (implicit)
+
+Console.WriteLine(b); // Output: 100
+Console.WriteLine(f); // Output: 100
+```
+
+**Narrowing Conversion (Explicit Conversion):**
+
+- Converts a value to a smaller or more specific type.
+- May cause data loss or overflow; requires explicit cast.
+
+**Example:** `double` to `int`, `long` to `short`.
+
+```cs
+double x = 123.45;
+int y = (int)x;   // Narrowing: double to int (explicit), y = 123
+
+long big = 1000;
+short small = (short)big; // Narrowing: long to short (explicit)
+
+Console.WriteLine(y); // Output: 123
+Console.WriteLine(small); // Output: -31072
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. How to view an Assembly?
+
+To view an assembly in C#, you can inspect its metadata, types, and IL code using several tools:
+
+**1. Using ILDASM (IL Disassembler):**
+
+ILDASM is a tool provided with the .NET SDK to view the contents of an assembly (DLL or EXE).
+
+**Steps:**
+
+1. Open the Developer Command Prompt for Visual Studio.
+2. Run:
+```cs
+ildasm YourAssembly.dll
+```
+3. The ILDASM window will open, allowing you to browse namespaces, classes, methods, and view IL code.
+
+**2. Using dotPeek or ILSpy (Third-Party Tools):**
+
+- [dotPeek](https://www.jetbrains.com/decompiler/) and [ILSpy](https://github.com/icsharpcode/ILSpy) are free .NET decompilers.
+- Open your `.dll` or `.exe` file in these tools to view C# code, metadata, and resources.
+
+**3. Using Visual Studio:**
+
+- Right-click on a reference in Solution Explorer → "Go to Definition" to view metadata.
+- Use "Object Browser" (View → Object Browser) to explore assemblies.
+
+**4. Using Reflection in Code:**
+
+You can use reflection to inspect an assembly programmatically:
+
+```cs
+using System;
+using System.Reflection;
+
+class Program
+{
+    static void Main()
+    {
+        Assembly asm = Assembly.LoadFrom("MyAssembly.dll");
+        foreach (Type type in asm.GetTypes())
+        {
+            Console.WriteLine(type.FullName);
+        }
+    }
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What are MultiLingual Applications?
+
+MultiLingual Applications are software applications designed to support multiple languages, allowing users to interact with the application in their preferred language. In C#, this is typically achieved using resource files (.resx) and the .NET localization framework.
+
+**Key Points:**
+
+- **Localization:** Adapting the application for different languages and regions (e.g., translating UI text, formatting dates/numbers).
+- **Resource Files:** Store language-specific strings and resources in separate .resx files (e.g., `Resources.en.resx`, `Resources.fr.resx`).
+- **Culture Settings:** The application detects or allows the user to select their culture (language/region), and loads the appropriate resources at runtime.
+- **.NET Support:** .NET provides classes like `ResourceManager` and `CultureInfo` to manage localization.
+
+**How it works:**
+
+- Text and UI strings are stored in resource files for each supported language.
+- The application loads the appropriate resource file based on the user's culture or language preference.
+- .NET provides classes like `ResourceManager` and `CultureInfo` to facilitate localization.
+
+**Example:**
+
+Suppose you have two resource files:
+
+- `Resources.en.resx` (for English)
+- `Resources.fr.resx` (for French)
+
+You can load the correct string at runtime:
+
+```cs
+using System.Globalization;
+using System.Resources;
+
+ResourceManager rm = new ResourceManager("Namespace.Resources", typeof(Program).Assembly);
+CultureInfo ci = new CultureInfo("fr"); // or "en"
+
+string greeting = rm.GetString("Greeting", ci);
+
+Console.WriteLine(greeting); // Output depends on selected culture
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. Can you describe the process of code compilation in .NET?
+
+In .NET, code compilation involves several stages, including translating source code into Common Intermediate Language (CIL) and then executing it using the Common Language Runtime (CLR) with the Just-In-Time (JIT) compiler.
+
+The compiler (like Roslyn for C#) initially converts the high-level source code into CIL, a CPU-independent set of instructions. This CIL code, along with metadata, is stored in an assembly (PE format). When the program runs, the CLR uses the JIT compiler to convert the CIL into machine code, which is then executed on the specific CPU. 
+
+**Process of Code Compilation**
+
+1. **Source Code to Intermediate Language (IL):**
+   - When you write C# code and build your project, the C# compiler (`csc.exe`) compiles your source code into an Intermediate Language (IL), also known as Microsoft Intermediate Language (MSIL) or Common Intermediate Language (CIL).
+   - The compiled IL code, along with metadata, is stored in assemblies (`.dll` or `.exe` files).
+
+2. **Assembly Loading:**
+   - When you run your application, the .NET runtime (CLR – Common Language Runtime) loads the required assemblies.
+
+3. **Just-In-Time (JIT) Compilation:**
+   - The CLR uses a Just-In-Time (JIT) compiler to convert the IL code into native machine code specific to the operating system and processor.
+   - This compilation happens method-by-method, just before each method is executed for the first time.
+
+4. **Execution:**
+   - The native code is executed by the CPU.
+   - The JIT-compiled code is cached in memory for subsequent calls, improving performance.
+
+**Summary Diagram:**
+
+```
+Source Code (C#)
+      ↓
+C# Compiler
+      ↓
+IL Code + Metadata (Assembly)
+      ↓
+CLR Loads Assembly
+      ↓
+JIT Compiler
+      ↓
+Native Machine Code
+      ↓
+Execution by CPU
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. Can you return multiple values from a function in C#?
+
+Yes, you can return multiple values from a function in C#. There are several common ways to achieve this:
+
+**1. Using Tuples:**
+
+Tuples allow you to return multiple values of different types in a single return statement.
+
+```cs
+(string, int) GetPerson()
+{
+    return ("Pradeep", 30);
+}
+
+// Usage
+var person = GetPe//duv.Item1); // Pradeep
+Console.WriteLine(person.Item2); // 30
+```
+
+**2. Using Out Parameters:**
+
+The Out parameters allow a function to modify the values of variables passed as arguments. This is a way to "return" additional values indirectly.
+
+```cs
+void GetValues(out int a, out int b)
+{
+    a = 10;
+    b = 20;
+}
+
+int x, y;
+GetValues(out x, out y);
+Console.WriteLine(x); // 10
+Console.WriteLine(y); // 20
+```
+
+**3. Using a Custom Class or Struct**
+
+You can define a custom class or struct to encapsulate multiple values and return an instance of that type
+
+```cs
+class Result
+{
+    public int Sum { get; set; }
+    public int Product { get; set; }
+}
+
+// Example usage in a Main method
+public class Program
+{
+    static Result Calculate(int a, int b)
+    {
+      return new Result { Sum = a + b, Product = a * b };
+    }
+
+    public static void Main()
+    {
+        var result = Calculate(3, 4);
+        Console.WriteLine(result.Sum);     // 7
+        Console.WriteLine(result.Product); // 12
+    }
+}
+```
+
+**4. Using a Arrays or Lists**
+
+If the values to be returned are of the same type, you can return an array or a list.
+
+```cs
+public int[] GetValues()
+{
+    return new int[] { 10, 20, 30 };
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. In how many ways you can pass parameters to a method?
+
+You can pass parameters to a method in C# in several ways:
+
+**1. By Value (default):**  
+
+The method receives a copy of the argument. Changes inside the method do not affect the original variable.
+
+```cs
+Void MyMethod(int x) {
+    x = 10 // Only modifies the local copy
+}
+```
+
+**2. By Reference (`ref`):**  
+
+The method receives a reference to the original variable. The variable must be initialized before passing.
+
+```cs
+Void MyMethod(int x) {
+    x = 10 // Modifies the original value
+}
+```
+
+**3. Output Parameter (`out`):**  
+
+The method can assign a value to the parameter and return it to the caller. The variable does not need to be initialized before passing.
+
+```cs
+Void MyMethod(out int x) {
+    x = 10 // Must assign a value before method ends
+}
+```
+
+**4. Parameter Array (`params`):**  
+
+Allows passing a variable number of arguments as an array.
+
+```cs
+Void MyMethod(params int[] numbers) {
+    foreach(int n in numbers) {
+        Console.WriteLine(n);
+    }
+}
+```
+
+**5. Optional Parameters:**  
+
+Parameters with default values that can be omitted when calling the method.
+
+```cs
+Void MyMethod(int x = 5) {
+    Console.WriteLine(x);
+}
+```
+
+**6. Named Parameters:**  
+
+Allows specifying parameters by name when calling the method, allowing arguments to be passed in any order.
+
+```cs
+Void MyMethod(int x, int y) {
+    Console.WriteLine(x + y);
+}
+
+// call using named parameters
+MyMethod(y: 10, x: 5);
+```
+
+**7. in Parameters (Read-only Reference):**  
+
+Passes by reference but ensures the method cannot modify the value.
+
+```cs
+Void MyMethod(in int x) {
+    Console.WriteLine(x); // Cannot modify x
+}
+
+// call using named parameters
+MyMethod(y: 10, x: 5);
+```
+
+**Summary Table:**
+
+| Way                | Keyword    | Description                                 |
+|--------------------|------------|---------------------------------------------|
+| By Value           | (default)  | Passes a copy of the value                  |
+| By Reference       | ref        | Passes a reference to the variable          |
+| Output Parameter   | out        | Passes a reference, must assign in method   |
+| Parameter Array    | params     | Passes variable number of arguments         |
+| Optional Parameter | = value    | Allows omitting arguments with defaults     |
+| Named Parameter    | name: val  | Specify argument by name                    |
+| In Parameter       | in         | Passes a reference to the variable(cannot modify the value)|
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
 
 ## # 2. OPERATORS
 
 <br/>
 
+### Q. What is the purpose of the `nameof` operator in C#?
 ### Q. What is difference between const and readonly in C#?
 ### Q. How you would use a bitwise operator in C#? 
 ### Q. Explain the use of the `as` operator in C# and the best way to use it?
@@ -800,6 +1932,25 @@ Console.WriteLine(value.NonExistentMethod()); // Compiles, but throws runtime ex
 
 <br/>
 
+### Q. What is object-oriented programming?
+
+Object-oriented programming (OOP) in C# is a programming paradigm based on the concept of "objects", which are instances of classes. OOP enables developers to structure software in a modular way by organizing code into reusable components.
+
+**Key principles:**
+
+* **Encapsulation**: Bundles data and methods that operate on the data into a single unit called a class, and restricts direct access to some of the object\'s components.
+
+* **Inheritance**: Allows a class to inherit members (fields, methods, properties) from another class, promoting code reuse.
+
+* **Polymorphism**: Enables objects to be treated as instances of their parent class rather than their actual class, allowing for flexible and interchangeable code.
+
+* **Abstraction**: Hides complex implementation details and exposes only the necessary features of an object.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is a constructor in C# and what are its different types?
 ### Q. Can you explain the use of the "this" keyword in C#?
 ### Q. How are static constructors executed in Parent child?
 ### Q. If a base class has a number of overloaded constructors, and an inheriting class has a number of overloaded constructors; can you enforce a call from an inherited constructor to a specific base constructor?
@@ -819,9 +1970,8 @@ Console.WriteLine(value.NonExistentMethod()); // Compiles, but throws runtime ex
 ### Q. How can abstract classes be used to implement the Template Method design pattern?
 ### Q. Can you give an example of how abstract classes can lead to implementation of anti-patterns such as the God Object pattern?
 ### Q. How can abstract classes be used to implement the Factory Method pattern?
-### Q. Can you explain the SOLID principle of Single Responsibility and how it relates to abstract classes in C#?
+### Q. What are the SOLID principles in C#?
 ### Q. How can abstract classes be used to implement the Dependency Inversion principle?
-### Q. Can you explain the SOLID principle of Liskov Substitution and how it relates to abstract classes in C#?
 ### Q. What is the difference between an abstract class and a concrete class in C#, and how does this relate to the Open-Closed principle?
 ### Q. Can you give an example of how abstract classes can help to enforce the Interface Segregation principle?
 ### Q. How can abstract classes be used to implement the Strategy design pattern?
@@ -1145,6 +2295,7 @@ Console.WriteLine(value.NonExistentMethod()); // Compiles, but throws runtime ex
 ### Q. What is a `BinaryFormatter` in C#?
 ### Q. What is the purpose of the `SoapFormatter` class in C#?
 ### Q. What is the difference between `BinaryFormatter` and `SoapFormatter`?
+### Q. What is Serialization?
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
@@ -1320,6 +2471,49 @@ Console.WriteLine(value.NonExistentMethod()); // Compiles, but throws runtime ex
 
 <br/>
 
+### Q. What is Expression Tree In C#?
+
+An **Expression Tree** in C# is a data structure that represents code in a tree-like format, where each node is an expression (such as a method call, operation, or value). Expression trees are part of the `System.Linq.Expressions` namespace and are mainly used to represent code in a way that can be inspected, modified, or executed at runtime.
+
+**Key Points:**
+
+- Expression trees allow code to be represented as data, enabling dynamic query generation, compilation, and interpretation.
+- They are widely used in LINQ providers (like Entity Framework) to translate C# queries into SQL or other query languages.
+- Expression trees are built from lambda expressions using the `Expression<>` type.
+
+**Example:**
+
+```cs
+using System;
+using System.Linq.Expressions;
+
+class Program
+{
+    static void Main()
+    {
+        // Create an expression tree for: x => x * 2
+        Expression<Func<int, int>> expr = x => x * 2;
+
+        // Compile and execute the expression tree
+        var func = expr.Compile();
+        Console.WriteLine(func(5)); // Output: 10
+
+        // Inspect the expression tree
+        Console.WriteLine(expr.Body); // Output: (x * 2)
+    }
+}
+```
+
+**Use Cases:**
+
+- Building dynamic queries (e.g., in ORMs like Entity Framework)
+- Creating dynamic code at runtime
+- Analyzing or transforming code before execution
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 ### Q. What is LINQ in C# and why is it used?
 ### Q. What are the main advantages of using LINQ in C#?
 ### Q. How do you write a basic LINQ query in C#?
@@ -1348,6 +2542,7 @@ Console.WriteLine(value.NonExistentMethod()); // Compiles, but throws runtime ex
 ### Q. Can you give an example of using LINQ to implement the Interface Segregation Principle (ISP)?
 ### Q. Can you explain the Dependency Inversion Principle (DIP) and how it relates to LINQ code?
 ### Q. Explain the difference between Select and Where?
+### Q. What is the difference between `IEnumerable` and `IQueryable`?
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
@@ -1516,11 +2711,13 @@ Console.WriteLine(value.NonExistentMethod()); // Compiles, but throws runtime ex
 ### Q. What is the use of JIT (Just in time compiler)?
 ### Q. Is it possible to view IL code?
 ### Q. What is the benefit of compiling into IL code?
-### Q. What is the importance of CTS?
+### Q. What is thimportance of CTS?
 ### Q. How are initializers executed?
 ### Q. What is Shadowing?
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
 
+Thanks & Regards,
+Pradeep Kumar
+Phone: 7760653743
