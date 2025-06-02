@@ -1879,54 +1879,1648 @@ MyMethod(y: 10, x: 5);
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
+
+
 ## # 2. OPERATORS
 
 <br/>
 
-### Q. What is the purpose of the `nameof` operator in C#?
-### Q. What is difference between const and readonly in C#?
-### Q. How you would use a bitwise operator in C#? 
-### Q. Explain the use of the `as` operator in C# and the best way to use it?
-### Q. What is the use of Null Coalescing Operator (??) in C#? 
-### Q. Can you give an example of how to use the is operator and the as operator with inheritance in C#?
-### Q. Difference between "is" and "as" operator in C#.
-### Q. What are nullable types in C#?
-### Q. What is Type Casting and what are its types in C#?
-### Q. What are operators in C# and can you provide examples?
-### Q. What is the difference between `==` operator and `.Equals()` method?
-### Q. What is the purpose of the `var` keyword in C#?
-### Q. What are the differences between `const` and `readonly` keywords?
-### Q. How does `checked` and `unchecked` context affect arithmetic operations?
-### Q. What is short-circuit evaluation in C#?
-### Q. List some different ways for equality check in .Net?
-### Q. How to get the sizeof a datatype in C#?
-### Q. Asynchronous programming with async, await, Task in C#
-### Q. What is difference between static, readonly, and constant in C#
-### Q. How to loop through an enum in C#?
-### Q. What is NullReferenceException in C#?
-### Q. How to set default value to Property in C#
-### Q. How to convert int to enum in C#
-### Q. What is BigInteger Data Type in C#
-### Q. How to convert String to Enum in C#
-### Q. How to convert an Object to JSON in C#
-### Q. How to convert JSON String to Object in C#
-### Q. How to Pass or Access Command-line Arguments in C#?
-### Q. How to convert date object to string in C#?
-### Q. How to combine two arrays without duplicate values in C#?
-### Q. How to convert string to int in C#?
-### Q. What is boxing and unboxing?
-### Q. What effect does boxing and unboxing have on performance?
-### Q. Explain casting, implicit casting and explicit casting ?
-### Q. What can happen during explicit casting ?
-### Q. What is the difference between `explicit` and `implicit` conversions?
-### Q. What is the difference between `==` and `ReferenceEquals` in C#?
-### Q. Explain var and dynamic?
-### Q. What is the difference between constant and readonly in C#?
-### Q. What is the purpose of the `is` and `as` operators in C#?
+### Q. What are the different types of operators in C#?
+---
+C# operators are special symbols that perform operations on operands. They are categorized into several types: arithmetic, comparison, logical, bitwise, assignment, and others.
+
+The different types of operators in C# are:
+
+**1. Arithmetic Operators**
+
+These operators perform standard arithmetic operations on numeric values.
+
+- `+` (Addition)
+- `-` (Subtraction)
+- `*` (Multiplication)
+- `/` (Division)
+- `%` (Modulus)
+- `++` (Increment)
+- `--` (Decrement)
+
+**Example:**
+```cs
+int a = 10, b = 3;
+
+Console.WriteLine(a + b); // Output: 13
+Console.WriteLine(a - b); // Output: 7
+Console.WriteLine(a * b); // Output: 30
+Console.WriteLine(a / b); // Output: 3
+Console.WriteLine(a % b); // Output: 1
+```
+
+**2. Relational (Comparison) Operators**
+
+These operators compare two values and return a boolean result (true or false).
+
+- `==` (Equal to)
+- `!=` (Not equal to)
+- `>` (Greater than)
+- `<` (Less than)
+- `>=` (Greater than or equal to)
+- `<=` (Less than or equal to)
+
+**Example:**
+```cs
+int a = 5, b = 10;
+
+Console.WriteLine(a == b) // Output: False
+Console.WriteLine(a < b) // Output: True
+```
+
+**3. Logical Operators**
+
+These operators perform logical operations on boolean expressions.
+
+- `&&` (Logical AND)
+- `||` (Logical OR)
+- `!` (Logical NOT)
+
+**Example:**
+```cs
+bool isAdult = true;
+bool hasID = false;
+
+Console.WriteLine(isAdult && hasID); // Output: False
+Console.WriteLine(isAdult || hasID); // Output: True
+```
+
+**4. Assignment Operators**
+
+These operators assign values to variables.
+
+- `=` (Simple assignments)
+- `+=`, `-=`, `*=`, `/=`, `%=` (Compound assignments)
+
+**Example:**
+```cs
+int x = 5;
+x += 3; // x = x + 3
+
+Console.WriteLine(x); // Output: 8
+```
+
+**5. Bitwise Operators**
+
+These operators work directly on the binary representation of numbers.
+
+- `&` (AND)
+- `|` (OR)
+- `^` (XOR)
+- `~` (NOT)
+- `<<` (Left shift)
+- `>>` (Right shift)
+
+**Example:**
+```cs
+int a = 5;
+int b = 3;
+
+Console.WriteLine(a & b); // Output: 1 (0001)
+Console.WriteLine(a | b); // Output: 7 (0111)
+```
+
+**6. Conditional (Ternary) Operator**
+
+- `condition ? expr1 : expr2`
+
+**Example:**
+```cs
+int age = 18;
+String result = (age >= 18) ? "Adult" : "Minor";
+
+Console.WriteLine(result); // Output: Adult
+```
+
+**7. Null-Coalescing Operators**
+
+Used to handle null values:
+
+- `??` (Returns the left-hand operand if not null, otherwise right)
+- `??=` (Assigns the right-hand operand if the left is null)
+
+**Example:**
+```cs
+string name = null;
+string displayName = name ?? "Guest";
+
+Console.WriteLine(displayName); // Output: Guest
+```
+
+**8. Null-Conditional Operator**
+
+- `?.` (Safely access members/methods if the object is not null)
+
+**Example:**
+```cs
+object?.Member // If object is null, the expression returns null instead od throwing an exception.
+```
+
+**9. Type Operators**
+
+Used for type checking and casting:
+
+- `is` (Checks if an object is a specific type)
+- `as` (Attempts to cast an object to specific type)
+- `typeof` (Returns the type object for a type)
+- `sizeof` (Returns the size in bytes of a value type)
+
+**Example:**
+```cs
+object obj = "Hello World";
+
+if(obj is string)
+{
+    Console.WriteLine("It's a string!");
+}
+```
+
+**10. Other Operators**
+
+- `new` (Creates objects)
+- `nameof` (Gets the name of a variable/type/member as a string)
+- `checked` / `unchecked` (Controls overflow checking)
+- `await` (Used in asynchronous programming)
+- `=>` (Lambda operator)
+- `[]` (Array/indexer access)
+- `()` (Method call/cast)
+- `.` (Member access)
+
+
+**Example:**
+```cs
+// Simple Lambda Expression
+Func<int, int> square = x => x * x;
+
+Console.WriteLine(square(5)); // Output: 25
+```
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
+
+### Q. What is the purpose of the `nameof` operator in C#?
+---
+The `nameof` operator in C# is used to obtain the **simple (unqualified) string name** of a variable, type, or member. It is evaluated at compile time and helps make code safer and easier to maintain, especially when referring to member names in exceptions, logging, data binding, or attributes.
+
+**Purpose and Benefits:**
+
+- **Refactoring safety:** If you rename a variable, property, or method, `nameof` automatically updates the string, reducing errors from hard-coded strings.
+- **Compile-time checking:** Errors are caught at compile time if the referenced name does not exist.
+- **Improved readability:** Makes code clearer and less error-prone.
+
+
+**Typical use cases:**  
+- Argument validation: `throw new ArgumentNullException(nameof(parameter));`
+- PropertyChanged events in data binding
+- Logging and diagnostics
+
+**Example:**
+
+```cs
+public class Person
+{
+    public string FirstName { get; set; }
+
+    public void PrintName()
+    {
+        Console.WriteLine(nameof(FirstName)); // Output: FirstName
+    }
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is difference between const and readonly in C#?
+---
+In C#, both `const` and `readonly` are used to define values that cannot be changed after initialization, but they have important differences:
+
+| Feature         | const                              | readonly                                 |
+|-----------------|------------------------------------|------------------------------------------|
+| When assigned   | At compile time                    | At runtime (in constructor or declaration)|
+| Type            | Only primitive types, string, enum | Any type (including reference types)     |
+| Scope           | Implicitly static (class-level)    | Can be instance-level or static          |
+| Value changes   | Cannot be changed anywhere         | Can be assigned once per instance        |
+| Usage           | For values known at compile time   | For values known only at runtime         |
+
+**Const**:
+- Must be assigned a value at declaration.
+- Value is replaced at compile time (literal).
+- Always static; cannot be used with instance-specific values.
+
+**Example:**
+```cs
+public class MyClass
+{
+    public const double Pi = 3.14159;
+}
+```
+
+**Readonly**:
+- Can be assigned at declaration or in a constructor.
+- Value is set at runtime, so it can differ per instance.
+- Can be used with reference types and structs.
+
+**Example:**
+```cs
+public class MyClass
+{
+    public readonly int Id;
+
+    public MyClass(int id) {
+        Id = id; // Allowed in constructor
+    }
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. How you would use a bitwise operator in C#? 
+---
+Bitwise operators in C# are used to perform bit level operations on integer types like `int`, `uint`, `long`, `ulong`, `bytes`, etc. These operators treat their operands as a sequence of bits rather than as decimal, hexadecimal, or octal numbers.
+
+**Overview:**
+
+| Operator   | Symbol | Description  |
+|------------|--------|--------------|
+|AND         |  &     | Sets each bit to 1 if both bits are 1|
+|OR          |        | Sets each bit to 1 if at least one of the corresponding bits is 1, otherwise 0.|
+|XOR         |  ^     | Sets each bit to 1 if only one of two bits is 1|
+|NOT         |  ~     | Inverts all the bits|
+|Left Shift  |  <<    | Shifts bits to the left|
+|Right Shift |  >>    | Shifts bits to the right|
+
+**Typical use cases:**
+
+* Setting, clearing, or toggling specific bits in flags or masks.
+* Efficient storage of multiple boolean values.
+* Low-level programming, device control, or performance-critical code.
+
+**Example:**
+```cs
+int a = 5;      // 0101 in binary
+int b = 3;      // 0011 in binary
+
+// Bitwise AND
+int and = a & b; // 0001 = 1
+
+// Bitwise OR
+int or = a | b;  // 0111 = 7
+
+// Bitwise XOR
+int xor = a ^ b; // 0110 = 6
+
+// Bitwise NOT
+int notA = ~a;   // Inverts all bits
+
+// Left shift
+int leftShift = a << 1; // 1010 = 10
+
+// Right shift
+int rightShift = a >> 1; // 0010 = 2
+
+Console.WriteLine($"AND: {and}, OR: {or}, XOR: {xor}, NOT: {notA}, <<: {leftShift}, >>: {rightShift}");
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. Explain the use of the `as` operator in C# and the best way to use it?
+---
+The `as` operator in C# is used for **safe type casting**. It attempts to cast an object to a specified type and returns `null` if the conversion fails, instead of throwing an exception (unlike a direct cast).
+
+**Syntax:**
+```cs
+object obj = "hello";
+string str = obj as string; // str is "hello"
+```
+**When to Use the `as` Operator:**
+
+- **When you want to avoid exceptions:** Use `as` when you expect that the cast might fail and you want to handle it gracefully.
+- **When working with reference types or nullable value types:** `as` only works with these types.
+
+**Best Practices:**
+
+**1. Always check for null after using `as`:**
+```cs
+object obj = GetObject();
+MyClass mc = obj as MyClass;
+if (mc != null)
+{
+    mc.DoSomething();
+}
+else
+{
+    // Handle the failed cast
+}
+```
+
+**2. Use `as` for performance when you need to both check and cast:**
+   - Prefer `as` over `is` + cast when you need the casted value, to avoid double type-checking.
+
+**3. Do not use `as` with value types (except nullable):**
+   - `as` cannot be used with non-nullable value types.
+
+**Example:**
+```cs
+class Animal { }
+class Dog : Animal
+{
+    public void Bark() => Console.WriteLine("Woof!");
+}
+
+object obj = new Dog();
+
+Dog dog = obj as Dog;
+if (dog != null)
+{
+    dog.Bark(); // Output: Woof!
+}
+else
+{
+    Console.WriteLine("Not a Dog");
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the use of Null Coalescing Operator (??) in C#? 
+---
+The **null coalescing operator(??)** in C# is used to provide a default value when dealing nullable types or potentially null expressions. It helps to write cleaner and more concise code by avoiding explicit null checks.
+
+**Example:**
+```cs
+string userAge = null;
+string age = userAge ?? 18;
+
+Console.WriteLine(userAge); // Output: 18
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is difference between "is" and "as" operator in C#?
+---
+In C#, the `is` operator and the `as` operator are both used for type checking and type conversion, but they serve different purposes. The `is` operator checks if an object is of a specific type, returning a boolean value (true or false). The `as` operator attempts to convert an object to a specified type, returning the converted object if the conversion is successful, or null if it\'s not. 
+
+**1. `is` Operator:**
+- Checks if an object is compatible with a given type.
+- Returns a boolean (`true` or `false`).
+- Does **not** perform a cast.
+
+**Example:**
+```cs
+object obj = "hello";
+if (obj is string)
+{
+    Console.WriteLine("obj is a string");
+}
+```
+
+**2. `as` Operator:**
+- Attempts to cast an object to a specified reference type or nullable type.
+- Returns the object as the new type if successful, or `null` if the cast fails (no exception thrown).
+- Only works with reference types and nullable value types.
+
+**Example:**
+```cs
+object obj = "hello";
+string str = obj as string;
+if (str != null)
+{
+    Console.WriteLine($"String value: {str}");
+}
+```
+
+**Use Case:**  
+- Use `is` when you only need to check the type.
+- Use `as` when you want to try casting and handle failure gracefully (by checking for `null`).
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What are nullable types in C#?
+---
+In C#, nullable types are a way to represent data that can optionally have a value or be null. This is useful when you need to represent the absence of a value, such as optional fields.
+
+**Key Features**
+
+* **HasValue**: Indicates whether the variable contains a non-null value.
+* **Value**: Gets the value (throws an exception if HasValue is false).
+* **GetValueOrDefault()**: Returns the value or the default for the type if null.
+
+**Example:**
+```cs
+int? score = null;
+if (score.HasValue)
+{
+    Console.WriteLine($"Score: {score.Value}");
+}
+else
+{
+    Console.WriteLine("Score is not set.");
+}
+```
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is Type Casting and what are its types in C#?
+---
+Type casting in C# is the process of converting a variable from one data type to another. This is often necessary when working with different types of data, such as converting an `int` to a `double`, or casting a base class reference to a derived class.
+
+There are two main types of type casting in C#:
+
+**1. Implicit Casting**
+* Automatically performed by the compiler when converting from a smaller to a larger or compatible type.
+* Safe because there is no loss of data.
+
+**Examples:**  
+```cs
+int num = 100;
+double d = num; // Implicit casting: int to double
+```
+
+**2. Explicit Casting**
+* Required when converting from a larger to a smaller or incompatible type.
+* May result in data loss or runtime exceptions
+
+**Examples:**  
+```cs
+double d = 123.45;
+int num = (int)d; // Explicit casting: double to int (fractional part lost)
+```
+
+**3. Other Casting Types**
+
+- **Boxing and Unboxing:**  
+  - *Boxing* converts a value type to an object type.
+  - *Unboxing* extracts the value type from the object.
+
+**Example:**
+```cs
+int x = 10;
+object obj = x;      // Boxing
+int y = (int)obj;    // Unboxing
+```
+
+- **Using `as` and `is` Operators:**  
+  - `as` tries to cast and returns `null` if it fails (for reference/nullable types).
+  - `is` checks type compatibility.
+
+**Example:**
+```cs
+object obj = "hello";
+    string str = obj as string; // str is "hello"
+    if (obj is string) { /* true */ }
+```
+
+- **Using Convert Class:**  
+    - Provides methods to convert between base types.
+
+**Example:**
+```cs
+string str = "123";
+int num = Convert.ToInt32(str);
+```
+
+- **Using Parse() and TryParse()**
+    - Converts strings to numeric types
+    - TryParse() is safer as it avoids exceptions.
+
+**Example:**
+```cs
+int result;
+bool success = int.TryParse("456", out result);
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the difference between `==` operator and `.Equals()` method?
+---
+The `==` operator and `.Equals()` method are both used to compare objects in C#, but they behave differently depending on the type being compared:
+
+**1. `==` Operator:**
+
+- **Default behavior:** For reference types, `==` checks if both references point to the same object in memory (reference equality).
+- **Value types:** For built-in value types (like `int`, `double`), `==` compares the actual values (value equality).
+- **Can be overloaded:** Classes can overload the `==` operator to provide custom equality logic (e.g., `string` and many .NET types do this).
+
+**2. `.Equals()` Method:**
+
+- **Default behavior:** Inherited from `object`, compares reference equality unless overridden.
+- **Override:** Many types (like `string`, value types, and custom classes) override `.Equals()` to compare values.
+- **Polymorphic:** Can be overridden in derived classes for custom equality logic.
+
+**Key Differences:**
+
+| Aspect                | `==` Operator                        | `.Equals()` Method                |
+|-----------------------|--------------------------------------|-----------------------------------|
+| Reference Types       | Reference equality (unless overloaded)| Reference equality (unless overridden) |
+| Value Types           | Value equality                       | Value equality (overridden)       |
+| Overridable           | Yes (operator overloading)           | Yes (method override)             |
+| Null Handling         | Safe (returns false if either is null)| Throws if called on null instance |
+
+**Example:** 
+```csharp
+class Person {
+    public string Name;
+    public override bool Equals(object obj) =>
+        obj is Person p && Name == p.Name;
+    // == is not overloaded, so default is reference equality
+}
+
+var p1 = new Person { Name = "Pradeep" };
+var p2 = new Person { Name = "Pradeep" };
+
+Console.WriteLine(p1 == p2);        // False (different references)
+Console.WriteLine(p1.Equals(p2));   // True  (same value)
+```
+
+**Summary:**  
+- Use `==` for simple value types and when you know the operator is overloaded for value comparison (like `string`).
+- Use `.Equals()` when you want to ensure value-based comparison, especially for custom types.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is short-circuit evaluation in C#?
+---
+Short-circuit evaluation in C# is a performance optimization technique used with logical operators like `&&` and `||`. It means that the second operand in a logical expression is evaluated only if necessary.
+
+**1. Logical AND (&&):**
+
+- If the first operand is false, the result is always false, so the second operand is not evaluated.
+
+**Example:**
+
+```cs
+string s = null;
+if (s != null && s.Length > 0)
+{
+    Console.WriteLine("String is not empty.");
+}
+```
+
+Here, `s.Length > 0` is only checked if `s != null` is `true`, preventing a possible exception.
+
+**2. Logical OR (||):**
+
+- If the first operand is true, the result is always true, so the second is not evaluated.
+
+**Example:**
+```cs
+bool result = (x == 0) || (10 / x > 1);
+```
+
+If x is 0, the first condition is true, so the second part is not evaluated, again avoiding a divide-by-zero exception.
+
+**Benefits:** 
+
+- **Efficiency:** Avoids unnecessary computation.
+- **Safety:** Prevents errors like null reference or divide-by-zero.
+- **Control flow:** Lets you write conditions that depend on earlier checks.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. List some different ways for equality check in .Net?
+---
+In C#, there are several ways to perform equality checks depending on the type of objects comparison. Here are some common ways to check for equality in .NET:
+
+**1. `==` Operator**
+- Compares value types by value.
+- For reference types, checks reference equality unless overloaded (e.g., `string`).
+
+**Example:**
+```cs
+int a = 5, b = 5;
+bool result = a == b; // true
+
+string s1 = "hello", s2 = "hello";
+bool isEqual = s1 == s2; // true (string overloads ==)
+```
+
+**2. `.Equals()` Method**
+- Checks value equality if overridden; otherwise, checks reference equality.
+
+**Example:**
+```cs
+object o1 = "Hello";
+object o2 = "Hello";
+
+bool isEqual = o1.Equals(o2); // true
+```
+
+**3. `Object.ReferenceEquals()`**
+- Checks if two references point to the same object.
+- Does not consider value equality.
+
+**Example:**
+```cs
+object o1 = new object();
+object o2 = o1;
+
+bool isEqual = ReferenceEquals(o1, o2); // true
+```
+
+**4. `Object.Equals(a, b)`**
+- Static method; handles nulls safely.
+- Calls `.Equals()` internally.
+
+**Example:**
+```cs
+bool isEqual = Object.Equals(objA, objB);
+```
+
+**5. `IEquatable<T>.Equals()`**
+- Implement for custom value equality in your types.
+- Interface for type-safe equality
+- Recommended for value types and collections.
+
+**Example:**
+```cs
+public class Person : IEquatable<Person>
+{
+    public string Name;
+    public bool Equals(Person other) => Name == other?.Name;
+}
+```
+
+**6. `SequenceEqual()` (for collections)**
+- Compares elements of two sequences.
+
+**Example:**
+```cs
+var arr1 = new[] { 10, 20, 30 };
+var arr2 = new[] { 10, 20, 30 };
+
+bool isEqual = arr1.SequenceEqual(arr2); // true
+```
+
+**7. `StructuralComparisons.StructuralEqualityComparer`**
+- For arrays and tuples.
+
+**Example:**
+```cs
+var arr1 = new[] { 1, 2 };
+var arr2 = new[] { 1, 2 };
+
+bool isEqual = StructuralComparisons.StructuralEqualityComparer.Equals(arr1, arr2); // true
+```
+
+**8. `EqualityComparer<T>.Default.Equals()`**
+- Useful in generic code.
+- Uses the default quality comparer for the type.
+
+**Example:**
+```cs
+bool isEqual = EqualityComparer<string>.Default.Equals("Hi", "Hi");
+```
+
+**Summary Table:**
+
+| Method                        | Use Case                        |
+|-------------------------------|---------------------------------|
+| `==`                          | Value types, overloaded types   |
+| `.Equals()`                   | Value/reference, can override   |
+| `ReferenceEquals()`           | Reference equality only         |
+| `Object.Equals(a, b)`         | Safe, handles nulls             |
+| `IEquatable<T>.Equals()`      | Custom types, performance       |
+| `SequenceEqual()`             | Collections/arrays              |
+| `StructuralEqualityComparer`  | Arrays, tuples, structural types|
+| `EqualityComparer<T>.Default.Equals()`| generic code            |
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is difference between static, readonly, and constant in C#?
+---
+In C#, `static`, `readonly`, and `const` are modifiers used to define how variables behave in terms of initialization, memory allocation, and mutability. Here\'s a breakdown of the differences:
+
+**1. `const`(Constant)**
+- Value must be assigned at declaration and cannot change.
+- Value is replaced at compile time (literal).
+- Always static (shared across all instances).
+- Only primitive types, enums, or strings.
+
+**Example:**
+```cs
+public const double Pi = 3.14159;
+```
+
+**2. `readonly`**
+- Value can be assigned at declaration or in the constructor.
+- Value can differ per instance (unless also static).
+- Value cannot change after construction.
+- Can be any type (including reference types).
+
+**Example:**
+```cs
+public readonly int id;
+
+public MyClass(int id) { 
+    this.id = id; 
+}
+```
+
+**3. `static`**
+- Belongs to the type itself, not to any instance.
+- Shared across all instances.
+- Can be changed at runtime (unless also readonly/const).
+- Can be used with fields, methods, constructors, and classes.
+
+**Example:**
+```cs
+public static int Counter = 0;
+```
+
+**Summary:**
+|Feature       | const    | readonly      | static |
+|--------------|----------|---------------|--------|
+|Compile-time  |Yes       | No            | No     |
+|Runtime       |No        | Yes           | Yes    |
+|Instance-based|No        | Yes           | No     |
+|static        |Implicitly| Optional      | Yes    |
+|Mutable       |No        | No(after init)| Yes(if not readonly)|
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. How to loop through an enum in C#?
+---
+To loop through an enum in C#, you can use the `Enum.GetValues()` method, which returns an array of the enum\'s values. 
+
+**Example:**
+```cs
+enum Days
+{
+    Sunday,
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday
+}
+
+class Program
+{
+    static void Main()
+    {
+        foreach (Days day in Enum.GetValues(typeof(Days)))
+        {
+            Console.WriteLine(day);
+        }
+    }
+}
+```
+
+**Output:**
+```
+Sunday
+Monday
+Tuesday
+Wednesday
+Thursday
+Friday
+Saturday
+```
+
+- `Enum.GetValues(typeof(Days))` returns an array of all enum values.
+- You can also use `Enum.GetNames(typeof(Days))` to get the names as strings.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. How to set default value to Property in C#?
+---
+You can set a **default value** for a property in C# in several ways, depending on the type of property and the context.
+
+**1. Auto-Implemented Property with Default Values:**
+- You can assign a default value directly in the property declaration:
+```cs
+public class Person
+{
+    public string Name { get; set; } = "Unknown";
+    public int Age { get; set; } = 18;
+}
+```
+
+**2. Using a Constructor:**
+- If you need more complex logic or want to support older versions of C#, use a constructor:
+```cs
+public class Person
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+
+    public Person()
+    {
+        Name = "Unknown";
+        Age = 18;
+    }
+}
+```
+
+**3. Using Read-Only Properties (init-only):**
+
+```csharp
+public class Person
+{
+    public string Name { get; init; } = "Unknown";
+}
+```
+
+**4. Default values with Nullable Types:**
+- For optional values, you can use nullable types and assign defaults:
+```cs
+public class Person
+{
+    public int? Age { get; set; } = null;
+}
+```
+
+**Summary:**  
+- Use property initializers for simple default values.
+- Use the constructor for more complex logic or when default values depend on other parameters.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. How to convert int to enum in C#?
+---
+You can convert an integer to an enum type in C# using a simple cast. This is useful when you have an integer value (for example, from a database or user input) and want to work with it as an enum.
+
+**Example:**
+```cs
+public class Program
+{
+    enum Status
+    {
+        Pending = 0,
+        Approved = 1,
+        Rejected = 2
+    }
+            
+    public static void Main(string[] args)
+    {
+        int value = 1;
+        Status status = (Status)value;
+
+        Console.WriteLine(status); // Output: Approved
+    }
+}
+```
+
+**Note:**
+- The cast does not check if the integer value is defined in the enum. If the value is not defined, it will still cast, but the result may not be meaningful.
+- To check if the value is valid for the enum, use `Enum.IsDefined`:
+
+```cs
+if (Enum.IsDefined(typeof(Status), value))
+{
+    Status status = (Status)value;
+    Console.WriteLine(status)
+}
+else
+{
+    Console.WriteLine("Invalid status value");
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is BigInteger Data Type in C#?
+---
+The `BigInteger` data type in C# is a structure provided by the `System.Numerics` namespace that allows you to work with arbitrarily large integers—much larger than the built-in numeric types like `int` or `long`. Unlike these fixed-size types, `BigInteger` can represent numbers of any size and precision, limited only by the available system memory.
+
+**Key Points:**
+- `BigInteger` is used when you need to handle numbers larger than `long.MaxValue` (9,223,372,036,854,775,807).
+- It supports all standard arithmetic operations (+, -, *, /, %, etc.).
+- It is immutable—operations return a new `BigInteger` instance.
+
+**Example:**
+
+```cs
+using System;
+using System.Numerics;
+
+class Program
+{
+    static void Main()
+    {
+        BigInteger big = BigInteger.Parse("123456789012345678901234567890");
+        BigInteger result = big * 2;
+
+        Console.WriteLine(result); // Output: 246913578024691357802469135780
+    }
+}
+```
+
+**Note:**  
+- To use `BigInteger`, add a reference to `System.Numerics` and include `using System.Numerics;` at the top of your file.
+- This is especially useful in scenarios like cryptography, scientific computations, or financial calculations where precision and large values are critical. 
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. How to convert String to Enum in C#?
+---
+To convert a string to an enum in C#, use the `Enum.Parse()` or `Enum.TryParse()` method. `Enum.Parse()` throws an exception if the conversion fails, while `Enum.TryParse()` returns a boolean indicating success. 
+
+This is useful when you have a string value (e.g., from user input or a file) and want to convert it to a strongly-typed enum value.
+
+**1. Using Enum.Parse():**
+
+- This throws an exception if the string doesn\'t match any enum name.
+
+**Example:**
+```cs
+public enum Status
+{
+    Active,
+    Inactive,
+    Pending
+}
+
+string input = "Active";
+Status status = (status)Enum.Parse(typeof(Status), input);
+```
+
+**2. Using Enum.TryParse():**
+
+- This method is safer because it avoids exceptions and let you handle invalid input gracefully.
+
+**Example:**
+```cs
+public enum Status 
+{
+    Active,
+    Inactive,
+    Pending
+}
+
+string input = "Inactive";
+
+if(Enum.TryParse(input, out Status status)) 
+{
+    Console.WriteLine($"Parsed successfully: {status}");
+} 
+else
+{
+    Console.WriteLine("Invalid enum value.");
+}
+```
+
+**3. Case-Insensitive Parsing:**
+
+**Example:**
+```cs
+Enum.TryParse("pending", ignoreCase: true, out Status status);
+```
+
+**Notes:**
+- Use `Enum.TryParse` for safer conversion.
+- You can pass `true` as the second argument to `TryParse` for case-insensitive matching.
+- Always validate user input before parsing to avoid exceptions.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. How to convert an Object to JSON in C#?
+---
+In C#, you can convert an object to JSON string using the `System.Text.Json` namespace or `Newtonsoft.Json` (also known as Json.NET) library. The most common and modern approach is with `System.Text.Json`.
+
+**1. Using System.Text.Json:**
+
+You can convert an object to a JSON string in C# using the built-in `System.Text.Json` namespace:
+
+**Example:** 
+```cs
+using System.Text.Json;
+
+var person = new { Name = "Pradeep", Age = 30 };
+string json = JsonSerializer.Serialize(person);
+
+Console.WriteLine(json); // Output: {"Name":"Pradeep","Age":30}
+```
+
+**2. Using Newtonsoft.Json:**
+
+- install the NuGet package:
+
+```cs
+Install-Package Newtonsoft.Json
+```
+
+**Example:**
+```csharp
+using Newtonsoft.Json;
+
+var person = new { Name = "Pradeep", Age = 30 };
+string json = JsonConvert.SerializeObject(person);
+
+Console.WriteLine(json); // Output: {"Name":"Pradeep","Age":30}
+```
+
+**Note:**  
+- For `System.Text.Json`, add `using System.Text.Json;`.
+- For `Newtonsoft.Json`, install the NuGet package and add `using Newtonsoft.Json;`.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. How to convert JSON String to Object in C#?
+---
+To convert a JSON string to an object in C#, you typically use either the built-in `System.Text.Json` namespace or the popular third-party library `Newtonsoft.Json` (Json.NET).
+
+**1. Using System.Text.Json:**
+
+You can convert a JSON string to an object in C# using the built-in `System.Text.Json` namespace:
+
+**Example:**
+```cs
+using System.Text.Json;
+
+string json = "{\"Name\":\"Pradeep\",\"Age\":30}";
+
+// Define a matching class
+public class Person
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+
+// Deserialize the JSON string to an object
+Person person = JsonSerializer.Deserialize<Person>(json);
+
+Console.WriteLine(person.Name); // Output: Pradeep
+Console.WriteLine(person.Age);  // Output: 30
+```
+
+**2. Using Newtonsoft.Json (Json.NET):**
+
+First, install the NuGet package:  
+`Install-Package Newtonsoft.Json`
+
+**Example:**
+```cs
+using Newtonsoft.Json;
+
+string json = "{\"Name\":\"Pradeep\",\"Age\":30}";
+
+public class Person
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+
+Person person = JsonConvert.DeserializeObject<Person>(json);
+
+Console.WriteLine(person.Name); // Output: Pradeep
+Console.WriteLine(person.Age);  // Output: 30
+```
+
+**Note:**  
+- The class properties must match the JSON keys (case-insensitive by default).
+- For dynamic or anonymous types, you can use `JsonDocument` (System.Text.Json) or `JObject` (Newtonsoft.Json).
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. How to Pass or Access Command-line Arguments in C#?
+---
+In C#. you can access command-line arguments using the Main method's parameter, typicallydefined as a string[] args.
+
+**Example:**
+```cs
+using System;
+
+class Program
+{
+    static void Main(string[] args) 
+    {
+        Console.WriteLine("Number of arguments:" + args.Length);
+        foreach (string arg in args)
+        {
+            Console.WriteLine("Argument: " + arg);
+        }
+    }
+}
+```
+
+Running the Program
+```cs
+MyApp.exe firstArg secondArg
+```
+Output
+```cs
+Number of arguments: 2
+Argument: firstArg
+Argument: secondArg
+```
+**2. Alternative Access**
+
+- You can also access command-line arguments using:
+```cs
+string[] args = Environment.GetCommandLineArgs();
+```
+This includes the executable name as the first element(args[0]), unlike the Main method\'s args which starts from the first actual argument.
+
+### Q. How to convert date object to string in C#?
+---
+To convert a date object (DateTime) to a string in C#, use the `ToString()` method. You can specify a format string to control the output.
+
+**1. Default Format:**
+
+```cs
+DateTime now = DateTime.Now;
+string dateString = now.ToString();
+```
+
+**2. Custom Format:**
+
+```cs
+string formatted = now.ToString("yyyy-MM-dd HH:mm:ss");
+```
+
+**3. Culture-Specific Format:**
+
+```cs
+string cultureFormatted = now.ToString("D", new CultureInfo("fr-FR"));
+```
+
+**Common formats:**
+- `"yyyy-MM-dd"` → 2025-05-26
+- `"MM/dd/yyyy"` → 05/26/2025
+- `"dddd, MMMM dd, yyyy"` → Monday, May 26, 2025
+
+**Summary:**  
+Use `dateTime.ToString()` for default, or `dateTime.ToString("format")` for custom string output.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. How to combine two arrays without duplicate values in C#?
+---
+To combine two arrays without duplicate values in C#, you can use the `Union` method from **LINQ**, which returns the set union of two sequences (removing duplicates). 
+
+**Example:**
+```cs
+using System;
+using System.Linq;
+
+class Program
+{
+    static void Main()
+    {
+        int[] array1 = { 10, 20, 30 };
+        int[] array2 = { 30, 50, 10 };
+
+        int[] combinedArray = array1.Union(array2).ToArray();
+
+        Console.WriteLine("Combined Array: " + string.Join(", ", combinedArray)); // Output: 10, 20, 30, 50
+    }
+}
+```
+
+**Explanation:**
+- `Union` returns the set union of two sequence, which means it removes duplicates.
+- `ToArray()` converts the result back to an array.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. How to convert string to int in C#?
+---
+To convert a string to an int in C#, you can use one of the following methods:
+
+**1. int.Parse()**  
+
+This method throws an exception if the string is not a valid integer.
+
+```cs
+string str = "123";
+int number = int.Parse(str); // number = 123
+```
+
+**2. int.TryParse()**  
+
+This is the safest method. It returns true if the conversion is successful, otherwise false.
+
+```cs
+string str = "123";
+int number;
+bool isSuccess = int.TryParse(str, out number);
+
+if (isSuccess)
+{
+    Console.WriteLine("Conversion successful:" + number);
+}
+else
+{
+    Console.WriteLine("Invalid Input");
+}
+```
+
+**3. Convert.ToInt32()**  
+
+This method throws an exception if the string is not a valid number, but it handles `null` by returning 0.
+
+```cs
+string str = "123";
+int number = Convert.ToInt32(str); // number = 123
+```
+
+**Recommendation:**  
+
+Use `int.TryParse()` for user input or when the string may not be a valid integer, as it avoids exceptions.
+
+**Summary Table:**
+
+|Method           |Throws on invalid input|Handles null | Usage scenario      |
+|-----------------|-----------------------|-------------|---------------------|
+|int.Parse()      |Yes                    |No           | Trusted input       |
+|int.TryParse()   |No                     |Yes          | User/untrusted input|
+|Convert.ToInt32()|Yes                    |Yes (returns 0) | Nullable input   |
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is boxing and unboxing?
+---
+In C#, **boxing** and **unboxing** are processes that allow value types (like `int`, `float`, `bool`, `double`, `struct`, etc.) to be treated as reference types (like object).
+
+**1. Boxing:**  
+
+- Boxing is the process of converting a **value type** to a **reference type** (specially, to object or to any interface type implemented by the value type). 
+- The value is wrapped inside a System.Object and stored on the heap.
+
+**Example:**
+```cs
+int num = 42;
+object obj = num; // Boxing: num is copied into obj as an object
+```
+
+- The value 42 (a value type) is wrapped inside an object (a reference type).
+- This involves copying the value and storing it on the heap.
+
+**2. Unboxing:**
+ 
+**Unboxing** is the reverse process: converting a **reference type** back to a **value type**.
+
+**Example:**
+```cs
+object obj = 42;
+int num = (int)obj; // Unboxing: obj is converted back to int
+```
+
+- The object obj is unboxed back into an int.
+- This requires an explicit cast and can throw an exception if the types don\'t match.
+
+**Notes:**
+- Boxing incurs a performance cost due to heap allocation.
+- Unboxing requires explicit casting and can throw exceptions if the types do not match.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+
+### Q. What effect does boxing and unboxing have on performance?
+---
+Boxing and unboxing can negatively impact performance in C#.
+
+**Boxing** is the process of converting a value type (like `int`, `double`, or a struct) to a reference type (`object`). This involves allocating memory on the heap and copying the value, which is more expensive than working with value types on the stack.
+
+**Unboxing** is the reverse: extracting the value type from the object. This requires a type check and copying the value back from the heap to the stack.
+
+**Performance Effects:**
+
+**1. Memory Allocation:** 
+
+- Boxing allocates memory in the heap, whereas value types are usually stored on the stack.
+- Heap allocations are more expensive and require garbage collection, which can slow down your application.
+
+**2. Garbage collection:** 
+
+- Frequent boxing leads to more objects on the heap, increasing the load on the garbage collector.
+
+**3. CPU overhead:** 
+
+- Boxing and unboxing involve type checking and casting, which adds CPU cycles.
+
+**4. Cache Misses:**
+
+- Value types on the stack are more cache-friendly. Boxed objects on the heap can lead to cache misses, reducing performance.
+
+**Example:**
+```cs
+int x = 42;
+object obj = x;      // Boxing (heap allocation)
+int y = (int)obj;    // Unboxing (type check + copy)
+```
+
+**When to Avoid Boxing/Unboxing:** 
+
+- In tight loops or performance critical code.
+- When working with collections-prefer `List<int>` over `List<object>`.
+- Use generics to avoid boxing in data structures.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the difference between `==` and `ReferenceEquals` in C#?
+---
+The `==` and `ReferenceEquals` in C# are both used for comparisons, but they serve different purposes:
+
+- **`==` Operator**:
+  - For **value types** (like `int`, `struct`), `==` compares the actual values.
+  - For **reference types** (like classes), by default, `==` checks if both references point to the same object (reference equality). However, many classes (like `string`) **override** `==` to compare values instead.
+  - Can be **overloaded** by custom types to provide value-based equality.
+
+**Example:**
+````cs
+object a = new string("hello");
+object b = new string("hello");
+
+Console.WriteLine(a == b); // True, because string overrides == for value equality
+````
+
+- **`ReferenceEquals` Method**:
+  - Always checks if two references point to the **exact same object** in memory (reference equality), regardless of any operator overloading or overrides.
+  - Cannot be overloaded.
+
+**Example:**
+````cs
+object a = new string("hello");
+object b = String.Copy(a);
+
+Console.WriteLine(object.ReferenceEquals(a, b)); // False, different objects in memory
+````
+
+**Summary:**  
+- Use `==` for value comparison (if overridden).
+- Use `ReferenceEquals` when you need to know if two variables refer to the exact same object instance.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. How does operator overloading work in C#?
+---
+In C#, operator overloading allows developers to extend the functionality of operators (like `+`, `-`, `*`, etc.) to work with user-defined data types (classes and structs). This makes your objects behave more like built-in types, improving readability and usability.
+
+**Example:**
+
+```cs
+/**
+* + Operator Overloading Example
+*/
+Public class Point
+{
+    public int X { get; set; }
+    public int Y { get; set; }
+
+    public Point(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    // Overload the + operator
+    public static Point operator +(Point a, Point b) 
+    {
+        return new Point(a.X + b.X, a.Y + b.Y);
+    }
+}
+
+// Usage
+Point p1 = new Point(1, 2);
+Point p2 = new Point(3, 4);
+Point result = p1 + p2; // Uses the overload + operator
+```
+
+**Key Points:**
+
+* Only certain operators can be overloaded (eg. `+`, `-`, `*`, `/`, `==`, `!=`, `<`, `>`, `++`, `--`, `[]`, `()`).
+* Overloaded operators must be static and public.
+* You can also overload comparison operators, but they must be overloaded in paris (`==` with `!=`, `<` with `>`).
+* Overloading short-circuiting operators (`||` and `&&`) is generally discouraged due to potential confusion. 
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the "=>" operator in C#? Where is it used?
+---
+The `=>` operator in C# is called the **lambda operator** or **goes to operator**. It is used to define **lambda expressions**, which are anonymous functions that can contain expressions or statements and can be used to create delegates or expression tree types.
+
+**Syntax:**
+
+```cs
+(parameter) => expression
+```
+**Where is it used?**
+
+**1. Lambda Expressions:** Used to define inline functions, especially with LINQ, delegates, and events.
+
+**Examples:**
+```csharp
+Func<int, int, int> add = (a, b) => a + b;
+Console.WriteLine(add(2, 3)); // Output: 5
+```
+
+**2. LINQ Queries:** Commonly used in LINQ to filter, project, or transform data.
+**Example:**
+```csharp
+var evens = numbers.Where(n => n % 2 == 0);
+```
+
+**3. Event Handlers:** Can be use to define event handlers inline.
+**Example:**
+```csharp
+button.Click += (sender, e) => { Console.WriteLine("Button clicked!"); };
+```
+
+**4. Expression Trees:** In advanced scenarios, lambda expressions can be complied into expression trees for dynamic query generation.
+**Example:**
+```cs
+using System;
+using System.Linq.Expressions;
+
+class Program
+{
+    static void Main()
+    {
+        // Define an expression tree for a Lambda: x => x*x
+        Expression<Fun<int, int>> squareExpr = x => x * x;
+
+        // Print the expression
+        Console.WriteLine("Expression: " + squareExpr);
+
+        // Compile and invoke the expression 
+        Fun<int, int> square = squareExpr.Compile();
+        Console.WriteLine("Result of square(5): "+ square(5));
+    }
+}
+```
+
+**Summary:**  
+The `=>` operator is used to define inline functions (lambdas) and concise member implementations, making code more readable and expressive, especially in LINQ and functional programming scenarios.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the null-conditional operator (?.) and how does it differ from the null-coalescing operator (??)?
+---
+The **null-conditional operator** (`?.`) and the **null-coalescing operator** (`??`) are both used in C# to simplify working with potentially null values, but they serve different purposes:
+
+**1. Null-Conditional Operator (`?.`):**
+
+The **null-conditional operator** (`?.`) allows you to safely access a member or method of an object that might be `null`. If the object is `null`, the expression returns `null` instead of throwing a `NullReferenceException`.
+
+**Example:**
+```csharp
+Person person = null;
+string name = person?.Name; // name is null, no exception thrown
+```
+
+**2. Null-Coalescing Operator** (`??`) 
+
+The `??` operator provides a **default value** when the left hand operand is `null`. 
+
+**Example:**
+```csharp
+string name = person?.Name ?? "Unknown"; // If person or Name is null, name is "Unknown"
+```
+
+**Usage Together:**
+You can combine both:
+```csharp
+int? length = person?.Name?.Length ?? 0; // If person or Name is null, length is 0
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. What is the purpose of the default literal in C#?
+---
+The **default literal** in C# (introduced in C# 7.1) provides a concise way to represent the default value of a type without explicitly specifying the type. It is written simply as `default` (without a type in parentheses).
+
+**Examples:** Without **default** literal (older style)
+
+```csharp
+// Before C# 7.1
+int number = default(int); // 0
+string text = default(string) // null
+```
+
+**Example:** With **default** literal (modern style)
+```cs
+// After C# 7.1
+int number = default; // 0
+string text = default; // null
+```
+
+**In generic methods:**
+
+```cs
+public T GetDefaultValue<T>()
+{
+    return default;
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+### Q. Can you explain the is not pattern introduced in C# 9.0?
+---
+The **`is not` pattern** introduced in C# 9.0 is a concise way to check if an object is *not* of a certain type or does *not* match a pattern.
+
+**Syntax:**
+
+Instead of writing:
+```csharp
+if (!(obj is string)) 
+{  
+    Console.WriteLine("Obj is not string");
+}
+```
+You can now write:
+```csharp
+if (obj is not string) 
+{  
+    Console.WriteLine("Obj is not string");
+}
+```
+
+This improves readability and reduces the need for extra parentheses.
+
+**Example:**
+```csharp
+object value = 42;
+if (value is not string)
+{
+    Console.WriteLine("Not a string!"); // Output: Not a string!
+}
+```
+
+**Example:** Using Pattern Matching
+
+You can also use it with more complex patterns:
+```csharp
+if (person is not Employee { IsActive: true }) {
+    // person is either not an Employee or not active
+}
+```
+
+**Benefits:**  
+- More readable and expressive code.
+- Works with all pattern matching scenarios.
+- This pattern is especially useful in switch expressions and when working with pattern matching in modern C#.
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
 
 ## # 3. CLASSES
 
