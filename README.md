@@ -12,9 +12,11 @@
 * *[Angular Basics](https://github.com/learning-zone/angular-basics)*
 * *[SQL Basics](https://github.com/learning-zone/sql-basics)*
 * *[ASP.NET Core](asp-net-core.md)*
-* *[Entity Framework](entity-framework.md)*
+* *[ADO.NET](ado.net.md)*
+* *[.NET Multiple Choice Questions](dotnet-mcq.md)*
 * *[Unit Testing](dotnet-unit-test.md)*
-* *[Design Patterns](design-patterns.md)*
+* *[Design Patterns](dotnet-dp.md)*
+* *[Data Structures and Algorithms](dotnet-ds.md)*
 
 <br/>
 
