@@ -1,4 +1,4 @@
-# Design Patterns in .NET Core
+# Design Patterns in C#
 
 > *Click &#9733; if you like the project. Your contributions are heartily ♡ welcome.*
 
