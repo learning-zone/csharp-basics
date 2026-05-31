@@ -1,4 +1,4 @@
-# Data Structures and Algorithms in .NET Core
+# Data Structures and Algorithms in C#
 
 > *Click &#9733; if you like the project. Your contributions are heartily ♡ welcome.*
 
