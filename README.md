@@ -44,7 +44,7 @@ Focus: Concurrency, memory management, and advanced language features.
 
 * [Delegates and Events](#-10-delegates-and-events): Delegates, multicast delegates, events, and EventHandler patterns.
 * [Lambda Expressions](#-11-lambda-expressions): Func, Action, Predicate, expression trees, and closures.
-* [Language Integrated Query (LINQ)](#-12-language-integrated-query--linq-): LINQ operators, deferred execution, query syntax, and method chaining.
+* [Language Integrated Query (LINQ)](#-12-language-integrated-query-linq): LINQ operators, deferred execution, query syntax, and method chaining.
 * [Asynchronous Programming and Multithreading](#-13-asynchronous-programming-and-multithreading): Thread, Task, async/await, Parallel, and synchronization primitives.
 * [Memory Management and Garbage Collection](#-14-memory-management-and-garbage-collection): GC generations, IDisposable, finalizers, and memory pressure.
 
@@ -4771,7 +4771,7 @@ Console.WriteLine(grade); // Output: B
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## # 3. CLASSES
+## # 4. CLASSES AND STRUCTS
 
 <br>
 
@@ -11273,7 +11273,7 @@ Console.WriteLine(c1 == c2);  // false
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## # 4. INHERITANCE
+## # 5. INHERITANCE AND OOP
 
 <br>
 
@@ -12823,7 +12823,7 @@ Console.WriteLine(Sum(new[] { new Vector2D(1, 2), new Vector2D(3, 4) })); // Vec
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## # 5. COLLECTIONS
+## # 6. COLLECTIONS AND GENERICS
 
 <br>
 
@@ -15421,2707 +15421,6 @@ while (pq.TryDequeue(out string? task, out int priority))
 | Peek | `Peek()` | `Peek()` |
 | Safe remove | `TryPop(out T)` | `TryDequeue(out T)` |
 | Use case | Undo, DFS, parsing | Task queues, BFS, printing |
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## # 6. MULTITHREADING
-
-<br>
-
-## Q. What is multithreading in C# and why is it important?
-
-**Multithreading** is the ability to execute multiple threads concurrently within a single process, enabling parallelism and better CPU utilization. In modern .NET, the preferred abstraction is `Task` and `async`/`await` (via the **Task Parallel Library, TPL**) rather than raw `Thread` management.
-
-**Why it matters:**
-- Improves responsiveness (UI stays fluid while background work runs).
-- Maximizes CPU utilization on multi-core processors.
-- Enables concurrent I/O (e.g., multiple HTTP requests simultaneously).
-
-**1. `Task.Run` — run CPU-bound work on the thread pool:**
-
-```cs
-var result = await Task.Run(() =>
-{
-    // CPU-intensive work (runs on thread pool thread)
-    return Enumerable.Range(1, 1_000_000).Sum();
-});
-Console.WriteLine(result); // Output: 500000500000
-```
-
-**2. `async`/`await` — non-blocking async I/O (preferred for I/O-bound):**
-
-```cs
-public async Task<string[]> FetchAllAsync(string[] urls)
-{
-    using var client = new HttpClient();
-    var tasks = urls.Select(url => client.GetStringAsync(url));
-    return await Task.WhenAll(tasks); // all in parallel
-}
-```
-
-**3. `Parallel.ForEachAsync` (.NET 6+) — async parallel processing:**
-
-```cs
-var urls = new[] { "https://api1.example.com", "https://api2.example.com" };
-
-await Parallel.ForEachAsync(urls,
-    new ParallelOptions { MaxDegreeOfParallelism = 4 },
-    async (url, ct) =>
-    {
-        using var client = new HttpClient();
-        var data = await client.GetStringAsync(url, ct);
-        Console.WriteLine($"Fetched {data.Length} chars from {url}");
-    });
-```
-
-**4. Thread-safe shared state with `Interlocked`:**
-
-```cs
-int counter = 0;
-await Task.WhenAll(Enumerable.Range(0, 100).Select(_ =>
-    Task.Run(() => Interlocked.Increment(ref counter))));
-Console.WriteLine(counter); // Output: 100 (always correct)
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is Multithreading with .NET, and what is a thread in C#?
-
-A **thread** is the smallest unit of execution within a process. A **process** can have multiple threads running concurrently, sharing the same memory space.
-
-**Multithreading** is the ability to run multiple threads simultaneously to perform work in parallel, improving responsiveness and throughput.
-
-In .NET, threads are managed by the **CLR** and scheduled by the **OS**. Modern .NET (5+) recommends using `Task` and `async/await` over raw `Thread` for most scenarios.
-
-```cs
-// A thread in .NET = lightweight unit of execution
-Console.WriteLine($"Main thread ID: {Thread.CurrentThread.ManagedThreadId}");
-Console.WriteLine($"Is background: {Thread.CurrentThread.IsBackground}");
-Console.WriteLine($"Is thread pool: {Thread.CurrentThread.IsThreadPoolThread}");
-Console.WriteLine($"State: {Thread.CurrentThread.ThreadState}");
-```
-
-**Ways to implement multithreading in .NET 10:**
-
-```cs
-// 1. Thread (low-level — use only for dedicated long-running work)
-var t = new Thread(() => Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId}"));
-t.IsBackground = true;
-t.Start();
-t.Join();
-
-// 2. ThreadPool (managed pool — underlying mechanism for Tasks)
-ThreadPool.QueueUserWorkItem(_ => Console.WriteLine("ThreadPool work item"));
-
-// 3. Task (preferred — async, return values, exception propagation)
-await Task.Run(() => Console.WriteLine("Task on thread pool"));
-
-// 4. Parallel class (data parallelism)
-Parallel.For(0, 4, i => Console.WriteLine($"Parallel item {i}"));
-
-// 5. async/await (I/O-bound work without blocking threads)
-async Task<string> FetchDataAsync(string url)
-{
-    using var client = new HttpClient();
-    return await client.GetStringAsync(url);
-}
-
-// 6. PLINQ (parallel LINQ)
-var results = Enumerable.Range(1, 100).AsParallel().Where(n => n % 2 == 0).ToList();
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the difference between a thread and a process?
-
-| | **Process** | **Thread** |
-|-|------------|-----------|
-| Definition | An isolated running instance of a program | A unit of execution within a process |
-| Memory | Has its own address space | Shares the process address space |
-| Communication | IPC (pipes, sockets, shared memory) | Shared memory — fast but needs synchronization |
-| Isolation | Crash in one process doesn\'t affect others | Crash in one thread can crash the whole process |
-| Creation cost | High (separate memory, handles, etc.) | Lower (shares process resources) |
-| Switching cost | Expensive (context switch across processes) | Less expensive (same address space) |
-
-```cs
-// Process info
-var current = System.Diagnostics.Process.GetCurrentProcess();
-Console.WriteLine($"PID: {current.Id}");
-Console.WriteLine($"Name: {current.ProcessName}");
-Console.WriteLine($"Threads: {current.Threads.Count}");
-Console.WriteLine($"Memory: {current.WorkingSet64 / 1024 / 1024} MB");
-
-// Spawn a child process
-using var proc = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-{
-    FileName  = "dotnet",
-    Arguments = "--version",
-    RedirectStandardOutput = true,
-    UseShellExecute = false,
-});
-await proc!.WaitForExitAsync();
-Console.WriteLine(await proc.StandardOutput.ReadToEndAsync());
-
-// Thread info
-var thread = new Thread(() =>
-{
-    Console.WriteLine($"Thread ID: {Thread.CurrentThread.ManagedThreadId}");
-    Console.WriteLine($"Is pool: {Thread.CurrentThread.IsThreadPoolThread}");
-});
-thread.Start();
-thread.Join();
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you create a new thread in C#?
-
-```cs
-// 1. Thread with ThreadStart delegate (no parameters)
-var t1 = new Thread(DoWork);
-t1.Name         = "WorkerThread";
-t1.IsBackground = true; // daemon — terminates when main thread exits
-t1.Priority     = ThreadPriority.Normal;
-t1.Start();
-t1.Join(); // block caller until t1 finishes
-
-void DoWork() => Console.WriteLine($"Running on thread {Thread.CurrentThread.ManagedThreadId}");
-
-// 2. Thread with lambda
-var t2 = new Thread(() =>
-{
-    Console.WriteLine("Lambda thread");
-    Thread.Sleep(100); // simulate work
-});
-t2.Start();
-
-// 3. ParameterizedThreadStart — pass a single object parameter
-var t3 = new Thread(param =>
-{
-    string msg = (string)param!;
-    Console.WriteLine($"Message: {msg}");
-});
-t3.Start("Hello from parameter");
-
-// 4. Type-safe parameter passing via closure (preferred over ParameterizedThreadStart)
-int workerId = 42;
-string taskName = "ImportJob";
-var t4 = new Thread(() =>
-{
-    // captures workerId and taskName — fully type-safe
-    Console.WriteLine($"Worker {workerId}: {taskName}");
-});
-t4.Start();
-
-// 5. Foreground vs background threads
-// Foreground (default): app stays alive until ALL foreground threads finish
-// Background: app can exit even if background threads are still running
-var fg = new Thread(() => Thread.Sleep(5000)) { IsBackground = false }; // keeps app alive
-var bg = new Thread(() => Thread.Sleep(5000)) { IsBackground = true  }; // doesn\'t block exit
-
-// 6. Preferred modern alternative: Task.Run
-await Task.Run(() => Console.WriteLine("Preferred: Task on thread pool"));
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. Why does a delegate need to be passed to the Thread constructor, and how do you pass parameters type-safely?
-
-The `Thread` constructor requires a **delegate** (`ThreadStart` or `ParameterizedThreadStart`) because a thread needs to know *which method to execute*. The delegate is the entry point.
-
-```cs
-// ThreadStart — no parameters, no return value
-ThreadStart start = DoWork;
-var t1 = new Thread(start);
-t1.Start();
-
-void DoWork() => Console.WriteLine("No params");
-
-// ParameterizedThreadStart — one object parameter (not type-safe)
-ParameterizedThreadStart paramStart = obj =>
-{
-    int value = (int)obj!; // manual cast — runtime error if wrong type
-    Console.WriteLine($"Value: {value}");
-};
-var t2 = new Thread(paramStart);
-t2.Start(100); // pass object
-
-// … Type-safe approach — closure over strongly-typed variables
-int id    = 7;
-string name = "Alice";
-var t3 = new Thread(() =>
-{
-    // id and name captured by reference — fully type-safe, no casting
-    Console.WriteLine($"Worker {id}: {name}");
-});
-t3.Start();
-
-// … Pass a typed object via closure
-record WorkItem(int Id, string Name, DateTime Due);
-var item = new WorkItem(1, "Report", DateTime.Today);
-var t4 = new Thread(() =>
-{
-    Console.WriteLine($"Processing {item.Name} (due {item.Due:d})");
-});
-t4.Start();
-t4.Join();
-
-// Retrieving data from a thread — use a shared variable + lock, or Task<T>
-int result = 0;
-var t5 = new Thread(() => result = Compute()); // write result inside thread
-t5.Start();
-t5.Join();
-Console.WriteLine($"Result: {result}"); // safe to read after Join()
-
-int Compute() => 42;
-
-// Preferred: Task<T> — return values built-in, no shared variable needed
-int taskResult = await Task.Run(() => Compute());
-Console.WriteLine($"Task result: {taskResult}");
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the difference between `Thread.Join` and `Thread.Sleep`? What are `Thread.IsAlive` and `Thread.Join`?
-
-| | `Thread.Join` | `Thread.Sleep` |
-|-|--------------|---------------|
-| **Blocks** | The **calling** thread | The **current** thread |
-| **Until** | The target thread finishes | The timeout elapses |
-| **Purpose** | Wait for another thread | Pause execution temporarily |
-| **Returns** | `bool` (overload with timeout) | `void` |
-
-```cs
-var worker = new Thread(() =>
-{
-    Console.WriteLine("Worker started");
-    Thread.Sleep(500); // pause this thread for 500 ms
-    Console.WriteLine("Worker done");
-});
-
-worker.Start();
-Console.WriteLine($"Worker alive: {worker.IsAlive}"); // true
-
-// Join() — main thread blocks here until worker finishes
-bool finished = worker.Join(timeout: TimeSpan.FromSeconds(2));
-Console.WriteLine($"Finished in time: {finished}");   // true
-Console.WriteLine($"Worker alive: {worker.IsAlive}"); // false
-
-// Thread.Sleep(0) — yield to other threads of equal or higher priority
-Thread.Sleep(0);
-
-// Thread.Sleep(Timeout.Infinite) — sleep until interrupted
-// Thread.Interrupt() — throws ThreadInterruptedException in sleeping/waiting thread
-
-// IsAlive — true after Start() and before the thread method returns
-var t = new Thread(() => Thread.Sleep(200));
-Console.WriteLine(t.IsAlive); // false — not started yet
-t.Start();
-Console.WriteLine(t.IsAlive); // true  — running
-t.Join();
-Console.WriteLine(t.IsAlive); // false — completed
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are the different states of a Thread in C#?
-
-`Thread.ThreadState` is a flags enum — a thread can be in multiple states simultaneously.
-
-| State | Meaning |
-|-------|---------|
-| `Unstarted` | Created but `Start()` not yet called |
-| `Running` | Actively executing |
-| `WaitSleepJoin` | Blocked in `Sleep`, `Wait`, `Join`, or a lock |
-| `Background` | `IsBackground = true` |
-| `Stopped` | Completed or terminated |
-| `AbortRequested` | `Abort()` was called (removed in .NET Core) |
-| `Suspended` | `Suspend()` was called (removed in .NET Core) |
-
-```cs
-var t = new Thread(() =>
-{
-    Console.WriteLine("Working...");
-    Thread.Sleep(300);
-});
-
-Console.WriteLine(t.ThreadState); // Unstarted
-t.Start();
-Console.WriteLine(t.ThreadState); // Running | (possibly Background)
-Thread.Sleep(50);
-Console.WriteLine(t.ThreadState); // WaitSleepJoin
-t.Join();
-Console.WriteLine(t.ThreadState); // Stopped
-
-// Prefer checking IsAlive over ThreadState for simple checks
-// ThreadState is mostly useful for diagnostics
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the `ThreadPool` class and how is it used?
-
-The **ThreadPool** is a pool of pre-created worker threads managed by the CLR. It avoids the overhead of creating and destroying threads for each short-lived task.
-
-```cs
-// 1. QueueUserWorkItem — fire and forget (avoid in modern code)
-ThreadPool.QueueUserWorkItem(_ => Console.WriteLine("Pool work item"));
-
-// 2. Get/set pool limits
-ThreadPool.GetMinThreads(out int minWorker, out int minIo);
-ThreadPool.GetMaxThreads(out int maxWorker, out int maxIo);
-Console.WriteLine($"Min workers: {minWorker}, Max workers: {maxWorker}");
-
-// Set minimum threads (pre-warm the pool to avoid ramp-up latency)
-ThreadPool.SetMinThreads(workerThreads: 8, completionPortThreads: 8);
-
-// 3. Task.Run — the modern way to queue work on the thread pool
-var task = Task.Run(() =>
-{
-    Console.WriteLine($"Pool thread: {Thread.CurrentThread.IsThreadPoolThread}"); // true
-    return 42;
-});
-int result = await task;
-
-// 4. Parallel.ForEach — distributes iterations across pool threads
-Parallel.ForEach(Enumerable.Range(1, 10), i =>
-    Console.WriteLine($"Item {i} on thread {Thread.CurrentThread.ManagedThreadId}"));
-
-// 5. Long-running work should NOT use the thread pool
-// Use TaskCreationOptions.LongRunning to get a dedicated thread instead
-var longTask = Task.Factory.StartNew(() =>
-{
-    while (true) { /* background service */ Thread.Sleep(1000); }
-}, TaskCreationOptions.LongRunning);
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are `Task` and `async/await` in C#?
-
-A **`Task`** represents an asynchronous operation that may return a value (`Task<T>`). **`async/await`** is syntactic sugar that lets you write asynchronous code in a sequential, readable style.
-
-```cs
-// Task — represents an ongoing or completed operation
-Task t = Task.Run(() => Console.WriteLine("Fire and forget"));
-Task<int> t2 = Task.Run(() => 42);
-int value = await t2; // await suspends the caller, not the thread
-
-// async/await — I/O-bound (no thread blocked)
-async Task<string> GetDataAsync(string url)
-{
-    using var client = new HttpClient();
-    return await client.GetStringAsync(url); // no thread blocked during HTTP call
-}
-
-// CPU-bound — offload to thread pool via Task.Run
-async Task<int> ComputeAsync(int n)
-{
-    return await Task.Run(() =>
-    {
-        int sum = 0;
-        for (int i = 0; i < n; i++) sum += i;
-        return sum;
-    });
-}
-
-// Run multiple tasks concurrently
-var tasks = new[] { GetDataAsync("https://httpbin.org/get"), GetDataAsync("https://example.com") };
-string[] results = await Task.WhenAll(tasks);
-
-// Task.WhenAny — proceed when the first completes
-Task<string> first = await Task.WhenAny(tasks);
-Console.WriteLine("First done");
-
-// Return types
-// Task        — async void equivalent (no result)
-// Task<T>     — async with result
-// ValueTask<T>— struct, avoids heap alloc for hot paths that often complete synchronously
-// IAsyncEnumerable<T> — async stream
-
-async IAsyncEnumerable<int> GenerateAsync()
-{
-    for (int i = 0; i < 5; i++)
-    {
-        await Task.Delay(100);
-        yield return i;
-    }
-}
-
-await foreach (int n in GenerateAsync())
-    Console.Write($"{n} "); // 0 1 2 3 4
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the difference between `Task.Run` and `Task.Factory.StartNew`?
-
-| | `Task.Run` | `Task.Factory.StartNew` |
-|-|-----------|------------------------|
-| **Introduced** | .NET 4.5 | .NET 4.0 |
-| **Unwraps nested tasks** | … Automatically |  Must call `.Unwrap()` manually |
-| **Default scheduler** | `ThreadPool` | Current `TaskScheduler` |
-| **LongRunning option** |  Not supported | … `TaskCreationOptions.LongRunning` |
-| **Recommended for** | CPU-bound short tasks | Long-running or custom scheduler tasks |
-| **Simplicity** | Simpler, safer | More flexible but verbose |
-
-```cs
-// Task.Run — preferred for CPU-bound work on the thread pool
-int result = await Task.Run(() =>
-{
-    int sum = Enumerable.Range(1, 1_000_000).Sum();
-    return sum;
-});
-Console.WriteLine(result);
-
-// Task.Factory.StartNew — needed for LongRunning
-var longTask = Task.Factory.StartNew(() =>
-{
-    while (true)
-    {
-        Console.WriteLine("Background service tick");
-        Thread.Sleep(1000);
-    }
-}, TaskCreationOptions.LongRunning | TaskCreationOptions.DenyChildAttach);
-
-// Task.Run + async lambda — automatically unwraps Task<Task>
-int asyncResult = await Task.Run(async () =>
-{
-    await Task.Delay(100);
-    return 42;
-});
-
-// Task.Factory.StartNew + async lambda — must unwrap manually
-int manualResult = await await Task.Factory.StartNew(async () =>
-{
-    await Task.Delay(100);
-    return 42;
-}); // double-await because StartNew returns Task<Task<int>>
-
-// Custom TaskScheduler (advanced — e.g., UI thread, limited concurrency)
-var scheduler = new LimitedConcurrencyLevelTaskScheduler(maxDegreeOfParallelism: 2);
-var factory   = new TaskFactory(scheduler);
-await factory.StartNew(() => Console.WriteLine("Limited concurrency task"));
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you handle exceptions in multithreaded applications?
-
-```cs
-// 1. await — exceptions propagate naturally
-async Task ProcessAsync()
-{
-    try
-    {
-        await Task.Run(() => throw new InvalidOperationException("Task error"));
-    }
-    catch (InvalidOperationException ex)
-    {
-        Console.WriteLine($"Caught: {ex.Message}");
-    }
-}
-await ProcessAsync();
-
-// 2. Task.WhenAll — AggregateException wraps all exceptions
-var tasks = new[]
-{
-    Task.Run(() => throw new Exception("Error 1")),
-    Task.Run(() => throw new Exception("Error 2")),
-    Task.Run(() => Console.WriteLine("OK")),
-};
-try
-{
-    await Task.WhenAll(tasks);
-}
-catch // await unwraps first exception
-{
-    // Inspect all exceptions via the tasks themselves
-    foreach (var t in tasks.Where(t => t.IsFaulted))
-        Console.WriteLine(t.Exception!.InnerException!.Message);
-}
-
-// 3. Unhandled exceptions on raw Thread — must catch inside the thread
-var thread = new Thread(() =>
-{
-    try
-    {
-        throw new Exception("Thread crash");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Thread caught: {ex.Message}");
-    }
-});
-thread.Start();
-
-// 4. Global unhandled exception handler (last resort)
-AppDomain.CurrentDomain.UnhandledException += (_, e) =>
-    Console.WriteLine($"Unhandled: {(e.ExceptionObject as Exception)?.Message}");
-
-TaskScheduler.UnobservedTaskException += (_, e) =>
-{
-    Console.WriteLine($"Unobserved task exception: {e.Exception.Message}");
-    e.SetObserved(); // prevent crash
-};
-
-// 5. CancellationToken — not an exception per se, but related
-var cts = new CancellationTokenSource();
-try
-{
-    await Task.Run(() =>
-    {
-        cts.Token.ThrowIfCancellationRequested();
-    }, cts.Token);
-}
-catch (OperationCanceledException)
-{
-    Console.WriteLine("Task was cancelled");
-}
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is a deadlock and how can it be avoided? What are the four necessary conditions for deadlock?
-
-A **deadlock** occurs when two or more threads are permanently blocked, each waiting for a resource held by the other.
-
-**Four necessary conditions (Coffman conditions):**
-
-| Condition | Meaning |
-|-----------|---------|
-| **Mutual Exclusion** | A resource is held exclusively by one thread |
-| **Hold and Wait** | A thread holds a resource while waiting for another |
-| **No Preemption** | Resources cannot be forcibly taken away |
-| **Circular Wait** | Thread A waits for Thread B, which waits for Thread A |
-
-```cs
-// Classic deadlock — two threads lock in opposite orders
-object lockA = new(), lockB = new();
-
-var t1 = new Thread(() =>
-{
-    lock (lockA) { Thread.Sleep(50); lock (lockB) { Console.WriteLine("T1 done"); } }
-});
-var t2 = new Thread(() =>
-{
-    lock (lockB) { Thread.Sleep(50); lock (lockA) { Console.WriteLine("T2 done"); } }
-});
-// t1.Start(); t2.Start(); // would deadlock!
-
-// Prevention strategies:
-
-// 1. Consistent lock ordering — always acquire locks in the same order
-var t3 = new Thread(() => { lock (lockA) { lock (lockB) { Console.WriteLine("T3 done"); } } });
-var t4 = new Thread(() => { lock (lockA) { lock (lockB) { Console.WriteLine("T4 done"); } } });
-t3.Start(); t4.Start();
-
-// 2. Monitor.TryEnter with timeout — fail fast instead of blocking forever
-bool got = false;
-Monitor.TryEnter(lockA, TimeSpan.FromSeconds(1), ref got);
-if (got)
-{
-    try { /* work */ }
-    finally { Monitor.Exit(lockA); }
-}
-else
-{
-    Console.WriteLine("Could not acquire lock — skip or retry");
-}
-
-// 3. Avoid nested locks — redesign to use a single lock or lock-free structures
-
-// 4. Use async/await — no thread is blocked waiting; deadlock risk eliminated
-await Task.Run(() => { /* lock-free async work */ });
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is LiveLock?
-
-A **livelock** occurs when two or more threads keep reacting to each other\'s actions — they are actively executing but making no progress. Unlike a deadlock, threads are not blocked; they just keep changing state in response to each other indefinitely.
-
-```cs
-// Simulated livelock — two threads keep "politely yielding" to each other
-int sharedFlag = 0;
-bool thread1Done = false, thread2Done = false;
-
-var t1 = new Thread(() =>
-{
-    while (!thread1Done)
-    {
-        if (Interlocked.CompareExchange(ref sharedFlag, 1, 0) == 0)
-        {
-            Console.WriteLine("T1: doing work");
-            Thread.Sleep(50);
-            Interlocked.Exchange(ref sharedFlag, 0);
-            thread1Done = true;
-        }
-        else
-        {
-            Console.WriteLine("T1: yielding"); // keeps yielding to T2
-            Thread.Sleep(10);
-        }
-    }
-});
-
-var t2 = new Thread(() =>
-{
-    while (!thread2Done)
-    {
-        if (Interlocked.CompareExchange(ref sharedFlag, 2, 0) == 0)
-        {
-            Console.WriteLine("T2: doing work");
-            Thread.Sleep(50);
-            Interlocked.Exchange(ref sharedFlag, 0);
-            thread2Done = true;
-        }
-        else
-        {
-            Console.WriteLine("T2: yielding"); // keeps yielding to T1
-            Thread.Sleep(10);
-        }
-    }
-});
-
-// Prevention:
-// - Add randomized back-off delays (Thread.Sleep(Random.Next(10, 100)))
-// - Use a priority scheme — one thread gets precedence
-// - Use proper lock-free algorithms (e.g., Interlocked operations)
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the purpose of the `lock` statement in C#? What is the difference between `lock` and `Interlocked`?
-
-The `lock` statement ensures **mutual exclusion** — only one thread can execute a guarded block at a time. It is syntactic sugar over `Monitor.Enter` / `Monitor.Exit`.
-
-```cs
-public class SafeCounter
-{
-    private readonly object _syncRoot = new();
-    private int _count;
-
-    public void Increment()
-    {
-        lock (_syncRoot) // only one thread at a time
-        {
-            _count++;
-        }
-    }
-
-    public int Count
-    {
-        get { lock (_syncRoot) { return _count; } }
-    }
-}
-
-var counter = new SafeCounter();
-await Task.WhenAll(Enumerable.Range(0, 1000).Select(_ =>
-    Task.Run(counter.Increment)));
-Console.WriteLine(counter.Count); // always 1000
-
-// What lock compiles to:
-// Monitor.Enter(obj, ref lockTaken);
-// try { ... } finally { if (lockTaken) Monitor.Exit(obj); }
-
-//  Rules:
-// - Lock on a private readonly object, never on 'this', string literals, or Type objects
-// - Keep locked sections short
-// - Never call unknown code inside a lock (can cause deadlock)
-```
-
-**`lock` vs `Interlocked`:**
-
-| | `lock` | `Interlocked` |
-|-|--------|--------------|
-| **Use case** | Guard multi-statement critical sections | Atomic operations on single variables |
-| **Overhead** | Higher (OS kernel object) | Very low (CPU atomic instruction) |
-| **Operations** | Any code | `Increment`, `Decrement`, `Add`, `Exchange`, `CompareExchange`, `Read` |
-
-```cs
-// Interlocked — atomic operations, no lock needed for single-variable updates
-int value = 0;
-
-await Task.WhenAll(Enumerable.Range(0, 1000).Select(_ =>
-    Task.Run(() => Interlocked.Increment(ref value))));
-Console.WriteLine(value); // always 1000
-
-// CompareExchange — optimistic locking / spin loop
-int current, updated;
-do
-{
-    current = value;
-    updated = current + 10;
-} while (Interlocked.CompareExchange(ref value, updated, current) != current);
-Console.WriteLine(value);
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the difference between `Monitor` and `lock` in C#? How do you use the `Monitor` class?
-
-`lock` is shorthand for `Monitor.Enter`/`Monitor.Exit`. `Monitor` gives you additional control: `TryEnter` with timeout, `Wait`, `Pulse`, and `PulseAll` for thread signalling.
-
-```cs
-object sync = new();
-
-// lock (compiles to Monitor internally)
-lock (sync) { /* critical section */ }
-
-// Monitor.Enter / Exit — explicit equivalent of lock
-bool lockTaken = false;
-try
-{
-    Monitor.Enter(sync, ref lockTaken);
-    // critical section
-}
-finally
-{
-    if (lockTaken) Monitor.Exit(sync);
-}
-
-// Monitor.TryEnter — non-blocking, with timeout
-bool acquired = Monitor.TryEnter(sync, TimeSpan.FromMilliseconds(500));
-if (acquired)
-{
-    try { /* work */ }
-    finally { Monitor.Exit(sync); }
-}
-
-// Monitor.Wait / Pulse — producer-consumer signalling
-object buffer = new();
-Queue<int> queue = new();
-
-var producer = new Thread(() =>
-{
-    for (int i = 0; i < 5; i++)
-    {
-        lock (buffer)
-        {
-            queue.Enqueue(i);
-            Console.WriteLine($"Produced: {i}");
-            Monitor.Pulse(buffer); // wake one waiting thread
-        }
-        Thread.Sleep(100);
-    }
-});
-
-var consumer = new Thread(() =>
-{
-    for (int i = 0; i < 5; i++)
-    {
-        lock (buffer)
-        {
-            while (queue.Count == 0)
-                Monitor.Wait(buffer); // releases lock + waits for Pulse
-
-            int item = queue.Dequeue();
-            Console.WriteLine($"Consumed: {item}");
-        }
-    }
-});
-
-consumer.Start(); producer.Start();
-consumer.Join(); producer.Join();
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the Race condition?
-
-A **race condition** occurs when the outcome of a program depends on the timing or ordering of thread execution. When two or more threads access shared data concurrently and at least one modifies it, without proper synchronization, the result is unpredictable.
-
-```cs
-// Race condition — unsynchronized increment
-int counter = 0;
-
-var tasks = Enumerable.Range(0, 1000)
-    .Select(_ => Task.Run(() => counter++)) // NOT atomic: read + add + write
-    .ToArray();
-await Task.WhenAll(tasks);
-Console.WriteLine(counter); // may be < 1000 — race condition!
-
-// Strategies to prevent race conditions:
-
-// 1. lock — guard the critical section
-int safeCounter = 0;
-object sync = new();
-await Task.WhenAll(Enumerable.Range(0, 1000)
-    .Select(_ => Task.Run(() => { lock (sync) safeCounter++; })));
-Console.WriteLine(safeCounter); // always 1000
-
-// 2. Interlocked — atomic update for simple variables
-int atomicCounter = 0;
-await Task.WhenAll(Enumerable.Range(0, 1000)
-    .Select(_ => Task.Run(() => Interlocked.Increment(ref atomicCounter))));
-Console.WriteLine(atomicCounter); // always 1000
-
-// 3. Concurrent collections — thread-safe without manual locking
-var bag = new System.Collections.Concurrent.ConcurrentBag<int>();
-await Task.WhenAll(Enumerable.Range(0, 1000)
-    .Select(i => Task.Run(() => bag.Add(i))));
-Console.WriteLine(bag.Count); // always 1000
-
-// 4. Immutable data / local variables — no sharing = no race
-var results = await Task.WhenAll(
-    Enumerable.Range(1, 4).Select(i => Task.Run(() => i * i)));
-Console.WriteLine(string.Join(", ", results)); // 1, 4, 9, 16
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What happens if shared resources are not protected from concurrent access? How do you protect shared resources?
-
-**Without protection:** data corruption, torn reads/writes, stale caches, non-deterministic results.
-
-```cs
-// Unprotected — torn write (int64 may not be atomically written on 32-bit)
-long shared = 0;
-// multiple threads writing concurrently = undefined behavior
-
-// Protection options (choose based on scenario):
-
-// 1. lock — simplest, general purpose
-private readonly object _lock = new();
-private int _state;
-public void Update(int value) { lock (_lock) { _state = value; } }
-public int  Read()            { lock (_lock) { return _state;  } }
-
-// 2. Interlocked — atomic single-variable ops (fastest)
-private int _count;
-public void Increment() => Interlocked.Increment(ref _count);
-public int  Count       => Interlocked.CompareExchange(ref _count, 0, 0); // atomic read
-
-// 3. ReaderWriterLockSlim — multiple readers OR one writer
-private readonly ReaderWriterLockSlim _rwLock = new();
-private Dictionary<int, string> _cache = new();
-
-public string? Get(int key)
-{
-    _rwLock.EnterReadLock();
-    try { return _cache.TryGetValue(key, out var v) ? v : null; }
-    finally { _rwLock.ExitReadLock(); }
-}
-public void Set(int key, string val)
-{
-    _rwLock.EnterWriteLock();
-    try { _cache[key] = val; }
-    finally { _rwLock.ExitWriteLock(); }
-}
-
-// 4. Concurrent collections — thread-safe without explicit locks
-var dict  = new System.Collections.Concurrent.ConcurrentDictionary<int, string>();
-var queue = new System.Collections.Concurrent.ConcurrentQueue<int>();
-var stack = new System.Collections.Concurrent.ConcurrentStack<int>();
-var bag   = new System.Collections.Concurrent.ConcurrentBag<int>();
-
-// 5. Volatile — prevent CPU/compiler reordering for simple flags
-private volatile bool _running = true;
-public void Stop() => _running = false; // visible immediately to all threads
-
-// 6. Channels (System.Threading.Channels) — async-friendly message passing
-var channel = System.Threading.Channels.Channel.CreateBounded<int>(100);
-await channel.Writer.WriteAsync(42);
-int item = await channel.Reader.ReadAsync();
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is synchronization and why is it important? Can you name the synchronization primitives in .NET?
-
-**Synchronization** is the coordination of threads to ensure correct access to shared resources, prevent race conditions, and establish ordering guarantees.
-
-**Why it matters:** Without synchronization, concurrent threads can produce corrupted data, deadlocks, or non-deterministic behaviour.
-
-**Synchronization primitives in .NET:**
-
-| Primitive | Use case |
-|-----------|---------|
-| `lock` / `Monitor` | Mutual exclusion for any code block |
-| `Mutex` | Cross-process mutual exclusion |
-| `Semaphore` / `SemaphoreSlim` | Limit concurrent access to N threads |
-| `ManualResetEvent` / `ManualResetEventSlim` | Signal multiple waiting threads at once |
-| `AutoResetEvent` | Signal one waiting thread, then auto-reset |
-| `CountdownEvent` | Wait until N operations have completed |
-| `Barrier` | Synchronize N threads at a phase boundary |
-| `ReaderWriterLockSlim` | Multiple readers / exclusive writer |
-| `SpinLock` | Busy-wait for very short critical sections |
-| `SpinWait` | Spinning with back-off before yielding |
-| `Interlocked` | Atomic operations on primitive variables |
-| `volatile` | Visibility guarantee for simple flags |
-| `SemaphoreSlim` (async) | `WaitAsync()` — async-friendly throttling |
-| `Channel<T>` | Async-safe producer/consumer messaging |
-
-```cs
-// Choosing the right primitive:
-// Short critical section on same machine ’ lock
-// Need timeout / TryEnter             ’ Monitor.TryEnter
-// Limit concurrency (e.g., DB pool)   ’ SemaphoreSlim
-// Signal all waiting threads           ’ ManualResetEventSlim
-// Signal one thread, auto-reset        ’ AutoResetEvent
-// Count-down to zero                   ’ CountdownEvent
-// Phase-by-phase parallel work         ’ Barrier
-// Concurrent reads, rare writes        ’ ReaderWriterLockSlim
-// Nanosecond-critical inner loops      ’ SpinLock
-// Cross-process lock                   ’ Mutex
-
-using var slim = new SemaphoreSlim(initialCount: 3, maxCount: 3);
-var tasks = Enumerable.Range(0, 10).Select(async i =>
-{
-    await slim.WaitAsync();
-    try
-    {
-        Console.WriteLine($"Task {i} running (max 3 concurrent)");
-        await Task.Delay(200);
-    }
-    finally { slim.Release(); }
-});
-await Task.WhenAll(tasks);
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is AutoResetEvent and how is it different from ManualResetEvent?
-
-Both derive from `EventWaitHandle` and allow threads to signal each other.
-
-| | `AutoResetEvent` | `ManualResetEvent` / `ManualResetEventSlim` |
-|-|-----------------|---------------------------------------------|
-| **Reset** | Automatically after releasing **one** waiting thread | Must call `Reset()` manually |
-| **Releases** | Exactly **one** thread per `Set()` call | **All** waiting threads when `Set()` is called |
-| **State** | Like a turnstile — one thread passes, gate closes | Like a gate — open for all until closed |
-| **Use case** | Worker thread signalling (one-at-a-time) | Broadcast event (all threads proceed) |
-
-```cs
-// AutoResetEvent — one producer signals one consumer at a time
-using var are = new AutoResetEvent(initialState: false);
-
-var producer = new Thread(() =>
-{
-    for (int i = 0; i < 3; i++)
-    {
-        Thread.Sleep(300);
-        Console.WriteLine($"Produced {i}");
-        are.Set(); // releases exactly one waiting thread
-    }
-});
-
-var consumer = new Thread(() =>
-{
-    for (int i = 0; i < 3; i++)
-    {
-        are.WaitOne(); // blocks until Set() — auto-resets after waking
-        Console.WriteLine($"Consumed {i}");
-    }
-});
-
-producer.Start(); consumer.Start();
-producer.Join();  consumer.Join();
-
-// ManualResetEventSlim — broadcast to ALL waiting threads
-using var mre = new ManualResetEventSlim(initialState: false);
-
-var workers = Enumerable.Range(0, 4).Select(i => new Thread(() =>
-{
-    mre.Wait(); // all four threads block here
-    Console.WriteLine($"Worker {i} released");
-})).ToList();
-
-workers.ForEach(w => w.Start());
-Thread.Sleep(200);
-mre.Set();  // releases ALL four workers simultaneously
-mre.Reset(); // close gate again for next round
-workers.ForEach(w => w.Join());
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the Semaphore? What is Mutex and how does it differ from other synchronization mechanisms?
-
-**Semaphore** limits how many threads can access a resource simultaneously. `SemaphoreSlim` is the lightweight, async-friendly version recommended for most in-process scenarios.
-
-**Mutex** is like a `lock` but works **across processes** and is owned by the thread that acquired it.
-
-```cs
-// SemaphoreSlim — limit concurrency to N threads (async-friendly)
-using var sem = new SemaphoreSlim(initialCount: 2, maxCount: 2);
-
-var tasks = Enumerable.Range(0, 6).Select(async i =>
-{
-    await sem.WaitAsync();
-    try
-    {
-        Console.WriteLine($"  [{i}] entered (max 2 concurrent)");
-        await Task.Delay(300);
-        Console.WriteLine($"  [{i}] leaving");
-    }
-    finally { sem.Release(); }
-});
-await Task.WhenAll(tasks);
-
-// Semaphore (kernel-level, cross-thread/process)
-using var kernelSem = new Semaphore(initialCount: 1, maximumCount: 1, name: "MyAppSemaphore");
-kernelSem.WaitOne();
-try { /* exclusive access */ }
-finally { kernelSem.Release(); }
-
-// Mutex — cross-process mutual exclusion
-using var mutex = new Mutex(initiallyOwned: false, name: "Global\\MyAppMutex");
-
-// Single-instance app pattern
-bool createdNew;
-using var singleInstance = new Mutex(initiallyOwned: true, name: "Global\\MyApp", createdNew: out createdNew);
-if (!createdNew)
-{
-    Console.WriteLine("Another instance is already running.");
-    return;
-}
-// Only one instance reaches here
-```
-
-**Comparison:**
-
-| | `lock` | `Mutex` | `SemaphoreSlim` |
-|-|--------|---------|----------------|
-| **Scope** | In-process | Cross-process | In-process |
-| **Max holders** | 1 | 1 | N (configurable) |
-| **Async** |  |  | … `WaitAsync` |
-| **Overhead** | Low | High (kernel) | Low |
-| **Thread-affinity** | Yes | Yes | No |
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the `volatile` keyword?
-
-`volatile` tells the compiler and CPU that a field may be changed by multiple threads, preventing **caching** of the variable in a CPU register and disabling certain compiler/CPU **reordering** optimisations.
-
-```cs
-// Without volatile — compiler may cache _running in a register
-// and the loop never sees the update from another thread
-public class Processor
-{
-    private volatile bool _running = true; // volatile ensures visibility
-
-    public void Run()
-    {
-        while (_running) // reads from memory each iteration, not a register
-        {
-            // process work...
-        }
-        Console.WriteLine("Stopped cleanly");
-    }
-
-    public void Stop() => _running = false; // immediately visible to Run()
-}
-
-// volatile is appropriate for:
-// - Simple flags (bool, int, reference)
-// - Sentinel values checked in a spin loop
-
-// volatile is NOT appropriate for:
-// - Compound operations (check + set, read + increment) — use Interlocked or lock
-// - Complex objects — use lock or Concurrent collections
-
-// Difference: volatile vs Interlocked vs lock
-//   volatile: prevents caching/reordering; does NOT make compound ops atomic
-//   Interlocked: atomic operations on single primitives (Increment, CompareExchange)
-//   lock: exclusive section — any code, any type, highest overhead
-
-// Thread.MemoryBarrier — explicit full memory fence (advanced, rarely needed)
-private int _data;
-private volatile bool _ready;
-
-public void Producer()
-{
-    _data = 42;
-    Thread.MemoryBarrier(); // ensure _data write is visible before _ready write
-    _ready = true;
-}
-
-public int Consumer()
-{
-    while (!_ready) Thread.SpinWait(1);
-    Thread.MemoryBarrier();
-    return _data; // guaranteed to see 42
-}
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are the Interlocked functions?
-
-`Interlocked` provides **atomic** operations on shared variables — safe without `lock` and with minimal overhead (single CPU instruction).
-
-```cs
-int counter = 0;
-long total   = 0;
-
-// Increment / Decrement — thread-safe ++ and --
-Interlocked.Increment(ref counter);       // counter++
-Interlocked.Decrement(ref counter);       // counter--
-Console.WriteLine(counter);               // 0
-
-// Add — thread-safe +=
-Interlocked.Add(ref counter, 10);
-Console.WriteLine(counter);               // 10
-
-// Exchange — atomically sets value, returns old value
-int previous = Interlocked.Exchange(ref counter, 100);
-Console.WriteLine($"Was {previous}, now {counter}"); // Was 10, now 100
-
-// CompareExchange — atomically: if (counter == expected) counter = newValue
-// Returns the original value
-int original = Interlocked.CompareExchange(ref counter, newValue: 200, comparand: 100);
-Console.WriteLine($"Original: {original}, Counter: {counter}"); // Original: 100, Counter: 200
-
-// Read — atomic read of a long on 32-bit systems
-long atomicRead = Interlocked.Read(ref total);
-
-// Or (C# 9+)
-Interlocked.Or(ref counter,  0b1111); // bitwise OR
-Interlocked.And(ref counter, 0b1010); // bitwise AND
-
-// Practical: lock-free spin-based update
-int value = 0;
-int current, newVal;
-do
-{
-    current = value;
-    newVal  = current * 2 + 1;
-} while (Interlocked.CompareExchange(ref value, newVal, current) != current);
-Console.WriteLine(value); // 1
-
-// Practical: reference swap
-string? sharedRef = "initial";
-string? old = Interlocked.Exchange(ref sharedRef, "updated");
-Console.WriteLine($"Was '{old}', now '{sharedRef}'");
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How can you share data between multiple threads?
-
-```cs
-// 1. Shared field with lock — simplest and most common
-public class SharedState
-{
-    private readonly object _lock = new();
-    private List<string> _items = [];
-
-    public void Add(string item)    { lock (_lock) { _items.Add(item); } }
-    public List<string> Snapshot()  { lock (_lock) { return [.._items]; } }
-}
-
-// 2. Concurrent collections — no manual lock needed
-var dict  = new System.Collections.Concurrent.ConcurrentDictionary<string, int>();
-var queue = new System.Collections.Concurrent.ConcurrentQueue<string>();
-var bag   = new System.Collections.Concurrent.ConcurrentBag<int>();
-
-await Task.WhenAll(
-    Task.Run(() => dict.TryAdd("key1", 1)),
-    Task.Run(() => dict.TryAdd("key2", 2)));
-
-// 3. Channel<T> — async-safe producer/consumer (preferred in .NET 5+)
-var channel = System.Threading.Channels.Channel.CreateUnbounded<int>();
-
-var producer = Task.Run(async () =>
-{
-    for (int i = 0; i < 5; i++)
-    {
-        await channel.Writer.WriteAsync(i);
-        Console.WriteLine($"Sent: {i}");
-    }
-    channel.Writer.Complete();
-});
-
-var consumer = Task.Run(async () =>
-{
-    await foreach (int item in channel.Reader.ReadAllAsync())
-        Console.WriteLine($"Received: {item}");
-});
-
-await Task.WhenAll(producer, consumer);
-
-// 4. ThreadLocal<T> — per-thread copy (not shared, but partitions data)
-var localRng = new ThreadLocal<Random>(() => new Random());
-await Task.WhenAll(Enumerable.Range(0, 4).Select(_ =>
-    Task.Run(() => Console.WriteLine(localRng.Value!.Next(100)))));
-
-// 5. Immutable shared data — safest (no synchronization needed)
-// Prefer record types and ImmutableList<T>, ImmutableDictionary<T,V>
-using System.Collections.Immutable;
-ImmutableList<int> immutable = ImmutableList<int>.Empty.Add(1).Add(2);
-// Any thread can read immutable safely; Add() returns a new list
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you implement a producer-consumer scenario in C#?
-
-```cs
-using System.Threading.Channels;
-
-// … Modern approach: Channel<T> (preferred in .NET 5+)
-var channel = Channel.CreateBounded<int>(capacity: 10);
-
-async Task ProduceAsync()
-{
-    for (int i = 0; i < 20; i++)
-    {
-        await channel.Writer.WriteAsync(i);
-        Console.WriteLine($"Produced: {i}");
-        await Task.Delay(50);
-    }
-    channel.Writer.Complete();
-}
-
-async Task ConsumeAsync(int id)
-{
-    await foreach (int item in channel.Reader.ReadAllAsync())
-    {
-        Console.WriteLine($"Consumer {id} got: {item}");
-        await Task.Delay(120);
-    }
-}
-
-// One producer, two consumers
-await Task.WhenAll(
-    ProduceAsync(),
-    ConsumeAsync(1),
-    ConsumeAsync(2));
-
-// Alternative: BlockingCollection<T> (older, synchronous API)
-var collection = new System.Collections.Concurrent.BlockingCollection<int>(boundedCapacity: 5);
-
-var producer = Task.Run(() =>
-{
-    for (int i = 0; i < 10; i++)
-    {
-        collection.Add(i); // blocks if full
-        Console.WriteLine($"Added: {i}");
-    }
-    collection.CompleteAdding();
-});
-
-var consumer = Task.Run(() =>
-{
-    foreach (int item in collection.GetConsumingEnumerable()) // blocks if empty
-        Console.WriteLine($"Consumed: {item}");
-});
-
-await Task.WhenAll(producer, consumer);
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the `CancellationToken` and how is it used in multithreading?
-
-`CancellationToken` provides a cooperative cancellation model — the producer (caller) signals cancellation; the consumer (worker) checks and responds to it. No thread is forcibly aborted.
-
-```cs
-// 1. Basic usage
-using var cts = new CancellationTokenSource();
-CancellationToken token = cts.Token;
-
-var task = Task.Run(async () =>
-{
-    for (int i = 0; i < 100; i++)
-    {
-        token.ThrowIfCancellationRequested(); // throws OperationCanceledException
-        Console.WriteLine($"Working {i}");
-        await Task.Delay(100, token); // also cancellable
-    }
-}, token);
-
-await Task.Delay(350);
-cts.Cancel(); // signal cancellation
-
-try   { await task; }
-catch (OperationCanceledException) { Console.WriteLine("Task cancelled"); }
-
-// 2. Timeout cancellation
-using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
-// CancellationTokenSource.CreateLinkedTokenSource — combine multiple tokens
-using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
-    cts.Token, timeoutCts.Token);
-
-// 3. Register a callback on cancellation
-linkedCts.Token.Register(() => Console.WriteLine("Cleanup on cancellation"));
-
-// 4. Check without throwing
-if (token.IsCancellationRequested)
-{
-    Console.WriteLine("Cancelled (non-throwing check)");
-    return;
-}
-
-// 5. Pass to .NET APIs — most async methods accept CancellationToken
-using var httpClient = new HttpClient();
-try
-{
-    using var newCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-    string data = await httpClient.GetStringAsync("https://example.com", newCts.Token);
-}
-catch (TaskCanceledException) { Console.WriteLine("HTTP request timed out"); }
-
-// 6. Thread-based (non-async) polling
-void LongWork(CancellationToken ct)
-{
-    while (!ct.IsCancellationRequested)
-    {
-        Thread.Sleep(100); // do work
-    }
-    ct.ThrowIfCancellationRequested();
-}
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you use `Concurrent` collections in C#?
-
-`System.Collections.Concurrent` provides thread-safe collections that avoid explicit `lock` statements.
-
-```cs
-using System.Collections.Concurrent;
-
-// ConcurrentDictionary<TKey, TValue>
-var dict = new ConcurrentDictionary<string, int>();
-dict.TryAdd("Alice", 100);
-dict.AddOrUpdate("Alice", 100, (key, old) => old + 50); // atomic update
-int val = dict.GetOrAdd("Bob", key => 200);             // atomic get-or-add
-Console.WriteLine(dict["Alice"]); // 150
-
-// ConcurrentQueue<T> — FIFO, lock-free
-var queue = new ConcurrentQueue<int>();
-Parallel.For(0, 10, i => queue.Enqueue(i));
-while (queue.TryDequeue(out int item))
-    Console.Write($"{item} ");
-Console.WriteLine();
-
-// ConcurrentStack<T> — LIFO
-var stack = new ConcurrentStack<int>();
-stack.PushRange([1, 2, 3, 4, 5]);
-if (stack.TryPop(out int top)) Console.WriteLine($"Popped: {top}"); // 5
-
-// ConcurrentBag<T> — unordered, optimised for same-thread add/take
-var bag = new ConcurrentBag<int>();
-await Task.WhenAll(Enumerable.Range(0, 100).Select(i =>
-    Task.Run(() => bag.Add(i))));
-Console.WriteLine($"Bag count: {bag.Count}"); // 100
-
-// BlockingCollection<T> — bounded buffer with blocking Add/Take
-var bounded = new BlockingCollection<int>(boundedCapacity: 5);
-
-var prod = Task.Run(() =>
-{
-    for (int i = 0; i < 10; i++)
-    {
-        bounded.Add(i);                         // blocks when full
-        Console.WriteLine($"Produced: {i}");
-    }
-    bounded.CompleteAdding();
-});
-
-var cons = Task.Run(() =>
-{
-    foreach (int n in bounded.GetConsumingEnumerable()) // blocks when empty
-        Console.WriteLine($"Consumed: {n}");
-});
-
-await Task.WhenAll(prod, cons);
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the difference between `Parallel.For` and `Task.Run`?
-
-| | `Parallel.For` / `Parallel.ForEach` | `Task.Run` |
-|-|-------------------------------------|-----------|
-| **Purpose** | Data parallelism — divide a collection across cores | Run a single unit of work asynchronously |
-| **Blocking** | Blocks the calling thread until all iterations complete | Non-blocking — returns a `Task` |
-| **Partitioning** | Automatic (Partitioner) | Manual |
-| **Degree of parallelism** | `MaxDegreeOfParallelism` option | Manual via `SemaphoreSlim` |
-| **Use case** | CPU-bound loops over data | Single async or CPU-bound job |
-
-```cs
-// Parallel.For — best for CPU-bound data processing
-var results = new int[10];
-Parallel.For(0, 10, new ParallelOptions { MaxDegreeOfParallelism = 4 }, i =>
-{
-    results[i] = i * i; // safe because each i writes to a different index
-    Console.WriteLine($"i={i} on thread {Thread.CurrentThread.ManagedThreadId}");
-});
-Console.WriteLine(string.Join(", ", results));
-
-// Parallel.ForEach
-var files = Directory.GetFiles(".", "*.cs");
-Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = 2 }, file =>
-{
-    int lines = File.ReadLines(file).Count();
-    Console.WriteLine($"{Path.GetFileName(file)}: {lines} lines");
-});
-
-// Task.Run — single async unit of work
-var task = Task.Run(() =>
-{
-    long sum = 0;
-    for (long i = 0; i < 1_000_000; i++) sum += i;
-    return sum;
-});
-Console.WriteLine(await task);
-
-//  Parallel.For with async — use Parallel.ForEachAsync (.NET 6+)
-await Parallel.ForEachAsync(files, new ParallelOptions { MaxDegreeOfParallelism = 4 },
-    async (file, ct) =>
-    {
-        string content = await File.ReadAllTextAsync(file, ct);
-        Console.WriteLine($"{Path.GetFileName(file)}: {content.Length} chars");
-    });
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are the advantages and disadvantages of multithreading?
-
-**Advantages:**
-
-| Advantage | Detail |
-|-----------|--------|
-| **Improved throughput** | Utilize multiple CPU cores for CPU-bound work |
-| **Responsiveness** | UI thread stays responsive while background work runs |
-| **Parallelism** | Independent tasks run simultaneously |
-| **Better resource utilisation** | Threads run while others wait on I/O |
-| **Scalability** | Scale to available hardware cores |
-
-**Disadvantages:**
-
-| Disadvantage | Detail |
-|-------------|--------|
-| **Complexity** | Harder to design, debug, and reason about |
-| **Race conditions** | Unsynchronized shared state leads to bugs |
-| **Deadlocks / livelocks** | Threads block each other permanently |
-| **Overhead** | Context switches, synchronization, memory |
-| **Difficult testing** | Bugs are timing-dependent and non-reproducible |
-| **Priority inversion** | High-priority thread blocked by low-priority one |
-
-```cs
-// When to use multithreading:
-// … CPU-bound: image processing, data crunching, compression
-// … Parallel independent tasks: batch file processing
-// … Background work: keep UI responsive
-// … I/O-bound: async/await without dedicated threads
-
-// When to AVOID:
-//  Simple sequential logic — adds complexity with no benefit
-//  Shared state that\'s complex to synchronize
-//  Very short tasks — thread creation overhead exceeds benefit
-
-// Modern guideline:
-// CPU-bound: Parallel.For, Parallel.ForEachAsync, Task.Run
-// I/O-bound: async/await (no extra threads needed)
-// Producer/consumer: Channel<T>
-// Avoid raw Thread() — use Task-based APIs instead
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How does multithreading improve performance over a single-threaded solution?
-
-```cs
-// Single-threaded: tasks run sequentially — total time = sum of each
-var sw = System.Diagnostics.Stopwatch.StartNew();
-
-int r1 = HeavyCompute(1);
-int r2 = HeavyCompute(2);
-int r3 = HeavyCompute(3);
-int r4 = HeavyCompute(4);
-
-sw.Stop();
-Console.WriteLine($"Sequential: {sw.ElapsedMilliseconds} ms, results: {r1+r2+r3+r4}");
-
-// Multi-threaded: tasks run in parallel — total time  max of each
-sw.Restart();
-
-int[] results = await Task.WhenAll(
-    Task.Run(() => HeavyCompute(1)),
-    Task.Run(() => HeavyCompute(2)),
-    Task.Run(() => HeavyCompute(3)),
-    Task.Run(() => HeavyCompute(4)));
-
-sw.Stop();
-Console.WriteLine($"Parallel:   {sw.ElapsedMilliseconds} ms, results: {results.Sum()}");
-
-int HeavyCompute(int seed)
-{
-    Thread.Sleep(500); // simulate 500 ms CPU work
-    return seed * seed;
-}
-// Sequential: ~2000 ms
-// Parallel:   ~500 ms  (4x speedup on 4+ cores)
-
-// I/O-bound: async/await saves threads entirely
-sw.Restart();
-var fetches = Enumerable.Range(1, 4).Select(i =>
-    Task.Run(() => { Thread.Sleep(300); return i; })); // simulate I/O
-int[] ioResults = await Task.WhenAll(fetches);
-sw.Stop();
-Console.WriteLine($"Async I/O: {sw.ElapsedMilliseconds} ms"); // ~300 ms
-
-// Amdahl\'s Law: speedup is limited by the sequential portion
-// If 20% of code is sequential, max speedup = 1 / 0.2 = 5x regardless of cores
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. When should multithreading be used and when should it be avoided in C#?
-
-```cs
-// … USE multithreading when:
-
-// 1. CPU-bound parallel work — multiple independent CPU-intensive tasks
-var primes = await Task.Run(() =>
-    Enumerable.Range(2, 1_000_000)
-              .AsParallel()
-              .Where(IsPrime)
-              .Count());
-
-// 2. UI responsiveness — background work while UI stays responsive
-// (WPF/MAUI: always run long work off the UI thread)
-await Task.Run(() => ProcessLargeFile("data.csv")); // off UI thread
-
-// 3. I/O-bound parallelism — multiple concurrent HTTP/DB calls
-var responses = await Task.WhenAll(
-    httpClient.GetStringAsync("https://api1.example.com"),
-    httpClient.GetStringAsync("https://api2.example.com"));
-
-// 4. Background services — polling, cleanup, monitoring
-var cts = new CancellationTokenSource();
-Task bgService = Task.Factory.StartNew(async () =>
-{
-    while (!cts.Token.IsCancellationRequested)
-    {
-        await DoMaintenanceAsync();
-        await Task.Delay(TimeSpan.FromMinutes(5), cts.Token);
-    }
-}, TaskCreationOptions.LongRunning);
-
-//  AVOID multithreading when:
-
-// 1. Simple sequential logic — no gain, only complexity
-// BAD:
-int badResult = await Task.Run(() => 2 + 2);
-
-// GOOD:
-int goodResult = 2 + 2;
-
-// 2. Tasks are too short — thread overhead > benefit
-// BAD: threading a 1 s operation
-// GOOD: batch small items, then parallelize the batch
-
-// 3. Heavy shared state — if everything needs a lock, parallelism is lost
-
-// 4. Ordering matters — parallel tasks don\'t preserve order
-
-bool IsPrime(int n)
-{
-    if (n < 2) return false;
-    for (int i = 2; i * i <= n; i++)
-        if (n % i == 0) return false;
-    return true;
-}
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How can you ensure mutual exclusion without using `lock` or `Monitor`?
-
-```cs
-// 1. SemaphoreSlim(1,1) — async-compatible mutual exclusion
-var sem = new SemaphoreSlim(1, 1);
-
-async Task CriticalSectionAsync()
-{
-    await sem.WaitAsync(); // async — doesn\'t block a thread
-    try { /* exclusive work */ await Task.Delay(100); }
-    finally { sem.Release(); }
-}
-
-// 2. Mutex — cross-process mutual exclusion
-using var mutex = new Mutex(false, "Global\\MyAppMutex");
-mutex.WaitOne();
-try { /* exclusive work */ }
-finally { mutex.ReleaseMutex(); }
-
-// 3. SpinLock — busy-wait for very short sections (no kernel transition)
-var spinLock = new SpinLock(enableThreadOwnerTracking: false);
-bool taken = false;
-try
-{
-    spinLock.Enter(ref taken);
-    // ultra-short critical section
-    Console.WriteLine("SpinLock acquired");
-}
-finally { if (taken) spinLock.Exit(); }
-
-// 4. Interlocked.CompareExchange — optimistic lock-free CAS
-int lockFlag = 0;
-while (Interlocked.CompareExchange(ref lockFlag, 1, 0) != 0)
-    Thread.SpinWait(1); // spin until we set flag 0’1
-try { /* exclusive work */ }
-finally { Interlocked.Exchange(ref lockFlag, 0); }
-
-// 5. ReaderWriterLockSlim — multiple readers, exclusive writer
-var rwLock = new ReaderWriterLockSlim();
-// Writer
-rwLock.EnterWriteLock();
-try { /* exclusive write */ }
-finally { rwLock.ExitWriteLock(); }
-// Reader
-rwLock.EnterReadLock();
-try { /* concurrent reads */ }
-finally { rwLock.ExitReadLock(); }
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. Explain the difference between `Barrier` and `CountdownEvent`. Provide a real-world scenario for each.
-
-| | `Barrier` | `CountdownEvent` |
-|-|-----------|-----------------|
-| **Purpose** | Synchronize N threads at each **phase boundary** | Wait until N operations have signalled completion |
-| **Reusable** | … Automatically resets for each phase |  One-shot (or manually reset) |
-| **Participants** | Fixed at creation (can be added/removed) | Count set at creation |
-| **Direction** | All threads wait for each other | One thread waits; many threads signal |
-
-```cs
-// Barrier — pipeline with phases
-// Real-world: parallel rendering pipeline where all threads must finish
-// Phase 1 (geometry) before any starts Phase 2 (shading)
-
-int workers = 4;
-using var barrier = new Barrier(participants: workers, postPhaseAction: b =>
-    Console.WriteLine($"\n--- Phase {b.CurrentPhaseNumber + 1} complete ---\n"));
-
-var tasks = Enumerable.Range(0, workers).Select(id => Task.Run(() =>
-{
-    Console.WriteLine($"Worker {id}: Phase 1 (geometry)");
-    Thread.Sleep(Random.Shared.Next(100, 400));
-    barrier.SignalAndWait(); // wait for all to finish Phase 1
-
-    Console.WriteLine($"Worker {id}: Phase 2 (shading)");
-    Thread.Sleep(Random.Shared.Next(100, 300));
-    barrier.SignalAndWait(); // wait for all to finish Phase 2
-
-    Console.WriteLine($"Worker {id}: Phase 3 (output)");
-}));
-await Task.WhenAll(tasks);
-
-// CountdownEvent — wait for N async completions
-// Real-world: download N files concurrently; proceed only when all are done
-
-int fileCount = 5;
-using var countdown = new CountdownEvent(initialCount: fileCount);
-
-for (int i = 0; i < fileCount; i++)
-{
-    int fileId = i;
-    Task.Run(() =>
-    {
-        Thread.Sleep(Random.Shared.Next(200, 600)); // simulate download
-        Console.WriteLine($"File {fileId} downloaded");
-        countdown.Signal(); // decrement the count
-    });
-}
-
-countdown.Wait(); // block until count reaches 0
-Console.WriteLine("All files downloaded — proceeding with processing");
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are the issues with `Thread.Abort()`? How do you gracefully stop a thread?
-
-**`Thread.Abort()` is removed in .NET Core / .NET 5+.** It was unsafe because it injected a `ThreadAbortException` at an arbitrary point, potentially corrupting state, leaving locks acquired, or skipping `finally` blocks.
-
-```cs
-//  Thread.Abort — NOT available in .NET 5+
-// var t = new Thread(...);
-// t.Abort(); // throws PlatformNotSupportedException on .NET 5+
-
-// … Graceful cancellation via CancellationToken (recommended)
-using var cts = new CancellationTokenSource();
-
-var worker = Task.Run(async () =>
-{
-    while (!cts.Token.IsCancellationRequested)
-    {
-        Console.WriteLine("Working...");
-        await Task.Delay(300, cts.Token);
-    }
-    Console.WriteLine("Gracefully stopped");
-}, cts.Token);
-
-await Task.Delay(1000);
-cts.Cancel(); // cooperative cancellation
-try   { await worker; }
-catch (OperationCanceledException) { Console.WriteLine("Task cancelled"); }
-
-// … Volatile flag — simple polling (no Task)
-public class BackgroundWorker
-{
-    private volatile bool _stop;
-    private Thread? _thread;
-
-    public void Start()
-    {
-        _thread = new Thread(() =>
-        {
-            while (!_stop)
-            {
-                Console.WriteLine("Tick");
-                Thread.Sleep(200);
-            }
-            Console.WriteLine("Worker stopped");
-        }) { IsBackground = true };
-        _thread.Start();
-    }
-
-    public void Stop()
-    {
-        _stop = true;
-        _thread?.Join(timeout: TimeSpan.FromSeconds(2));
-    }
-}
-
-var bw = new BackgroundWorker();
-bw.Start();
-await Task.Delay(700);
-bw.Stop();
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you achieve thread synchronization using `ReaderWriterLockSlim`? What are its advantages over `ReaderWriterLock`?
-
-`ReaderWriterLockSlim` allows **multiple concurrent readers** and **exclusive writers**, improving throughput for read-heavy workloads.
-
-| | `ReaderWriterLock` | `ReaderWriterLockSlim` |
-|-|-------------------|----------------------|
-| **Performance** | Slower | Faster (optimised internals) |
-| **Recursive support** | Via flags | Opt-in (`LockRecursionPolicy`) |
-| **Upgradeable read lock** |  | … `EnterUpgradeableReadLock` |
-| **Recommendation** | Legacy (avoid) | … Use this |
-
-```cs
-public class ThreadSafeCache<TKey, TValue> where TKey : notnull
-{
-    private readonly Dictionary<TKey, TValue> _dict = new();
-    private readonly ReaderWriterLockSlim _lock = new();
-
-    public TValue? Get(TKey key)
-    {
-        _lock.EnterReadLock(); // multiple readers concurrently
-        try
-        {
-            return _dict.TryGetValue(key, out var val) ? val : default;
-        }
-        finally { _lock.ExitReadLock(); }
-    }
-
-    public void Set(TKey key, TValue value)
-    {
-        _lock.EnterWriteLock(); // exclusive — blocks all readers and writers
-        try { _dict[key] = value; }
-        finally { _lock.ExitWriteLock(); }
-    }
-
-    // Upgradeable lock — check then conditionally write (no double-locking)
-    public TValue GetOrAdd(TKey key, Func<TKey, TValue> factory)
-    {
-        _lock.EnterUpgradeableReadLock();
-        try
-        {
-            if (_dict.TryGetValue(key, out var existing)) return existing;
-
-            _lock.EnterWriteLock(); // upgrade to write
-            try
-            {
-                var value = factory(key);
-                _dict[key] = value;
-                return value;
-            }
-            finally { _lock.ExitWriteLock(); }
-        }
-        finally { _lock.ExitUpgradeableReadLock(); }
-    }
-
-    public void Dispose() => _lock.Dispose();
-}
-
-// Usage
-var cache = new ThreadSafeCache<string, int>();
-await Task.WhenAll(
-    Task.Run(() => cache.Set("x", 42)),
-    Task.Run(() => Console.WriteLine(cache.Get("x"))),
-    Task.Run(() => Console.WriteLine(cache.GetOrAdd("y", _ => 99))));
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. Discuss the differences between `volatile`, `Interlocked`, and `Thread.MemoryBarrier`. When should each be used?
-
-| | `volatile` | `Interlocked` | `Thread.MemoryBarrier` |
-|-|-----------|--------------|----------------------|
-| **Prevents caching** | … | … (implicit) | … (explicit fence) |
-| **Prevents reordering** | Partial (acquire/release) | … | … (full fence) |
-| **Atomic compound ops** |  | … |  |
-| **Overhead** | Minimal | Low (single CPU instruction) | Low–Medium |
-| **Use case** | Simple flags; visibility | Atomic read/modify/write | Custom lock-free algorithms |
-
-```cs
-// volatile — prevent caching of a simple flag
-private volatile bool _shutdown = false;
-
-void Worker()
-{
-    while (!_shutdown) { /* work */ }  // always reads from memory
-}
-void Stop() => _shutdown = true; // immediately visible
-
-// Interlocked — atomic compound operation on a single variable
-int counter = 0;
-Interlocked.Increment(ref counter);               // atomic read + add + write
-int old = Interlocked.Exchange(ref counter, 100); // atomic swap
-int orig = Interlocked.CompareExchange(ref counter, 200, 100); // CAS
-
-// Thread.MemoryBarrier — full memory fence in custom lock-free code
-private int _data;
-private int _flag;
-
-void Produce()
-{
-    _data = 99;
-    Thread.MemoryBarrier(); // STORE fence: _data write visible before _flag write
-    _flag = 1;
-}
-
-int Consume()
-{
-    while (Volatile.Read(ref _flag) == 0) { } // spin
-    Thread.MemoryBarrier(); // LOAD fence: _flag read before _data read
-    return _data; // guaranteed to see 99
-}
-
-// Volatile.Read / Volatile.Write — explicit volatile semantics without field keyword
-int val = Volatile.Read(ref _flag);
-Volatile.Write(ref _flag, 1);
-
-// Rule of thumb:
-// One thread writes, one thread reads a simple flag  ’ volatile
-// Atomic increment / compare-and-swap               ’ Interlocked
-// Custom lock-free algorithm with ordering needs    ’ MemoryBarrier / Volatile.Read/Write
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. Explain thread-local storage and data partitioning in C# multithreading.
-
-**Thread-local storage (TLS)** gives each thread its own private copy of a variable — no sharing, no synchronization needed.  
-**Data partitioning** divides a dataset into independent chunks and assigns each chunk to a separate thread.
-
-```cs
-// 1. ThreadLocal<T> — per-thread instance
-var localRng = new ThreadLocal<Random>(() => new Random(), trackAllValues: true);
-
-await Task.WhenAll(Enumerable.Range(0, 4).Select(i => Task.Run(() =>
-{
-    // Each thread has its own Random — no lock needed
-    int roll = localRng.Value!.Next(1, 7);
-    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId}: rolled {roll}");
-})));
-
-// See all per-thread values
-Console.WriteLine($"Instances created: {localRng.Values.Count}");
-localRng.Dispose();
-
-// 2. [ThreadStatic] — simpler but no initializer
-[ThreadStatic] private static int _threadId;
-
-// 3. Data partitioning — PLINQ
-var numbers = Enumerable.Range(1, 10_000_000);
-long sum = numbers.AsParallel()
-                  .WithDegreeOfParallelism(4)
-                  .Where(n => n % 2 == 0)
-                  .Select(n => (long)n)
-                  .Sum();
-Console.WriteLine($"Sum of evens: {sum}");
-
-// 4. Data partitioning — Parallel.For with thread-local accumulator (no shared state)
-long total = 0;
-Parallel.For(
-    fromInclusive: 0L,
-    toExclusive:   10_000_000L,
-    localInit:    () => 0L,                          // per-thread local
-    body:         (i, _, local) => local + i,        // accumulate locally
-    localFinally: local => Interlocked.Add(ref total, local) // merge once
-);
-Console.WriteLine($"Parallel total: {total}");
-
-// 5. Partitioner — custom partition strategy
-var partitioner = Partitioner.Create(0, 10_000_000, rangeSize: 500_000);
-Parallel.ForEach(partitioner, range =>
-{
-    long localSum = 0;
-    for (long i = range.Item1; i < range.Item2; i++) localSum += i;
-    Interlocked.Add(ref total, localSum);
-});
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you combine async/await with multithreading? How does `TaskScheduler` fit in?
-
-`async/await` is primarily an **I/O-bound** model — it doesn\'t create new threads. When you need CPU-bound work alongside async, combine `Task.Run` with `await`. `TaskScheduler` controls *where* tasks execute.
-
-```cs
-// 1. CPU-bound work + async I/O together
-async Task<int> ProcessFileAsync(string path, CancellationToken ct)
-{
-    // I/O-bound: no thread blocked
-    string content = await File.ReadAllTextAsync(path, ct);
-
-    // CPU-bound: offload to thread pool, don\'t block the async context
-    int wordCount = await Task.Run(() => content.Split().Length, ct);
-    return wordCount;
-}
-
-// 2. Concurrent CPU + I/O
-var tasks = Directory.GetFiles(".", "*.cs")
-    .Select(f => ProcessFileAsync(f, CancellationToken.None));
-int[] counts = await Task.WhenAll(tasks);
-Console.WriteLine($"Total words: {counts.Sum()}");
-
-// 3. TaskScheduler — controls execution context
-// Default: ThreadPoolTaskScheduler (Task.Run uses this)
-// CurrentThread: runs on the current thread (synchronous; testing)
-// LimitedConcurrency: caps concurrent tasks
-
-public class LimitedConcurrencyLevelTaskScheduler(int maxParallelism)
-    : TaskScheduler
-{
-    private readonly LinkedList<Task> _tasks = new();
-    private int _running;
-
-    protected override void QueueTask(Task task)
-    {
-        lock (_tasks) _tasks.AddLast(task);
-        TryExecuteNextTask();
-    }
-
-    private void TryExecuteNextTask()
-    {
-        lock (_tasks)
-        {
-            if (_running >= maxParallelism || _tasks.Count == 0) return;
-            _running++;
-            var task = _tasks.First!.Value;
-            _tasks.RemoveFirst();
-            ThreadPool.QueueUserWorkItem(_ =>
-            {
-                TryExecuteTask(task);
-                lock (_tasks) { _running--; TryExecuteNextTask(); }
-            });
-        }
-    }
-
-    protected override bool TryExecuteTaskInline(Task task, bool prev) => false;
-    protected override IEnumerable<Task> GetScheduledTasks() { lock (_tasks) return [.._tasks]; }
-}
-
-var scheduler = new LimitedConcurrencyLevelTaskScheduler(maxParallelism: 2);
-var factory   = new TaskFactory(CancellationToken.None,
-    TaskCreationOptions.None, TaskContinuationOptions.None, scheduler);
-
-await Task.WhenAll(Enumerable.Range(0, 6)
-    .Select(i => factory.StartNew(() =>
-    {
-        Console.WriteLine($"Task {i} on thread {Thread.CurrentThread.ManagedThreadId}");
-        Thread.Sleep(200);
-    })));
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is parallelism? How do you control the degree of parallelism using the `Parallel` class?
-
-**Parallelism** is executing multiple operations simultaneously on multiple CPU cores. **Degree of parallelism (DOP)** is how many threads/tasks run concurrently.
-
-```cs
-// Parallel.For with MaxDegreeOfParallelism
-var options = new ParallelOptions
-{
-    MaxDegreeOfParallelism = 4,       // at most 4 threads
-    CancellationToken      = CancellationToken.None,
-};
-
-var results = new int[20];
-Parallel.For(0, 20, options, i =>
-{
-    results[i] = i * i;
-    Console.WriteLine($"  [{i}] on thread {Thread.CurrentThread.ManagedThreadId}");
-});
-Console.WriteLine(string.Join(", ", results));
-
-// Parallel.ForEach — over collections
-var files = Directory.EnumerateFiles(".", "*.cs").ToList();
-Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = 2 }, file =>
-    Console.WriteLine($"{Path.GetFileName(file)} — {new FileInfo(file).Length} bytes"));
-
-// Parallel.ForEachAsync — async-compatible (.NET 6+)
-await Parallel.ForEachAsync(files, new ParallelOptions { MaxDegreeOfParallelism = 3 },
-    async (file, ct) =>
-    {
-        string content = await File.ReadAllTextAsync(file, ct);
-        Console.WriteLine($"{Path.GetFileName(file)}: {content.Length} chars");
-    });
-
-// PLINQ — parallel LINQ
-long sum = Enumerable.Range(1, 10_000_000)
-    .AsParallel()
-    .WithDegreeOfParallelism(Environment.ProcessorCount)
-    .Where(n => n % 2 == 0)
-    .Select(n => (long)n)
-    .Sum();
-Console.WriteLine($"Sum: {sum}");
-
-// Choosing DOP:
-// CPU-bound: Environment.ProcessorCount  (fully utilise all cores)
-// I/O-bound: higher than CPU count is fine (threads spend time waiting)
-// Mixed:     experiment; start with 2 — ProcessorCount for I/O
-
-Console.WriteLine($"CPU cores: {Environment.ProcessorCount}");
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. Describe lock contention and how to mitigate it.
-
-**Lock contention** occurs when multiple threads compete to acquire the same lock. The thread that can\'t acquire the lock blocks, waiting — wasting CPU time and reducing throughput.
-
-```cs
-// High contention — all threads fight for one lock
-object sharedLock = new();
-int counter = 0;
-
-// BAD: all 1000 tasks contend on a single lock
-await Task.WhenAll(Enumerable.Range(0, 1000).Select(_ =>
-    Task.Run(() => { lock (sharedLock) counter++; })));
-
-// … Mitigation 1: Interlocked — no lock needed for simple atomic ops
-int atomicCounter = 0;
-await Task.WhenAll(Enumerable.Range(0, 1000).Select(_ =>
-    Task.Run(() => Interlocked.Increment(ref atomicCounter))));
-
-// … Mitigation 2: Lock striping — partition data across multiple locks
-const int Stripes = 16;
-var locks    = Enumerable.Range(0, Stripes).Select(_ => new object()).ToArray();
-var counters = new int[Stripes];
-
-await Task.WhenAll(Enumerable.Range(0, 1000).Select(i =>
-    Task.Run(() =>
-    {
-        int stripe = i % Stripes;
-        lock (locks[stripe]) counters[stripe]++;
-    })));
-Console.WriteLine($"Total: {counters.Sum()}"); // 1000
-
-// … Mitigation 3: ReaderWriterLockSlim — allow concurrent reads
-var rwl = new ReaderWriterLockSlim();
-var dict = new Dictionary<string, int> { ["key"] = 0 };
-
-// Many readers can proceed simultaneously
-await Task.WhenAll(Enumerable.Range(0, 100).Select(_ => Task.Run(() =>
-{
-    rwl.EnterReadLock();
-    try { _ = dict["key"]; }
-    finally { rwl.ExitReadLock(); }
-})));
-
-// … Mitigation 4: Reduce lock scope — keep critical section minimal
-int result;
-lock (sharedLock) result = counter; // read fast under lock
-Console.WriteLine(ExpensiveProcess(result)); // heavy work OUTSIDE lock
-
-// … Mitigation 5: ConcurrentDictionary — built-in lock striping
-var cd = new System.Collections.Concurrent.ConcurrentDictionary<int, int>();
-await Task.WhenAll(Enumerable.Range(0, 1000).Select(i =>
-    Task.Run(() => cd.AddOrUpdate(i % 10, 1, (_, v) => v + 1))));
-
-int ExpensiveProcess(int v) => v * 2;
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is lazy initialization in C# multithreading and how does it affect startup performance?
-
-**Lazy initialization** defers the creation of an expensive object until it is first accessed. This reduces startup time and avoids allocating resources that may never be needed.
-
-```cs
-// 1. Lazy<T> — thread-safe by default (LazyThreadSafetyMode.ExecutionAndPublication)
-var heavyService = new Lazy<DatabaseService>(() =>
-{
-    Console.WriteLine("Initializing DatabaseService...");
-    return new DatabaseService("Server=localhost;");
-});
-
-Console.WriteLine("App started (no DB init yet)");
-// DB not initialized until first .Value access
-Console.WriteLine(heavyService.Value.Query("SELECT 1")); // initialized here
-Console.WriteLine(heavyService.Value.Query("SELECT 2")); // reuses same instance
-
-// 2. Thread-safety modes
-var lazy1 = new Lazy<int>(() => 42,
-    LazyThreadSafetyMode.ExecutionAndPublication); // default — safe, single init
-var lazy2 = new Lazy<int>(() => 42,
-    LazyThreadSafetyMode.PublicationOnly);          // allows multiple inits, first wins
-var lazy3 = new Lazy<int>(() => 42,
-    LazyThreadSafetyMode.None);                     // no thread safety — fastest, single-thread only
-
-// 3. Lazy<T> in a service / singleton
-public sealed class AppServices
-{
-    private static readonly Lazy<AppServices> _instance =
-        new(() => new AppServices(), LazyThreadSafetyMode.ExecutionAndPublication);
-
-    public static AppServices Instance => _instance.Value;
-    private AppServices() { Console.WriteLine("AppServices initialized"); }
-    public void DoWork() => Console.WriteLine("Working");
-}
-
-AppServices.Instance.DoWork(); // initialized on first access
-
-// 4. LazyInitializer — static helper, struct-friendly (no wrapper object)
-DatabaseService? _db = null;
-DatabaseService db = LazyInitializer.EnsureInitialized(
-    ref _db, () => new DatabaseService("Server=prod;"));
-
-// 5. Impact on startup
-// Without lazy: all services created at startup — slow, wastes memory for unused services
-// With lazy:    only what\'s needed is created — faster startup, lower memory footprint
-
-class DatabaseService(string connStr)
-{
-    public string Query(string sql)
-    {
-        Console.WriteLine($"Query [{sql}] on {connStr}");
-        return "result";
-    }
-}
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. Explain `SpinLock` in C# multithreading. How does it differ from `lock` / `Monitor`?
-
-`SpinLock` is a mutual exclusion primitive that **busy-waits** (spins) in a tight loop rather than yielding the thread to the OS. This avoids kernel transitions, making it faster for **very short** critical sections — but wasteful for longer ones.
-
-| | `lock` / `Monitor` | `SpinLock` |
-|-|-------------------|-----------|
-| **Blocking** | Suspends thread (kernel sleep) | Busy-wait (CPU spinning) |
-| **Best for** | Sections taking > ~1 s | Sections taking < ~1 s |
-| **CPU usage while waiting** | Low (thread suspended) | High (continuous spin) |
-| **Overhead per acquire** | Higher (kernel transition) | Lower (no kernel call) |
-| **Struct** | Class | `struct` — avoid copying |
-| **Thread affinity** | No | Must release on same thread |
-
-```cs
-// SpinLock usage
-var spinLock = new SpinLock(enableThreadOwnerTracking: false);
-int sharedCounter = 0;
-
-await Task.WhenAll(Enumerable.Range(0, 1000).Select(_ => Task.Run(() =>
-{
-    bool taken = false;
-    try
-    {
-        spinLock.Enter(ref taken); // busy-wait until acquired
-        sharedCounter++;           // very short critical section
-    }
-    finally
-    {
-        if (taken) spinLock.Exit(useMemoryBarrier: false);
-    }
-})));
-
-Console.WriteLine(sharedCounter); // 1000
-
-// SpinWait — adaptive spinning with back-off (yield after many spins)
-var sw = new SpinWait();
-volatile bool ready = false;
-Task.Run(() => { Thread.Sleep(100); ready = true; });
-
-while (!ready)
-    sw.SpinOnce(); // spins first, then yields, then sleeps
-Console.WriteLine("Ready!");
-
-// TryEnter — non-blocking
-bool acquired = false;
-spinLock.TryEnter(ref acquired);
-if (acquired)
-{
-    try { /* work */ }
-    finally { spinLock.Exit(); }
-}
-
-//  Rules:
-// - Never use SpinLock for I/O-bound or blocking code
-// - Never await inside a SpinLock (deadlock risk on thread pool)
-// - Don\'t copy the SpinLock struct — always pass by ref
-// - Use Interlocked instead when operating on a single variable
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How are threads different from TPL?
-
-| | Raw `Thread` | Task Parallel Library (TPL) |
-|-|-------------|----------------------------|
-| **Abstraction** | Low-level OS thread | High-level task abstraction |
-| **Thread reuse** | No — new thread each time | Yes — reuses thread pool threads |
-| **Return values** | Not built-in | `Task<T>` returns results |
-| **Exception handling** | Manual (inside thread body) | Propagated via `await` / `.Result` |
-| **Cancellation** | Manual flag/volatile | `CancellationToken` built-in |
-| **Async/await** | Not supported | Native support |
-| **Composition** | Manual `Join`, no chaining | `WhenAll`, `WhenAny`, continuations |
-| **Parallel loops** | Manual partitioning | `Parallel.For`, `Parallel.ForEach` |
-| **Best for** | Long-running, dedicated background threads | Everything else |
-
-```cs
-// Thread — low-level, full control
-var thread = new Thread(() =>
-{
-    Console.WriteLine($"Raw thread: {Thread.CurrentThread.ManagedThreadId}");
-    Thread.Sleep(200);
-    Console.WriteLine("Thread done");
-});
-thread.IsBackground = true;
-thread.Start();
-thread.Join();
-
-// TPL — high-level, composable, async-friendly
-int result = await Task.Run(() =>
-{
-    Console.WriteLine($"TPL thread: {Thread.CurrentThread.ManagedThreadId}");
-    Thread.Sleep(200);
-    return 42;
-});
-Console.WriteLine($"Task result: {result}");
-
-// TPL continuation chaining
-var pipeline = Task.Run(() => "raw data")
-    .ContinueWith(t => t.Result.ToUpper())
-    .ContinueWith(t => $"Processed: {t.Result}");
-Console.WriteLine(await pipeline);
-
-// TPL: parallel loop — 4 cores, no manual thread management
-await Parallel.ForEachAsync(Enumerable.Range(0, 8), async (i, ct) =>
-{
-    await Task.Delay(100, ct);
-    Console.WriteLine($"Item {i} done");
-});
-```
-## Q. What is the difference between Task and Thread in C#?
-
-`Thread` is a low-level OS construct for concurrent execution. `Task` is a higher-level abstraction from the Task Parallel Library (TPL) that runs work on the **thread pool** and supports `async`/`await`.
-
-| Feature                   | `Thread`                         | `Task`                              |
-|---------------------------|----------------------------------|-------------------------------------|
-| Abstraction level         | Low-level (OS thread)            | High-level (thread pool / async)    |
-| Creation cost             | High (new OS thread each time)   | Low (reuses thread pool threads)    |
-| Return value              | No built-in support              | `Task<T>` returns a result          |
-| Exception handling        | Manual (unhandled = crash)       | Propagated via `await` / `.Result`  |
-| Cancellation              | Manual (`Thread.Abort` removed)  | `CancellationToken` built-in        |
-| Async/await               | Not supported                    | Native support                      |
-| Recommended for           | Long-running dedicated work      | Everything else (preferred)         |
-
-**Thread example (rare in modern .NET):**
-
-```cs
-var thread = new Thread(() =>
-    Console.WriteLine($"Thread: {Thread.CurrentThread.ManagedThreadId}"));
-thread.IsBackground = true;
-thread.Start();
-thread.Join();
-```
-
-**Task example (preferred):**
-
-```cs
-var result = await Task.Run(() =>
-{
-    Console.WriteLine($"Thread pool ID: {Thread.CurrentThread.ManagedThreadId}");
-    return 42;
-});
-Console.WriteLine(result); // Output: 42
-```
-
-**Long-running task (equivalent to a dedicated thread):**
-
-```cs
-var longRunning = Task.Factory.StartNew(() =>
-{
-    while (true) { /* background service loop */ }
-}, TaskCreationOptions.LongRunning);
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is `ConfigureAwait(false)` and when should it be used?
-
-When a `Task` is awaited, by default .NET tries to **resume on the original synchronisation context** (e.g., the UI thread, or an ASP.NET Classic request context). `ConfigureAwait(false)` instructs the runtime to resume on **any available thread-pool thread** instead, which avoids unnecessary context switches and potential deadlocks.
-
-```cs
-// ” 1. Default behaviour (ConfigureAwait(true) / omitted) ”———————
-// Resumes on the captured synchronisation context (e.g. UI thread)
-async Task LoadAndDisplayAsync()
-{
-    var data = await FetchDataAsync();   // resumes on UI thread  important for WPF/WinForms
-    label.Text = data;                   // … safe — UI update on UI thread
-}
-
-// ” 2. Library code — always use ConfigureAwait(false) ”——————————
-// Library methods should NOT capture the caller\'s context
-public static async Task<string> FetchDataAsync(string url)
-{
-    using var client = new HttpClient();
-    // ConfigureAwait(false) — resume on any thread pool thread
-    string json = await client.GetStringAsync(url).ConfigureAwait(false);
-    return json;   // no context-sensitive work here
-}
-
-// ” 3. Deadlock scenario (ASP.NET Classic / WPF without ConfigureAwait) ”
-// BAD: .Result on async method in single-threaded context causes deadlock
-// string result = FetchDataAsync("https://example.com").Result; //  DEADLOCK
-
-// GOOD: await end-to-end, or use ConfigureAwait(false) in the library
-public static async Task<string> SafeFetchAsync(string url)
-{
-    using var client = new HttpClient();
-    return await client.GetStringAsync(url).ConfigureAwait(false);
-}
-
-// ” 4. ASP.NET Core — no SynchronisationContext, so ConfigureAwait(false)
-//    is not required for correctness, but still a good habit in library code
-public async Task<IActionResult> GetAsync()
-{
-    // In ASP.NET Core, SynchronisationContext is null — both are equivalent
-    var data = await FetchDataAsync("https://api.example.com/data");
-    return Ok(data);
-}
-
-// ” 5. ConfigureAwait in a loop ”—————————————————————————————————
-public static async Task ProcessItemsAsync(IEnumerable<int> ids)
-{
-    foreach (int id in ids)
-    {
-        var result = await LoadItemAsync(id).ConfigureAwait(false);
-        Console.WriteLine(result);
-    }
-}
-
-static Task<string> LoadItemAsync(int id) => Task.FromResult($"Item-{id}");
-```
-
-**When to use / not use `ConfigureAwait(false)`:**
-
-| Scenario | Use `ConfigureAwait(false)`? | Reason |
-|----------|------------------------------|--------|
-| Library / NuGet package code | … Always | Don\'t impose context on callers |
-| ASP.NET Core controller / middleware | Optional | No SynchronisationContext |
-| WPF / WinForms UI method |  No | Need to return to UI thread |
-| ASP.NET Classic (System.Web) | … Yes | Avoid deadlocks on captured context |
-| Unit test with `async` | … Yes | Test runners may have a context |
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is `IAsyncEnumerable<T>` and how do you use `await foreach` in C#?
-
-`IAsyncEnumerable<T>` (C# 8 / .NET Standard 2.1+) enables **asynchronous streaming** — producing and consuming items one at a time without buffering the entire result set in memory. It combines the pull-based iteration of `IEnumerable<T>` with asynchrony.
-
-```cs
-using System.Runtime.CompilerServices;
-
-// ” 1. Producing an async stream ”————————————————————————————————
-// Use `yield return` inside an `async` method returning IAsyncEnumerable<T>
-static async IAsyncEnumerable<int> GenerateNumbersAsync(
-    int count,
-    [EnumeratorCancellation] CancellationToken ct = default)
-{
-    for (int i = 1; i <= count; i++)
-    {
-        ct.ThrowIfCancellationRequested();
-        await Task.Delay(50, ct);   // simulate async work (DB query, HTTP, etc.)
-        yield return i;
-    }
-}
-
-// ” 2. Consuming with `await foreach` ”———————————————————————————
-await foreach (int number in GenerateNumbersAsync(5))
-    Console.WriteLine(number);   // prints 1..5 as they arrive
-
-// ” 3. CancellationToken support ”————————————————————————————————
-using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
-try
-{
-    await foreach (int n in GenerateNumbersAsync(100, cts.Token))
-        Console.WriteLine(n);
-}
-catch (OperationCanceledException)
-{
-    Console.WriteLine("Stream cancelled.");
-}
-
-// ” 4. ConfigureAwait on IAsyncEnumerable ”———————————————————————
-await foreach (int n in GenerateNumbersAsync(5).ConfigureAwait(false))
-    Console.WriteLine(n);
-
-// ” 5. Real-world: streaming database rows ”——————————————————————
-// (EF Core 3+ supports IAsyncEnumerable via AsAsyncEnumerable())
-// async IAsyncEnumerable<Order> StreamOrdersAsync(AppDbContext db)
-// {
-//     await foreach (var order in db.Orders.AsAsyncEnumerable())
-//         yield return order;
-// }
-
-// ” 6. Stream large file lines without loading all into memory ”——
-static async IAsyncEnumerable<string> ReadLinesAsync(
-    string path,
-    [EnumeratorCancellation] CancellationToken ct = default)
-{
-    await using var fs = File.OpenRead(path);
-    using var reader = new StreamReader(fs);
-    string? line;
-    while ((line = await reader.ReadLineAsync(ct)) is not null)
-        yield return line;
-}
-
-// ” 7. LINQ-style on async streams (System.Linq.Async NuGet) ”————
-// var evens = GenerateNumbersAsync(10).Where(n => n % 2 == 0);
-// await foreach (var n in evens) Console.WriteLine(n);
-
-// ” 8. Collect to list when needed ”——————————————————————————————
-var items = new List<int>();
-await foreach (int n in GenerateNumbersAsync(5))
-    items.Add(n);
-Console.WriteLine(string.Join(", ", items));  // 1, 2, 3, 4, 5
-```
-
-**`IAsyncEnumerable<T>` vs alternatives:**
-
-| Approach | Buffering | Back-pressure | Best for |
-|----------|-----------|---------------|----------|
-| `Task<List<T>>` | All items at once | No | Small result sets |
-| `IAsyncEnumerable<T>` | One item at a time | Yes (pull) | Large / infinite streams |
-| `Channel<T>` | Configurable | Yes | Producer-consumer pipelines |
-| `IObservable<T>` (Rx) | Push-based | Complex | Event-driven streams |
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are the pitfalls of `async void` methods in C#?
-
-`async void` is allowed only for event handlers. Using it anywhere else creates silent, hard-to-debug failures because **exceptions escape the caller\'s context** and cannot be awaited.
-
-```cs
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-// PROBLEM 1 — Unhandled exceptions crash the process
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-async void FireAndForget()                 //  async void — avoid
-{
-    await Task.Delay(100);
-    throw new InvalidOperationException("Oops!");  // crashes the process — cannot be caught by caller
-}
-
-try
-{
-    FireAndForget();    // returns immediately — exception is NOT catchable here
-}
-catch (Exception)
-{
-    //  Never reached — the exception happens after the await
-    Console.WriteLine("This will never print");
-}
-
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-// PROBLEM 2 — Cannot be awaited or composed
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-async void LoadAsync() { await Task.Delay(500); Console.WriteLine("Done"); }
-
-// await LoadAsync();     //  compile error — void is not awaitable
-// Task t = LoadAsync();  //  compile error — returns void, not Task
-
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-// CORRECT ALTERNATIVES
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-
-// ” 1. Return Task — preferred for all non-event-handler async methods
-async Task LoadDataAsync()
-{
-    await Task.Delay(100);
-    Console.WriteLine("Data loaded");
-}
-await LoadDataAsync();   // … awaitable, exception propagates normally
-
-// ” 2. async void is ONLY acceptable for event handlers
-// (because event delegates have a void return signature)
-public class MyForm
-{
-    private Button _btn = new Button();
-
-    public MyForm()
-    {
-        _btn.Click += OnButtonClickAsync;   // … event handler — async void OK
-    }
-
-    private async void OnButtonClickAsync(object? sender, EventArgs e)
-    {
-        try
-        {
-            await LoadDataAsync();
-        }
-        catch (Exception ex)
-        {
-            // … Always wrap async void event handlers in try/catch
-            Console.Error.WriteLine($"Event handler error: {ex.Message}");
-        }
-    }
-}
-
-// ” 3. Fire-and-forget with proper error handling ”———————————————
-static Task StartBackgroundWork()
-{
-    return Task.Run(async () =>
-    {
-        try
-        {
-            await Task.Delay(100);
-            Console.WriteLine("Background work done");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Background error: {ex.Message}");
-        }
-    });
-}
-
-_ = StartBackgroundWork();   // discard Task intentionally — fire-and-forget pattern
-
-// ” 4. Top-level async in older frameworks ”——————————————————————
-// BEFORE C# 7.1: Main couldn\'t be async ’ temptation to use async void
-// async void Main() { }  // 
-
-// C# 7.1+: async Main is fully supported
-// static async Task Main(string[] args) { await DoWorkAsync(); }  // …
-```
-
-**`async void` rules:**
-
-| Rule | Reason |
-|------|--------|
-| Never use `async void` except for event handlers | Exceptions crash the process |
-| Always `try/catch` inside `async void` event handlers | Last line of defence |
-| Replace `async void` with `async Task` everywhere else | Awaitable, composable, testable |
-| For fire-and-forget, use `_ = task` with internal error handling | Explicitly marks the intent |
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
@@ -22329,7 +19628,7 @@ TaskScheduler.UnobservedTaskException += (_, e) =>
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## # 10. EVENTS AND DELEGATES
+## # 10. DELEGATES AND EVENTS
 
 <br>
 
@@ -23160,1622 +20459,7 @@ static int GetSubscriberCount<T>(object publisher, string eventName) where T : D
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## # 11. GARBAGE COLLECTION
-
-<br>
-
-## Q. What is garbage collection in .NET and how does it work?
-
-The **Garbage Collector (GC)** is an automatic memory manager in the .NET runtime that allocates and reclaims heap memory for managed objects, eliminating the need for manual `free`/`delete` calls.
-
-**How it works:**
-1. Objects are allocated on the **managed heap**
-2. The GC periodically checks which objects are **reachable** (via roots: stack variables, static fields, GC handles)
-3. **Unreachable** objects are swept — their memory is reclaimed
-4. **Surviving** objects are **compacted** (defragmentation) and promoted to higher generations
-
-```mermaid
-flowchart TD
-    A["Object Created\n(new keyword)"] --> B["Allocated in\nGeneration 0 (Gen 0)"]
-    B --> C{"GC Collection\ntriggered?"}
-    C -->|"Still reachable\n(has root)"| D["Survive ’ Promoted\nto Generation 1"]
-    C -->|"Unreachable\n(no root)"| E["Memory Reclaimed\n(swept)"]
-    D --> F{"Next GC\ncollection?"}
-    F -->|"Still reachable"| G["Promote to\nGeneration 2\n(long-lived)"]
-    F -->|"Unreachable"| E
-    G --> H{"Large Object?\n≥ 85KB"}
-    H -->|Yes| I["Large Object Heap\n(LOH) — Gen 2"]
-    H -->|No| G
-
-    style E fill:#e74c3c,color:#fff
-    style G fill:#27ae60,color:#fff
-    style I fill:#8e44ad,color:#fff
-```
-
-```cs
-// Objects on managed heap — GC manages lifetime automatically
-var list = new List<string>();          // heap allocation
-list.Add("item");                       // more heap
-list = null;                           // now unreachable ’ eligible for GC
-
-// You never need to free managed objects — GC handles it
-string s = new string('x', 1000);
-s = null; // GC will reclaim when it runs next collection
-
-// GC roots — objects reachable from these are NOT collected:
-// - Local variables on the stack
-// - Static fields
-// - CPU registers
-// - GC handles (pinned, strong, weak)
-
-// Check GC memory info
-var gcInfo = GC.GetGCMemoryInfo();
-Console.WriteLine($"Heap size: {gcInfo.HeapSizeBytes:N0} bytes");
-Console.WriteLine($"Fragmented: {gcInfo.FragmentedBytes:N0} bytes");
-Console.WriteLine($"Total available: {gcInfo.TotalAvailableMemoryBytes:N0} bytes");
-
-// GC notifications (server scenarios)
-GC.RegisterForFullGCNotification(10, 10);
-Console.WriteLine($"GC latency mode: {System.Runtime.GCSettings.LatencyMode}");
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are Generation 0, Generation 1, and Generation 2 in garbage collection? How does the GC know when to clean up?
-
-The GC uses a **generational** model based on the observation that recently allocated objects tend to die young. Objects are promoted through generations as they survive collections.
-
-| Generation | Contains | GC frequency | Notes |
-|-----------|---------|------------|-------|
-| **Gen 0** | Newly allocated objects | Very frequent (ms) | Cheapest collection |
-| **Gen 1** | Survived one Gen 0 | Less frequent | Buffer between Gen 0 and Gen 2 |
-| **Gen 2** | Long-lived objects | Infrequent (seconds) | Static fields, caches, singletons |
-| **LOH** | Objects ≥ 85,000 bytes | With Gen 2 | Large Object Heap — not compacted by default |
-
-```cs
-// Objects start in Gen 0
-var obj = new object();
-Console.WriteLine(GC.GetGeneration(obj)); // 0
-
-// Force promotion for demonstration
-GC.Collect(0); // collect Gen 0
-GC.WaitForPendingFinalizers();
-Console.WriteLine(GC.GetGeneration(obj)); // 1 (survived ’ promoted)
-
-GC.Collect(1);
-GC.WaitForPendingFinalizers();
-Console.WriteLine(GC.GetGeneration(obj)); // 2 (survived again)
-
-// Large objects go straight to LOH (Gen 2)
-var large = new byte[100_000]; // ≥ 85KB → LOH
-Console.WriteLine(GC.GetGeneration(large)); // 2
-
-// How GC knows when to collect:
-// 1. Gen 0 budget exhausted (allocations exceed threshold)
-// 2. System memory pressure
-// 3. Explicit GC.Collect() call
-// 4. AppDomain unload
-
-// GC phases: Mark ’ Sweep ’ Compact
-// Mark   — traverse from roots, mark all reachable objects
-// Sweep  — identify unreachable objects
-// Compact — slide live objects together, update references
-
-// Gen 0 metrics
-Console.WriteLine($"Gen 0 collections: {GC.CollectionCount(0)}");
-Console.WriteLine($"Gen 1 collections: {GC.CollectionCount(1)}");
-Console.WriteLine($"Gen 2 collections: {GC.CollectionCount(2)}");
-Console.WriteLine($"Total memory: {GC.GetTotalMemory(false):N0} bytes");
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. Does the garbage collector clean up primitive types?
-
-**Primitive types** (value types like `int`, `double`, `bool`, `struct`) allocated on the **stack** are NOT managed by the GC — they are freed automatically when the stack frame is popped.
-
-Only **reference types** on the **managed heap** are managed by the GC.
-
-```cs
-// Value types on the stack — NO GC involvement
-int x = 42;          // stack — freed when method returns
-double d = 3.14;     // stack
-bool flag = true;    // stack
-
-// Value types inside a class — ON the heap (as part of the object)
-class DataHolder
-{
-    public int Count;     // on heap because DataHolder is a reference type
-    public double Value;  // on heap
-}
-var holder = new DataHolder(); // holder reference on stack, object on heap ’ GC manages
-
-// Struct on the stack
-struct Point { public int X, Y; }
-Point p = new Point { X = 1, Y = 2 }; // entirely on stack — NO GC
-
-// Struct on the heap (boxed or inside a class/array)
-object boxed = p;          // boxing — copied to heap ’ GC manages
-Point[] points = new Point[10]; // array on heap, but Point values inline in array
-
-// Summary:
-// Primitive/value types on stack ’ freed by stack unwind (no GC)
-// Reference types on heap ’ GC manages
-// Boxed value types on heap ’ GC manages
-// Value types as fields of heap objects ’ GC manages (as part of parent object)
-
-Console.WriteLine($"Is value type: {typeof(int).IsValueType}");    // True
-Console.WriteLine($"Is value type: {typeof(string).IsValueType}"); // False
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How does the garbage collector behave when a class has a destructor (finalizer)?
-
-Objects with **finalizers** are placed on the **finalization queue** when they become unreachable. The GC must run the finalizer before reclaiming memory, which requires **at least two GC cycles**.
-
-```cs
-// Object WITH finalizer — two-cycle collection
-public class ResourceWithFinalizer
-{
-    public ResourceWithFinalizer() => Console.WriteLine("Created");
-
-    // Finalizer (destructor syntax) — called by GC on a dedicated finalizer thread
-    ~ResourceWithFinalizer()
-    {
-        Console.WriteLine("Finalized by GC");
-        // GC thread — do NOT use Thread.CurrentThread, allocate large objects, etc.
-    }
-}
-
-// Cycle 1: object found unreachable ’ moved to finalization queue (NOT reclaimed yet)
-// Cycle 2: finalizer thread runs, GC reclaims memory
-
-// … Dispose pattern — call GC.SuppressFinalize to skip the second cycle
-public class ManagedResource : IDisposable
-{
-    private bool _disposed;
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed) return;
-        if (disposing)
-        {
-            // free managed resources
-        }
-        // free unmanaged resources
-        _disposed = true;
-    }
-
-    ~ManagedResource()
-    {
-        Dispose(disposing: false); // safety net — unmanaged only
-    }
-
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this); // remove from finalization queue ’ single cycle
-    }
-}
-
-// Always use 'using' to call Dispose deterministically
-using var res = new ManagedResource();
-// Dispose called here — GC.SuppressFinalize prevents finalizer run
-
-// Impact on GC:
-// Without Dispose: 2 GC cycles, finalizer thread overhead, delayed reclamation
-// With Dispose + SuppressFinalize: 1 GC cycle, no finalizer overhead
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. Can the garbage collector reclaim unmanaged resources? Can you force garbage collection? Is it a good practice?
-
-**Unmanaged resources** (file handles, sockets, native memory via `Marshal.AllocHGlobal`, COM objects) are **NOT managed by the GC**. They must be released explicitly via `IDisposable` / finalizers.
-
-```cs
-//  GC cannot free unmanaged resources — you must do it
-var handle = System.Runtime.InteropServices.Marshal.AllocHGlobal(1024);
-// ... use handle
-System.Runtime.InteropServices.Marshal.FreeHGlobal(handle); // manual cleanup required
-
-// … Wrap in SafeHandle or IDisposable for automatic cleanup
-public class NativeBuffer : IDisposable
-{
-    private IntPtr _ptr;
-    private bool _disposed;
-
-    public NativeBuffer(int size)
-        => _ptr = System.Runtime.InteropServices.Marshal.AllocHGlobal(size);
-
-    public void Dispose()
-    {
-        if (!_disposed)
-        {
-            System.Runtime.InteropServices.Marshal.FreeHGlobal(_ptr);
-            _ptr = IntPtr.Zero;
-            _disposed = true;
-            GC.SuppressFinalize(this);
-        }
-    }
-
-    ~NativeBuffer() => Dispose(); // safety net
-}
-
-using var buf = new NativeBuffer(1024);
-
-// Forcing GC — GC.Collect()
-GC.Collect();                         // collect all generations
-GC.Collect(0);                        // collect Gen 0 only
-GC.Collect(2, GCCollectionMode.Forced); // forced full collection
-GC.WaitForPendingFinalizers();        // wait for finalizer thread to complete
-GC.Collect();                         // collect finalizable objects
-
-//  Is it good practice to force GC?
-//  Almost never — reasons:
-// - Promotes objects to higher generations unnecessarily (Gen 0 ’ Gen 1 ’ Gen 2)
-// - Disrupts GC\'s self-tuning heuristics
-// - Causes latency spikes (stop-the-world pause)
-// - Rarely improves performance; often makes it worse
-
-// … Acceptable rare cases:
-// 1. After a known large allocation is no longer needed
-// 2. In unit tests verifying finalizer behaviour
-// 3. Before performance-sensitive benchmarks (baseline memory)
-// 4. Out-of-process tooling / diagnostics
-
-void ProcessLargeBatch()
-{
-    LoadLargeDataSet();
-    GC.Collect(2, GCCollectionMode.Aggressive, blocking: true, compacting: true); // rare justified case
-}
-
-void LoadLargeDataSet() { }
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you detect memory leaks in .NET applications?
-
-```cs
-// Common causes of managed memory leaks:
-// 1. Event handlers not unsubscribed (most common)
-// 2. Static fields holding object references
-// 3. Caches with no eviction policy
-// 4. Closures capturing large objects
-// 5. Long-lived collections growing unbounded
-
-// 1. Event leak — subscriber held alive by publisher\'s event
-public class Publisher
-{
-    public event EventHandler? Updated;
-}
-
-public class Subscriber
-{
-    public Subscriber(Publisher pub)
-        => pub.Updated += OnUpdated; // pub holds reference to 'this'
-
-    private void OnUpdated(object? sender, EventArgs e) { }
-
-    // Fix: implement IDisposable and unsubscribe
-}
-
-// 2. Detect with GC.GetTotalMemory
-long before = GC.GetTotalMemory(forceFullCollection: true);
-var list = new List<byte[]>();
-for (int i = 0; i < 100; i++) list.Add(new byte[1024 * 1024]); // 100 MB
-long after = GC.GetTotalMemory(false);
-Console.WriteLine($"Leaked: {(after - before) / 1024 / 1024} MB");
-list.Clear();
-
-// 3. WeakReference — holds reference without preventing GC
-var weakRef = new WeakReference<byte[]>(new byte[1024]);
-GC.Collect();
-if (weakRef.TryGetTarget(out var target))
-    Console.WriteLine("Still alive");
-else
-    Console.WriteLine("Collected");
-
-// 4. Tools for detecting leaks:
-// - dotnet-counters: dotnet counters monitor --process-id <pid>
-// - dotnet-dump:     dotnet dump collect --process-id <pid>
-// - Visual Studio Diagnostic Tools ’ Memory Usage ’ Snapshots
-// - JetBrains dotMemory, Redgate ANTS, PerfView
-
-// 5. MemoryDiagnoser in BenchmarkDotNet
-// [MemoryDiagnoser]
-// public class MyBenchmark { ... }
-
-// 6. ObjectPooling to reduce pressure
-var pool = System.Buffers.ArrayPool<byte>.Shared;
-byte[] rented = pool.Rent(1024);
-try { /* use buffer */ }
-finally { pool.Return(rented); } // returned to pool — no GC pressure
-
-byte[] target2 = [];
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is a finalizer in C#? What is `GC.SuppressFinalize` and when should you use it?
-
-```cs
-// Finalizer — called by GC before reclaiming object memory
-// Syntax: ~ClassName() { }
-// - Runs on the dedicated finalizer thread
-// - Non-deterministic timing
-// - Do NOT call managed code that may have been collected
-// - Only for unmanaged resource cleanup as a SAFETY NET
-
-public class FileWrapper : IDisposable
-{
-    private IntPtr _fileHandle;
-    private bool _disposed;
-
-    public FileWrapper(string path)
-        => _fileHandle = OpenFile(path); // OS handle
-
-    // Finalizer — safety net if Dispose was not called
-    ~FileWrapper()
-    {
-        Console.WriteLine("Finalizer: cleaning up (Dispose was not called!)");
-        Dispose(disposing: false);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed) return;
-        if (disposing)
-        {
-            // safe to access managed objects here
-        }
-        CloseFile(_fileHandle); // unmanaged cleanup always
-        _fileHandle = IntPtr.Zero;
-        _disposed = true;
-    }
-
-    // GC.SuppressFinalize — tells GC: "finalizer not needed, skip finalization queue"
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this); // … skip finalizer — memory reclaimed in ONE cycle
-    }
-
-    private static IntPtr OpenFile(string path) => new(1);
-    private static void CloseFile(IntPtr h) { }
-}
-
-// Always call Dispose with 'using'
-using var fw = new FileWrapper("data.bin");
-// Dispose called ’ GC.SuppressFinalize ’ no finalizer overhead
-
-// GC.ReRegisterForFinalize — re-register for finalization (rare use: resurrection pattern)
-public class ResurrectableResource : IDisposable
-{
-    ~ResurrectableResource() => Console.WriteLine("Finalized");
-
-    public void Reset()
-    {
-        GC.ReRegisterForFinalize(this); // will finalize again when unreachable
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-        Console.WriteLine("Disposed");
-    }
-}
-
-// GC.KeepAlive — prevents GC from collecting object before a certain point
-void UseHandle(IntPtr handle)
-{
-    var resource = new FileWrapper("file");
-    _ = handle; // use handle
-    GC.KeepAlive(resource); // ensure resource is NOT collected before this point
-}
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is `GC.Collect` vs `GC.WaitForPendingFinalizers`?
-
-```cs
-// GC.Collect — triggers a garbage collection
-GC.Collect();         // collect all generations (0, 1, 2)
-GC.Collect(0);        // collect Gen 0 only
-GC.Collect(2, GCCollectionMode.Forced, blocking: true, compacting: true);
-// GCCollectionMode: Default, Forced, Optimized, Aggressive (.NET 6+)
-
-// GC.WaitForPendingFinalizers — blocks until finalizer thread completes all queued finalizers
-GC.WaitForPendingFinalizers();
-
-// Why use both together?
-// After Collect() — unreachable finalizable objects are queued for finalization
-// WaitForPendingFinalizers() — waits for finalizer thread to process that queue
-// Second Collect() — reclaims the now-finalized objects
-
-// Standard pattern when you MUST force GC (tests, benchmarks):
-GC.Collect();
-GC.WaitForPendingFinalizers();
-GC.Collect(); // reclaim objects that were waiting for finalization
-
-// Example — verifying finalizer runs in tests
-bool finalized = false;
-
-void CreateObject()
-{
-    var obj = new FinalizableObj(() => finalized = true);
-}
-
-CreateObject();           // obj goes out of scope
-GC.Collect();
-GC.WaitForPendingFinalizers();
-Console.WriteLine($"Finalized: {finalized}"); // True
-
-// GC.GetTotalMemory(forceFullCollection: true) — combines Collect + WaitForPendingFinalizers
-long memory = GC.GetTotalMemory(forceFullCollection: true);
-Console.WriteLine($"Memory after full GC: {memory:N0} bytes");
-
-class FinalizableObj(Action onFinalize)
-{
-    ~FinalizableObj() => onFinalize();
-}
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is a `WeakReference` in C#?
-
-A **`WeakReference<T>`** holds a reference to an object without preventing it from being garbage collected. Useful for caches and observer patterns where you don\'t want to force objects to stay alive.
-
-```cs
-// WeakReference<T> — does NOT prevent GC collection
-var data = new byte[1024 * 1024]; // 1 MB
-var weak = new WeakReference<byte[]>(data);
-
-data = null!; // remove strong reference
-GC.Collect();
-
-if (weak.TryGetTarget(out byte[]? target))
-    Console.WriteLine($"Still alive: {target.Length} bytes");
-else
-    Console.WriteLine("Collected by GC");
-
-// WeakReference cache pattern — auto-evicts entries under memory pressure
-public class WeakCache<TKey, TValue> where TKey : notnull where TValue : class
-{
-    private readonly Dictionary<TKey, WeakReference<TValue>> _cache = new();
-
-    public void Set(TKey key, TValue value)
-        => _cache[key] = new WeakReference<TValue>(value);
-
-    public TValue? Get(TKey key)
-    {
-        if (_cache.TryGetValue(key, out var wr) && wr.TryGetTarget(out var val))
-            return val;
-        _cache.Remove(key); // clean up dead entry
-        return null;
-    }
-}
-
-var cache = new WeakCache<int, string>();
-cache.Set(1, "hello");
-
-string? val = cache.Get(1);
-Console.WriteLine(val ?? "not found"); // hello
-
-// WeakReference (non-generic, legacy) — avoid, use WeakReference<T> instead
-object obj = new { Name = "test" };
-var legacyWeak = new WeakReference(obj);
-Console.WriteLine(legacyWeak.IsAlive); // True
-obj = null!;
-GC.Collect();
-Console.WriteLine(legacyWeak.IsAlive); // False
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the `Lazy<T>` class? What is the difference between `Lazy` and `Lazy<T>`?
-
-`Lazy<T>` defers creation of an expensive object until it is first accessed. It is thread-safe by default.
-
-```cs
-// Lazy<T> — deferred, thread-safe initialization
-var lazyConfig = new Lazy<AppConfig>(() =>
-{
-    Console.WriteLine("Loading config..."); // only runs on first access
-    return new AppConfig { Timeout = 30 };
-});
-
-// Value not yet created
-Console.WriteLine(lazyConfig.IsValueCreated); // False
-
-// First access — triggers initialization
-AppConfig config = lazyConfig.Value;           // "Loading config..."
-Console.WriteLine(lazyConfig.IsValueCreated); // True
-Console.WriteLine(lazyConfig.Value.Timeout);  // 30 — second access, no re-init
-
-// Thread safety modes
-var lazy1 = new Lazy<ExpensiveObject>(LazyThreadSafetyMode.ExecutionAndPublication); // default — lock on init
-var lazy2 = new Lazy<ExpensiveObject>(LazyThreadSafetyMode.PublicationOnly);         // race: one winner
-var lazy3 = new Lazy<ExpensiveObject>(LazyThreadSafetyMode.None);                    // no thread safety
-
-// Common pattern: lazy singleton in a class
-public class DataService
-{
-    private static readonly Lazy<DataService> _instance
-        = new(() => new DataService());
-
-    public static DataService Instance => _instance.Value;
-
-    private DataService() { }
-    public void Query() => Console.WriteLine("Querying data");
-}
-
-DataService.Instance.Query();
-
-// Lazy (non-generic) — does NOT exist as a public API
-// 'Lazy' by itself is not a type — always use Lazy<T>
-// The question likely refers to:
-// € Lazy<T>  — built-in BCL class
-// € Custom lazy patterns (lazy fields, lazy properties)
-
-// Lazy property pattern (no Lazy<T> class)
-private ExpensiveObject? _resource;
-ExpensiveObject Resource => _resource ??= new ExpensiveObject();
-
-record AppConfig { public int Timeout { get; init; } }
-class ExpensiveObject { }
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is a `MemoryCache` in C#?
-
-`MemoryCache` is an in-process, thread-safe cache provided by `Microsoft.Extensions.Caching.Memory`. It stores key-value pairs in memory with optional expiration, size limits, and eviction callbacks.
-
-```cs
-using Microsoft.Extensions.Caching.Memory;
-
-// Create cache
-var cache = new MemoryCache(new MemoryCacheOptions
-{
-    SizeLimit = 1024 // max entries (in size units you define)
-});
-
-// Set with absolute expiration
-cache.Set("user:1", new User(1, "Alice"), new MemoryCacheEntryOptions
-{
-    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
-    Size = 1 // count this entry as 1 unit toward SizeLimit
-});
-
-// Set with sliding expiration (refreshed on each access)
-cache.Set("session:abc", new SessionData(), new MemoryCacheEntryOptions
-{
-    SlidingExpiration = TimeSpan.FromMinutes(20),
-    Size = 1
-});
-
-// Get
-if (cache.TryGetValue("user:1", out User? user))
-    Console.WriteLine($"From cache: {user?.Name}");
-
-// GetOrCreate — atomic check-and-create
-User cachedUser = cache.GetOrCreate("user:2", entry =>
-{
-    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
-    entry.Size = 1;
-    return new User(2, "Bob"); // factory — called only on cache miss
-})!;
-
-// Async GetOrCreateAsync
-User cachedUser2 = await cache.GetOrCreateAsync("user:3", async entry =>
-{
-    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
-    entry.Size = 1;
-    return await LoadUserFromDbAsync(3);
-}) ?? throw new Exception("Not found");
-
-// Eviction callback
-cache.Set("temp:key", "value", new MemoryCacheEntryOptions
-{
-    AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30),
-    Size = 1
-}.RegisterPostEvictionCallback((key, value, reason, state) =>
-    Console.WriteLine($"Evicted '{key}': {reason}")));
-
-// Remove manually
-cache.Remove("user:1");
-
-// In ASP.NET Core — register via DI
-// services.AddMemoryCache();
-// Then inject IMemoryCache into your service
-
-static Task<User> LoadUserFromDbAsync(int id) => Task.FromResult(new User(id, $"User{id}"));
-record User(int Id, string Name);
-record SessionData;
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is a `Mutex` in C#?
-
-A `Mutex` (mutual exclusion) is a synchronization primitive that restricts access to a resource to **one thread at a time**, and uniquely supports **cross-process** synchronization via a named mutex.
-
-```cs
-// 1. Local mutex — single-process synchronization
-using var mutex = new Mutex();
-
-Thread t1 = new(() =>
-{
-    mutex.WaitOne(); // acquire
-    try   { Console.WriteLine("T1 in critical section"); Thread.Sleep(100); }
-    finally { mutex.ReleaseMutex(); }
-});
-
-Thread t2 = new(() =>
-{
-    mutex.WaitOne();
-    try   { Console.WriteLine("T2 in critical section"); }
-    finally { mutex.ReleaseMutex(); }
-});
-
-t1.Start(); t2.Start(); t1.Join(); t2.Join();
-
-// 2. Named mutex — cross-process (e.g., single-instance application)
-const string MutexName = "Global\\MyApp_SingleInstance";
-
-bool createdNew;
-using var globalMutex = new Mutex(initiallyOwned: true, MutexName, out createdNew);
-
-if (!createdNew)
-{
-    Console.WriteLine("Another instance is already running.");
-    return;
-}
-
-try
-{
-    Console.WriteLine("Application running...");
-    Thread.Sleep(5000); // simulate work
-}
-finally
-{
-    globalMutex.ReleaseMutex();
-}
-
-// 3. Mutex with timeout
-using var timedMutex = new Mutex();
-bool acquired = timedMutex.WaitOne(TimeSpan.FromSeconds(5));
-if (acquired)
-{
-    try { Console.WriteLine("Acquired with timeout"); }
-    finally { timedMutex.ReleaseMutex(); }
-}
-else
-{
-    Console.WriteLine("Timed out waiting for mutex");
-}
-
-// Note: for single-process scenarios prefer lock/Monitor or SemaphoreSlim
-// Mutex is heavier — use only when cross-process sync is needed
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is `Semaphore` vs `SemaphoreSlim` in C#?
-
-| | `Semaphore` | `SemaphoreSlim` |
-|-|------------|----------------|
-| **Cross-process** | … Named semaphores |  In-process only |
-| **Async support** |  | … `WaitAsync()` |
-| **Performance** | Heavier (OS kernel) | Lighter (user-mode) |
-| **Use when** | Cross-process throttling | In-process async throttling |
-
-```cs
-// SemaphoreSlim — preferred for async in-process scenarios
-var semaphore = new SemaphoreSlim(initialCount: 3, maxCount: 3); // allow 3 concurrent
-
-var tasks = Enumerable.Range(1, 10).Select(async i =>
-{
-    await semaphore.WaitAsync(); // acquire slot (async — no thread blocking)
-    try
-    {
-        Console.WriteLine($"Task {i} running (slots left: {semaphore.CurrentCount})");
-        await Task.Delay(500); // simulate work
-    }
-    finally
-    {
-        semaphore.Release(); // release slot
-        Console.WriteLine($"Task {i} done");
-    }
-});
-
-await Task.WhenAll(tasks); // max 3 tasks run concurrently
-
-// Named Semaphore — cross-process throttling
-using var namedSemaphore = new Semaphore(initialCount: 2, maximumCount: 2, name: "Global\\MySemaphore");
-bool entered = namedSemaphore.WaitOne(TimeSpan.FromSeconds(5));
-if (entered)
-{
-    try { Console.WriteLine("Entered semaphore"); }
-    finally { namedSemaphore.Release(); }
-}
-
-// Rate-limiting with SemaphoreSlim (throttle API calls)
-var throttle = new SemaphoreSlim(5); // max 5 concurrent HTTP calls
-async Task<string> FetchAsync(HttpClient client, string url)
-{
-    await throttle.WaitAsync();
-    try   { return await client.GetStringAsync(url); }
-    finally { throttle.Release(); }
-}
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is a deadlock in C#?
-
-A **deadlock** occurs when two or more threads each hold a resource that the other needs, causing all threads to wait indefinitely.
-
-```cs
-// Classic deadlock — two threads, two locks acquired in opposite order
-object lock1 = new();
-object lock2 = new();
-
-Thread t1 = new(() =>
-{
-    lock (lock1)
-    {
-        Thread.Sleep(50); // give t2 time to acquire lock2
-        lock (lock2) { Console.WriteLine("T1: acquired both locks"); }
-    }
-});
-
-Thread t2 = new(() =>
-{
-    lock (lock2)
-    {
-        Thread.Sleep(50);
-        lock (lock1) { Console.WriteLine("T2: acquired both locks"); }
-    }
-});
-
-// t1.Start(); t2.Start();  DEADLOCK! Both threads wait forever
-
-// Prevention 1: consistent lock ordering
-Thread safe1 = new(() => { lock (lock1) { lock (lock2) { Console.WriteLine("safe1"); } } });
-Thread safe2 = new(() => { lock (lock1) { lock (lock2) { Console.WriteLine("safe2"); } } });
-safe1.Start(); safe2.Start(); safe1.Join(); safe2.Join();
-
-// Prevention 2: use Monitor.TryEnter with timeout
-Thread tryLock = new(() =>
-{
-    if (Monitor.TryEnter(lock1, TimeSpan.FromSeconds(1)))
-    {
-        try
-        {
-            if (Monitor.TryEnter(lock2, TimeSpan.FromSeconds(1)))
-            {
-                try { Console.WriteLine("Acquired both"); }
-                finally { Monitor.Exit(lock2); }
-            }
-            else { Console.WriteLine("Could not acquire lock2 — backoff"); }
-        }
-        finally { Monitor.Exit(lock1); }
-    }
-});
-tryLock.Start(); tryLock.Join();
-
-// Prevention 3: prefer async/await + SemaphoreSlim over blocking locks
-// Prevention 4: CancellationToken in async operations prevents indefinite waits
-// Prevention 5: use higher-level concurrency primitives (Channel<T>, Dataflow)
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the `Interlocked` class in C#?
-
-`Interlocked` provides **atomic** operations on shared variables — thread-safe without locks, using CPU atomic instructions.
-
-```cs
-// Interlocked.Increment / Decrement — atomic ++ and --
-int counter = 0;
-var threads = Enumerable.Range(0, 10).Select(_ => new Thread(() =>
-{
-    for (int i = 0; i < 1000; i++)
-        Interlocked.Increment(ref counter); // atomic — no race condition
-})).ToList();
-
-threads.ForEach(t => t.Start());
-threads.ForEach(t => t.Join());
-Console.WriteLine(counter); // always 10,000
-
-// Without Interlocked: counter++ is NOT atomic (read-modify-write race)
-// counter++ ’ IL: ldloc, ldc.i4.1, add, stloc — three non-atomic operations
-
-// Interlocked.Add — atomic addition
-long total = 0;
-Interlocked.Add(ref total, 100);
-Console.WriteLine(total); // 100
-
-// Interlocked.Exchange — atomically set and return old value
-int state = 0;
-int oldState = Interlocked.Exchange(ref state, 1);
-Console.WriteLine($"Old: {oldState}, New: {state}"); // Old: 0, New: 1
-
-// Interlocked.CompareExchange — set if current value equals expected (CAS)
-int value = 5;
-int original = Interlocked.CompareExchange(ref value, newValue: 10, comparand: 5);
-Console.WriteLine($"Original: {original}, Value: {value}"); // Original: 5, Value: 10
-
-// CAS loop — lock-free update pattern
-long sharedLong = 0;
-void AddLockFree(long amount)
-{
-    long current, updated;
-    do
-    {
-        current = Interlocked.Read(ref sharedLong);
-        updated = current + amount;
-    } while (Interlocked.CompareExchange(ref sharedLong, updated, current) != current);
-}
-
-// Interlocked.Read — atomic 64-bit read on 32-bit systems
-long safeRead = Interlocked.Read(ref sharedLong);
-
-// Interlocked.MemoryBarrier / MemoryBarrierProcessWide — memory fences
-Interlocked.MemoryBarrier(); // full fence — prevents CPU/compiler reordering
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the difference between `Task` and `ValueTask`?
-
-| | `Task` / `Task<T>` | `ValueTask` / `ValueTask<T>` |
-|-|-------------------|---------------------------|
-| **Allocation** | Always heap allocated | No allocation if synchronous |
-| **Caching** | Can be cached/reused | Single await only |
-| **Overhead** | Higher for hot paths | Lower for sync-fast paths |
-| **Use when** | General async work | High-throughput, often-sync methods |
-
-```cs
-// Task — standard async, always allocates
-async Task<int> GetCountAsync()
-{
-    await Task.Delay(100); // genuinely async
-    return 42;
-}
-
-// ValueTask — avoids allocation when result is immediately available
-async ValueTask<int> GetCachedCountAsync()
-{
-    if (_cache.TryGetValue("count", out int cached))
-        return cached; // synchronous fast path — NO Task allocation
-
-    int value = await LoadFromDbAsync(); // async slow path
-    _cache["count"] = value;
-    return value;
-}
-
-// Using ValueTask
-int count = await GetCachedCountAsync();
-
-// Rules for ValueTask:
-// … Await it exactly once
-// … Don\'t store and await later (use AsTask() first)
-// … Don\'t await from multiple consumers
-// … Use when method frequently returns synchronously
-
-// Converting ValueTask to Task when you need to share/store
-ValueTask<int> vt = GetCachedCountAsync();
-Task<int> task = vt.AsTask(); // convert — now safely multi-awaitable
-int r1 = await task;
-int r2 = await task; // … safe after AsTask()
-
-// IValueTaskSource — advanced: reuse ValueTask with pool (avoid this unless profiling shows need)
-
-Dictionary<string, int> _cache = new();
-Task<int> LoadFromDbAsync() => Task.FromResult(100);
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is `CancellationToken` and `CancellationTokenSource` in C#?
-
-```cs
-// CancellationTokenSource — creates and controls cancellation
-using var cts = new CancellationTokenSource();
-CancellationToken token = cts.Token;
-
-// Cancel after timeout
-using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-
-// Cancel after delay
-cts.CancelAfter(TimeSpan.FromSeconds(5));
-
-// Manual cancel
-// cts.Cancel(); // triggers cancellation
-
-// CancellationToken — passed to async methods to observe cancellation
-async Task<string> FetchDataAsync(string url, CancellationToken ct = default)
-{
-    using var client = new HttpClient();
-    // Pass token to async I/O — cancels automatically
-    return await client.GetStringAsync(url, ct);
-}
-
-// Full usage example
-using var source = new CancellationTokenSource();
-CancellationToken ct = source.Token;
-
-// Register a callback on cancellation
-ct.Register(() => Console.WriteLine("Operation was cancelled"));
-
-Task workTask = Task.Run(async () =>
-{
-    for (int i = 0; i < 100; i++)
-    {
-        ct.ThrowIfCancellationRequested(); // poll and throw OperationCanceledException
-        await Task.Delay(100, ct);         // also respects cancellation
-        Console.WriteLine($"Step {i}");
-    }
-}, ct);
-
-await Task.Delay(350);
-source.Cancel(); // cancel after ~350ms
-
-try
-{
-    await workTask;
-}
-catch (OperationCanceledException)
-{
-    Console.WriteLine("Task was cancelled gracefully");
-}
-
-// Linked tokens — cancel when ANY source fires
-using var userCts    = new CancellationTokenSource();
-using var timeoutCts2 = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-using var linked     = CancellationTokenSource.CreateLinkedTokenSource(
-    userCts.Token, timeoutCts2.Token);
-
-await FetchDataAsync("https://example.com", linked.Token);
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the difference between `Task.WhenAll` and `Task.WhenAny`?
-
-| | `Task.WhenAll` | `Task.WhenAny` |
-|-|---------------|---------------|
-| **Completes when** | ALL tasks complete | FIRST task completes |
-| **Exception** | Waits for all; aggregates | Returns immediately; others keep running |
-| **Use for** | Fan-out parallel work | Timeout, race, first-success patterns |
-
-```cs
-// Task.WhenAll — wait for all, collect all results
-async Task WhenAllExample()
-{
-    Task<string> task1 = FetchAsync("https://api.example.com/users");
-    Task<string> task2 = FetchAsync("https://api.example.com/orders");
-    Task<string> task3 = FetchAsync("https://api.example.com/products");
-
-    string[] results = await Task.WhenAll(task1, task2, task3); // parallel fetch
-    Console.WriteLine($"Users: {results[0].Length} chars");
-    Console.WriteLine($"Orders: {results[1].Length} chars");
-}
-
-// Task.WhenAny — first to complete wins
-async Task WhenAnyExample()
-{
-    // Pattern 1: timeout
-    using var cts = new CancellationTokenSource();
-    Task<string> fetch   = FetchAsync("https://slow-api.example.com");
-    Task<string> timeout = Task.Delay(TimeSpan.FromSeconds(5)).ContinueWith(_ => "timeout");
-
-    Task<string> first = await Task.WhenAny(fetch, timeout);
-    string result = await first;
-    Console.WriteLine(result == "timeout" ? "Request timed out" : $"Got: {result.Length} chars");
-
-    // Pattern 2: first successful result from multiple endpoints
-    var endpoints = new[]
-    {
-        FetchAsync("https://api1.example.com/data"),
-        FetchAsync("https://api2.example.com/data"),
-        FetchAsync("https://api3.example.com/data"),
-    };
-    Task<string> winner = await Task.WhenAny(endpoints);
-    Console.WriteLine($"Fastest result: {(await winner).Length} chars");
-}
-
-// WhenAll exception handling — see all failures
-Task[] failingTasks =
-[
-    Task.Run(() => throw new Exception("Task 1")),
-    Task.Run(() => throw new Exception("Task 2")),
-];
-
-try { await Task.WhenAll(failingTasks); }
-catch
-{
-    foreach (var t in failingTasks.Where(t => t.IsFaulted))
-        Console.WriteLine(t.Exception!.InnerException!.Message);
-}
-
-static Task<string> FetchAsync(string url) =>
-    Task.FromResult($"data-from-{url}");
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is `ConcurrentDictionary` in C#?
-
-`ConcurrentDictionary<TKey, TValue>` is a thread-safe dictionary in `System.Collections.Concurrent` that allows multiple threads to read and write concurrently without external locking.
-
-```cs
-using System.Collections.Concurrent;
-
-var dict = new ConcurrentDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-// Thread-safe add or update
-dict["count"] = 0;
-
-// TryAdd — adds only if key doesn\'t exist
-bool added = dict.TryAdd("item1", 10);
-
-// AddOrUpdate — atomic add-or-update
-dict.AddOrUpdate(
-    key: "count",
-    addValue: 1,
-    updateValueFactory: (_, current) => current + 1);
-
-// GetOrAdd — atomic get-or-create
-int value = dict.GetOrAdd("hits", key =>
-{
-    Console.WriteLine($"Creating default for {key}");
-    return 0;
-});
-
-// GetOrAdd with factory object (avoid closure allocation)
-int value2 = dict.GetOrAdd("hits", static (key, seed) => seed, addValueFactoryArgument: 42);
-
-// Parallel increment
-var counter = new ConcurrentDictionary<string, long>();
-var tasks = Enumerable.Range(0, 100).Select(_ => Task.Run(() =>
-{
-    for (int i = 0; i < 1000; i++)
-        counter.AddOrUpdate("total", 1L, (_, v) => v + 1L);
-}));
-await Task.WhenAll(tasks);
-Console.WriteLine(counter["total"]); // always 100,000
-
-// TryGetValue / TryRemove / TryUpdate
-if (dict.TryGetValue("count", out int count))
-    Console.WriteLine($"count = {count}");
-
-dict.TryRemove("item1", out _);
-
-// Snapshot iteration (safe but may not be perfectly consistent)
-foreach (var (key, val) in dict)
-    Console.WriteLine($"{key} = {val}");
-
-// Keys / Values — snapshot copies
-ICollection<string> keys = dict.Keys;
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is `BlockingCollection` in C#? What is the difference between `ConcurrentBag` and `ConcurrentQueue`?
-
-**`BlockingCollection<T>`** provides bounded, blocking producer-consumer patterns. It wraps any `IProducerConsumerCollection<T>` (defaults to `ConcurrentQueue<T>`).
-
-| | `ConcurrentQueue<T>` | `ConcurrentBag<T>` |
-|-|---------------------|-------------------|
-| **Order** | FIFO | Unordered |
-| **Best for** | Producer-consumer pipelines | Work-stealing (same thread adds+removes) |
-| **Thread affinity** | None | Optimized for thread-local access |
-
-```cs
-// BlockingCollection — bounded producer-consumer queue
-var collection = new BlockingCollection<int>(boundedCapacity: 100);
-
-// Producer — blocks when collection is full
-Task producer = Task.Run(() =>
-{
-    for (int i = 0; i < 20; i++)
-    {
-        collection.Add(i);                 // blocks if at capacity
-        Console.WriteLine($"Produced: {i}");
-    }
-    collection.CompleteAdding();           // signal no more items
-});
-
-// Consumer — blocks when collection is empty
-Task consumer = Task.Run(() =>
-{
-    foreach (int item in collection.GetConsumingEnumerable()) // blocks until item or completed
-        Console.WriteLine($"Consumed: {item}");
-});
-
-await Task.WhenAll(producer, consumer);
-
-// ConcurrentQueue — FIFO, producer-consumer pipeline
-var queue = new ConcurrentQueue<string>();
-queue.Enqueue("first");
-queue.Enqueue("second");
-
-if (queue.TryDequeue(out string? item)) Console.WriteLine(item); // first
-if (queue.TryPeek(out string? next))    Console.WriteLine(next); // second
-
-// ConcurrentBag — unordered, thread-local optimization
-var bag = new ConcurrentBag<int>();
-Parallel.For(0, 10, i => bag.Add(i)); // each thread adds to local bag
-
-while (bag.TryTake(out int bagItem))
-    Console.Write($"{bagItem} "); // unordered output
-Console.WriteLine();
-
-// ConcurrentStack — LIFO
-var stack = new ConcurrentStack<int>();
-stack.Push(1); stack.Push(2); stack.Push(3);
-if (stack.TryPop(out int top)) Console.WriteLine(top); // 3
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the difference between server GC and workstation GC? How do you configure GC with `GCSettings`?
-
-| | **Workstation GC** | **Server GC** |
-|-|------------------|--------------|
-| **Default for** | Desktop, single-process apps | ASP.NET Core, server workloads |
-| **Threads** | 1 GC thread | 1 GC thread per CPU core |
-| **Heap** | 1 heap | 1 heap per CPU core |
-| **Throughput** | Lower | Higher |
-| **Latency** | Lower pauses | Higher pauses (more work per GC) |
-| **Memory** | Lower | Higher |
-
-```cs
-using System.Runtime;
-
-// Check current mode
-Console.WriteLine($"Server GC: {GCSettings.IsServerGC}");
-Console.WriteLine($"Latency mode: {GCSettings.LatencyMode}");
-
-// GCLatencyMode — balance throughput vs pause time
-// Configure for interactive/low-latency scenario
-GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
-// Minimizes Gen 2 collections — good for UI, real-time
-
-// Briefly suppress GC during critical section
-GC.TryStartNoGCRegion(1024 * 1024 * 10); // request 10 MB no-GC region
-try
-{
-    // Critical path — GC will not run here if memory is available
-    PerformLatencySensitiveWork();
-}
-finally
-{
-    GC.EndNoGCRegion();
-    GCSettings.LatencyMode = GCLatencyMode.Interactive; // restore
-}
-
-// Configure in runtimeconfig.json (preferred over code):
-// {
-//   "runtimeOptions": {
-//     "configProperties": {
-//       "System.GC.Server": true,
-//       "System.GC.Concurrent": true,
-//       "System.GC.HeapHardLimit": 1073741824
-//     }
-//   }
-// }
-
-// Or in .csproj:
-// <ServerGarbageCollection>true</ServerGarbageCollection>
-// <GarbageCollectionAdaptationMode>0</GarbageCollectionAdaptationMode>
-
-// Optimize GC in .NET:
-// 1. Reduce allocations — use stackalloc, Span<T>, ArrayPool<T>
-// 2. Avoid boxing — use generics instead of object
-// 3. Dispose IDisposable objects promptly (using statement)
-// 4. Use object pooling for large, frequently-allocated objects
-// 5. Prefer value types (struct) for small, short-lived data
-// 6. Avoid large object heap (LOH) fragmentation — pool large arrays
-
-void PerformLatencySensitiveWork() { }
-
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you implement the `IDisposable` pattern correctly in C#?
-
-`IDisposable` is used to release **unmanaged resources** (file handles, database connections, sockets, native memory) deterministically — without waiting for the garbage collector. The complete "dispose pattern" combines a public `Dispose()` method with a `~finalizer` as a safety net.
-
-```cs
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-// 1. Simple IDisposable — no finalizer needed (wraps another IDisposable)
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-public class FileProcessor : IDisposable
-{
-    private StreamReader? _reader;
-    private bool _disposed;
-
-    public FileProcessor(string path)
-        => _reader = new StreamReader(path);
-
-    public string? ReadLine() => _reader?.ReadLine();
-
-    public void Dispose()
-    {
-        if (_disposed) return;
-        _reader?.Dispose();   // dispose managed resource
-        _reader = null;
-        _disposed = true;
-    }
-}
-
-// Usage — always use `using` for IDisposable
-using var processor = new FileProcessor("data.txt");
-string? line = processor.ReadLine();
-
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-// 2. Full Dispose Pattern — when you hold UNMANAGED resources directly
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-public class NativeResourceHolder : IDisposable
-{
-    // Managed resource (another IDisposable)
-    private Stream? _stream;
-
-    // Unmanaged resource (IntPtr, SafeHandle, etc.)
-    private IntPtr _nativeHandle;
-
-    private bool _disposed;
-
-    public NativeResourceHolder(string path)
-    {
-        _stream       = File.OpenRead(path);
-        _nativeHandle = AllocateNativeResource();   // hypothetical P/Invoke
-    }
-
-    // ” Public entry point ”———————————————————————————————————
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);   // no need for finalizer — Dispose already ran
-    }
-
-    // ” Core logic — called by both Dispose() and finalizer ”——
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed) return;
-
-        if (disposing)
-        {
-            // Safe to access managed objects here (Dispose called)
-            _stream?.Dispose();
-            _stream = null;
-        }
-
-        // Always release unmanaged resources
-        if (_nativeHandle != IntPtr.Zero)
-        {
-            FreeNativeResource(_nativeHandle);   // hypothetical P/Invoke
-            _nativeHandle = IntPtr.Zero;
-        }
-
-        _disposed = true;
-    }
-
-    // ” Finalizer — safety net if caller forgot Dispose() ”————
-    ~NativeResourceHolder() => Dispose(disposing: false);
-
-    private static IntPtr AllocateNativeResource() => new IntPtr(1);   // placeholder
-    private static void FreeNativeResource(IntPtr handle) { }           // placeholder
-}
-
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-// 3. Preferred modern approach — wrap unmanaged handle in SafeHandle
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-using Microsoft.Win32.SafeHandles;
-
-public class SafeResourceHolder : IDisposable
-{
-    private SafeFileHandle? _handle;
-    private Stream?         _stream;
-    private bool            _disposed;
-
-    public SafeResourceHolder(string path)
-    {
-        _handle = File.OpenHandle(path);
-        _stream = new FileStream(_handle, FileAccess.Read);
-    }
-
-    public void Dispose()
-    {
-        if (_disposed) return;
-        _stream?.Dispose();   // disposes both stream and handle
-        _disposed = true;
-        // No finalizer needed — SafeHandle has its own
-    }
-}
-
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-// 4. IAsyncDisposable — for async cleanup (C# 8+)
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-public class AsyncDbConnection : IAsyncDisposable
-{
-    private bool _disposed;
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_disposed) return;
-        await CloseConnectionAsync();   // async teardown
-        _disposed = true;
-    }
-
-    private static Task CloseConnectionAsync() => Task.Delay(10);
-}
-
-await using var conn = new AsyncDbConnection();
-// ... use conn ...
-// DisposeAsync called automatically at end of scope
-```
-
-**Dispose pattern summary:**
-
-| Scenario | Use |
-|----------|-----|
-| Wraps only other `IDisposable` | Simple `Dispose()` — no finalizer |
-| Holds unmanaged resource directly | Full pattern with `Dispose(bool)` + finalizer |
-| Unmanaged handle | `SafeHandle` subclass — preferred over raw `IntPtr` |
-| Async teardown required | `IAsyncDisposable` + `await using` |
-| Always call GC.SuppressFinalize | After successful `Dispose()` to skip finalizer queue |
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the Large Object Heap (LOH) and how does it affect memory and GC performance?
-
-The .NET GC splits the managed heap into the **Small Object Heap (SOH)** for objects < 85,000 bytes and the **Large Object Heap (LOH)** for objects ≥ 85,000 bytes. The LOH is treated differently and can cause **memory pressure** and **fragmentation**.
-
-```cs
-// ” 1. What goes to the LOH ”—————————————————————————————————————
-// Any single managed object >= 85,000 bytes (default threshold)
-// Most common: large arrays (byte[], int[], string with >40K chars)
-
-byte[] small = new byte[84_999];  // SOH — Gen 0
-byte[] large = new byte[85_000];  // LOH — collected only during Gen 2 GC
-
-// ” 2. LOH is collected only with Gen 2 (Full GC) ”———————————————
-// SOH: Gen 0 ’ Gen 1 ’ Gen 2 (short-lived objects collected quickly)
-// LOH: always collected together with Gen 2 ’ more expensive, less frequent
-
-// ” 3. LOH fragmentation ”————————————————————————————————————————
-// LOH is NOT compacted by default (unlike SOH)
-// Allocate and free many large arrays ’ holes appear ’ OutOfMemoryException
-// even when total free memory is enough (fragmentation)
-void DemonstrateFragmentation()
-{
-    var arrays = new List<byte[]>();
-    for (int i = 0; i < 100; i++)
-        arrays.Add(new byte[100_000]);   // 100 — 100KB = 10 MB on LOH
-
-    // Release every other one
-    for (int i = 0; i < arrays.Count; i += 2)
-        arrays[i] = null!;
-
-    GC.Collect();   // compacts SOH but NOT LOH by default — fragmented holes remain
-}
-
-// ” 4. Force LOH compaction (one-time, expensive) ”———————————————
-GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-GC.Collect();   // compacts LOH this one time, then resets to NoCompaction
-
-// ” 5. Best practice: ArrayPool<T> to avoid LOH allocations ”—————
-using System.Buffers;
-
-void ProcessData(int size)
-{
-    //  Allocates a new large array — goes to LOH, increases GC pressure
-    // byte[] buffer = new byte[size];
-
-    // … Rent from pool — reuses existing arrays, no LOH pressure
-    byte[] buffer = ArrayPool<byte>.Shared.Rent(size);
-    try
-    {
-        // Use buffer (may be slightly larger than requested)
-        Array.Clear(buffer, 0, size);
-        Console.WriteLine($"Processing {buffer.Length} bytes");
-    }
-    finally
-    {
-        ArrayPool<byte>.Shared.Return(buffer);   // return to pool — NOT freed
-    }
-}
-
-ProcessData(200_000);   // large but no LOH allocation
-
-// ” 6. Span<T> and Memory<T> — zero-copy, stack-friendly slices ”—
-byte[] fullBuffer = new byte[1_000_000];
-
-// Span<T> — stack-allocated slice reference (cannot be stored in heap fields)
-Span<byte> slice = fullBuffer.AsSpan(0, 100);
-slice.Fill(0xFF);
-
-// Memory<T> — heap-compatible async-friendly slice
-Memory<byte> memSlice = fullBuffer.AsMemory(100, 200);
-await ProcessMemoryAsync(memSlice);
-
-static async Task ProcessMemoryAsync(Memory<byte> mem)
-{
-    await Task.Yield();
-    Console.WriteLine($"Processing {mem.Length} bytes asynchronously");
-}
-
-// ” 7. Monitor LOH size ”—————————————————————————————————————————
-long lohSize = GC.GetGCMemoryInfo().GenerationInfo[3].SizeAfterBytes;
-Console.WriteLine($"LOH size after GC: {lohSize / 1024:N0} KB");
-```
-
-**LOH rules of thumb:**
-
-| Rule | Reason |
-|------|--------|
-| Objects ≥ 85 KB go to LOH | Default GC threshold |
-| LOH collected only with Gen 2 GC | More expensive, less frequent |
-| LOH is NOT compacted by default | Fragmentation risk |
-| Use `ArrayPool<T>.Shared.Rent()` | Reuse large arrays, avoid LOH pressure |
-| Use `Span<T>` / `Memory<T>` | Zero-copy slices, no allocation |
-| Compact LOH only when needed | `GCLargeObjectHeapCompactionMode.CompactOnce` |
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are `Span<T>` and `Memory<T>` in C# and how do they reduce allocations?
-
-`Span<T>` and `Memory<T>` are **allocation-free slice types** that let you work with contiguous regions of memory — whether from arrays, stack, or native memory — without copying.
-
-```cs
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-// Span<T> — stack-only, synchronous, ultra-fast
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-
-// ” 1. Slice an array without copying ”———————————————————————————
-int[] numbers = [10, 20, 30, 40, 50, 60, 70];
-Span<int> middle = numbers.AsSpan(2, 3);   // [30, 40, 50] — no copy
-middle[1] = 99;                             // mutates the original array
-Console.WriteLine(numbers[3]);              // 99
-
-// ” 2. Parse substrings without allocating a new string ”—————————
-ReadOnlySpan<char> date = "2026-06-01".AsSpan();
-int year  = int.Parse(date[..4]);     // "2026"
-int month = int.Parse(date[5..7]);    // "06"
-int day   = int.Parse(date[8..]);     // "01"
-Console.WriteLine(new DateTime(year, month, day)); // 01/06/2026
-
-// ” 3. Stack-allocated Span (stackalloc) ”————————————————————————
-// No heap allocation at all
-Span<byte> stackBuffer = stackalloc byte[256];
-stackBuffer.Fill(0);
-Console.WriteLine(stackBuffer.Length);   // 256
-
-// ” 4. String split without allocating substrings ”———————————————
-static int CountCommas(ReadOnlySpan<char> text)
-{
-    int count = 0;
-    foreach (var c in text)
-        if (c == ',') count++;
-    return count;
-}
-Console.WriteLine(CountCommas("a,b,c,d".AsSpan()));   // 3
-
-// ” 5. Span across native memory (unsafe) ”———————————————————————
-// unsafe {
-//     byte* ptr = stackalloc byte[100];
-//     Span<byte> native = new Span<byte>(ptr, 100);
-// }
-
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-// Memory<T> — heap-compatible, works with async
-// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-
-// ” 6. Memory<T> in async methods ”———————————————————————————————
-byte[] buffer = new byte[4096];
-Memory<byte> mem = buffer.AsMemory(0, 1024);
-
-async Task ReadToMemoryAsync(Stream stream, Memory<byte> destination)
-{
-    int bytesRead = await stream.ReadAsync(destination);  // no copy — writes directly
-    Console.WriteLine($"Read {bytesRead} bytes");
-}
-
-// ” 7. ReadOnlyMemory<T> for strings and read-only data ”—————————
-ReadOnlyMemory<char> roMem = "Hello, World!".AsMemory(7, 5);  // "World"
-Console.WriteLine(new string(roMem.Span));  // World
-
-// ” 8. MemoryPool<T> for reusable large buffers ”—————————————————
-using IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent(minBufferSize: 4096);
-Memory<byte> pooledMem = owner.Memory;
-// use pooledMem...
-// IMemoryOwner.Dispose() returns memory to pool automatically
-
-// ” 9. Performance comparison ”———————————————————————————————————
-// Traditional (allocates):       string sub = str.Substring(start, length);
-// Span-based (zero alloc):       ReadOnlySpan<char> sub = str.AsSpan(start, length);
-
-static bool StartsWithHttp(string url)
-{
-    ReadOnlySpan<char> span = url;
-    return span.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
-        || span.StartsWith("http://", StringComparison.OrdinalIgnoreCase);
-}
-```
-
-**`Span<T>` vs `Memory<T>` vs `string`:**
-
-| Feature | `Span<T>` | `Memory<T>` | `string` / `T[]` |
-|---------|-----------|-------------|-----------------|
-| Stack-only | … Yes |  No |  No |
-| Works in `async` |  No | … Yes | … Yes |
-| Slicing | Zero-copy | Zero-copy | Allocates new object |
-| Mutation | … Yes | … Yes | `string` immutable |
-| Works with `stackalloc` | … Yes |  No |  No |
-| GC pressure | None (stack) | Low (slice only) | High (new object) |
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## # 12. LAMBDA EXPRESSIONS
+## # 11. LAMBDA EXPRESSIONS
 
 <br>
 
@@ -25457,7 +21141,7 @@ Console.WriteLine(between(25));  // False
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## # 13. Language Integrated Query
+## # 12. LANGUAGE INTEGRATED QUERY (LINQ)
 
 <br>
 
@@ -27390,1482 +23074,4528 @@ Console.WriteLine(products.MaxBy(p => p.Price)?.Name);  // C
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## # 14. MICROSERVICES
+## # 13. ASYNCHRONOUS PROGRAMMING AND MULTITHREADING
 
 <br>
 
-## Q. What are microservices and why are they used?
+## Q. What is multithreading in C# and why is it important?
 
-**Microservices** is an architectural style where an application is composed of small, independently deployable services, each responsible for a specific business capability and communicating via APIs.
+**Multithreading** is the ability to execute multiple threads concurrently within a single process, enabling parallelism and better CPU utilization. In modern .NET, the preferred abstraction is `Task` and `async`/`await` (via the **Task Parallel Library, TPL**) rather than raw `Thread` management.
 
-```
-Monolith                         Microservices
-””—————————————————————————      ””———————————  ””———————————  ””———————————
-”  UI + Business + Data   ”      ”  Order    ”  ”  Catalog  ”  ”  Payment  ”
-”  (all in one process)   ”  ’   ”  Service  ”  ”  Service  ”  ”  Service  ”
-”””—————————————————————————      ”””———————————  ”””———————————  ”””———————————
-                                                                   
-                                 Each has its own DB, deploy, scale, team
-```
+**Why it matters:**
+- Improves responsiveness (UI stays fluid while background work runs).
+- Maximizes CPU utilization on multi-core processors.
+- Enables concurrent I/O (e.g., multiple HTTP requests simultaneously).
 
-**Why use microservices?**
-
-| Benefit | Detail |
-|---------|--------|
-| **Independent deployment** | Deploy Order Service without touching Payment Service |
-| **Independent scaling** | Scale only the Catalog Service during a sale |
-| **Technology diversity** | Each service can use a different language/DB |
-| **Fault isolation** | Catalog failure doesn\'t bring down Orders |
-| **Team autonomy** | Small teams own end-to-end services |
-| **Faster release cycles** | Smaller, focused deployments |
-
-**When NOT to use microservices:**
-- Small teams / early-stage products — start with a monolith
-- When services need very frequent synchronous coordination (distributed monolith anti-pattern)
-- When operational complexity (containers, service mesh, distributed tracing) outweighs benefits
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you implement microservices in .NET Core?
-
-Each microservice is a separate ASP.NET Core Web API project with its own database, deployed independently as a Docker container.
+**1. `Task.Run` — run CPU-bound work on the thread pool:**
 
 ```cs
-// 1. Create a minimal microservice (OrderService)
-// dotnet new webapi -n OrderService
-
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<OrderDbContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("Orders")));
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<OrderService>();
-
-// Register HttpClient for inter-service calls
-builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
-    client.BaseAddress = new Uri(builder.Configuration["Services:Catalog"]!));
-
-var app = builder.Build();
-app.MapOrderEndpoints(); // feature-sliced minimal API endpoints
-app.Run();
-
-// 2. Typed HttpClient for service-to-service communication
-public class CatalogClient(HttpClient client)
+var result = await Task.Run(() =>
 {
-    public async Task<CatalogItem?> GetItemAsync(int id, CancellationToken ct = default)
-    {
-        var response = await client.GetAsync($"/api/catalog/{id}", ct);
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<CatalogItem>(cancellationToken: ct);
-    }
-}
-
-// 3. Simple endpoint
-app.MapPost("/orders", async (CreateOrderRequest req, OrderService svc, CancellationToken ct) =>
-{
-    var order = await svc.CreateAsync(req, ct);
-    return Results.Created($"/orders/{order.Id}", order);
+    // CPU-intensive work (runs on thread pool thread)
+    return Enumerable.Range(1, 1_000_000).Sum();
 });
-
-// 4. Health checks — required for Kubernetes probes
-builder.Services.AddHealthChecks()
-    .AddNpgSql(connStr, name: "database")
-    .AddUrlGroup(new Uri("http://catalog-service/health"), name: "catalog");
-
-app.MapHealthChecks("/health");
-app.MapHealthChecks("/health/ready", new() { Predicate = r => r.Tags.Contains("ready") });
+Console.WriteLine(result); // Output: 500000500000
 ```
 
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are the main advantages of using microservices architecture?
-
-| Advantage | Description |
-|-----------|-------------|
-| **Independent scaling** | Scale only bottleneck services |
-| **Independent deployment** | Deploy/rollback one service without affecting others |
-| **Technology flexibility** | Python ML model + C# API + Go service in same system |
-| **Fault isolation** | Circuit breakers prevent cascade failures |
-| **Team autonomy** | Teams own and deploy their service end-to-end |
-| **Smaller codebases** | Easier to understand, test, and onboard |
-| **Faster iteration** | Frequent small releases without full-system regression |
-| **Horizontal scalability** | Run 10 instances of Order Service, 2 of Admin |
-
-```
-Example: E-Commerce Platform
-
-””—————————————   ””——————————————   ””—————————————   ””—————————————
-”  API Gateway ””–” Order Service””–”Catalog Svc  ”   ”Payment Svc  ”
-” (YARP/Ocelot)”   ”  (C# + PG)  ”   ”(C# + PG)    ”   ”(C# + Redis) ”
-”””—————————————   ”””——————————————   ”””—————————————   ”””—————————————
-                         ”                                      ”
-                  ””————–”——————                    ””———————–”——————
-                  ” RabbitMQ /  ”                    ”  Notification  ”
-                  ” Azure SB    ””————————————————–”  Service       ”
-                  ”””—————————————                    ”””————————————————
-
-Each service:
- - Owns its database (no shared DB)
- - Has its own Docker image
- - Has its own CI/CD pipeline
- - Scales independently in Kubernetes
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you handle communication between microservices in .NET Core?
-
-**Synchronous** (request-response): HTTP/REST, gRPC
-**Asynchronous** (event-driven): message queues (RabbitMQ, Azure Service Bus, Kafka)
+**2. `async`/`await` — non-blocking async I/O (preferred for I/O-bound):**
 
 ```cs
-// 1. HTTP REST — typed HttpClient via IHttpClientFactory
-builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
-    client.BaseAddress = new Uri("http://catalog-service"));
-
-public class CatalogClient(HttpClient client)
+public async Task<string[]> FetchAllAsync(string[] urls)
 {
-    public Task<Product?> GetProductAsync(int id) =>
-        client.GetFromJsonAsync<Product>($"/products/{id}");
+    using var client = new HttpClient();
+    var tasks = urls.Select(url => client.GetStringAsync(url));
+    return await Task.WhenAll(tasks); // all in parallel
 }
+```
 
-// 2. gRPC — binary protocol, strongly-typed contracts (.proto files)
-// dotnet add package Grpc.AspNetCore
-// Service: catalog.proto ’ generated CatalogService.CatalogServiceClient
+**3. `Parallel.ForEachAsync` (.NET 6+) — async parallel processing:**
 
-builder.Services.AddGrpcClient<CatalogService.CatalogServiceClient>(opts =>
-    opts.Address = new Uri("https://catalog-service:5001"));
+```cs
+var urls = new[] { "https://api1.example.com", "https://api2.example.com" };
 
-public class OrderService(CatalogService.CatalogServiceClient grpcClient)
-{
-    public async Task<ProductInfo> GetProductInfoAsync(int id)
+await Parallel.ForEachAsync(urls,
+    new ParallelOptions { MaxDegreeOfParallelism = 4 },
+    async (url, ct) =>
     {
-        var reply = await grpcClient.GetProductAsync(new ProductRequest { Id = id });
-        return new ProductInfo(reply.Name, reply.Price);
-    }
-}
-
-// 3. Async messaging — MassTransit + RabbitMQ
-// dotnet add package MassTransit.RabbitMQ
-builder.Services.AddMassTransit(x =>
-{
-    x.AddConsumer<OrderCreatedConsumer>();
-    x.UsingRabbitMq((ctx, cfg) =>
-    {
-        cfg.Host("rabbitmq://localhost");
-        cfg.ConfigureEndpoints(ctx);
+        using var client = new HttpClient();
+        var data = await client.GetStringAsync(url, ct);
+        Console.WriteLine($"Fetched {data.Length} chars from {url}");
     });
-});
+```
 
-// Publisher
-public class OrderService(IPublishEndpoint publish)
-{
-    public async Task CreateOrderAsync(CreateOrderRequest req)
-    {
-        // ... create order in DB ...
-        await publish.Publish(new OrderCreated(orderId, req.Items));
-    }
-}
+**4. Thread-safe shared state with `Interlocked`:**
 
-// Consumer in another service
-public class OrderCreatedConsumer : IConsumer<OrderCreated>
-{
-    public async Task Consume(ConsumeContext<OrderCreated> ctx)
-    {
-        var msg = ctx.Message;
-        // process the event (e.g., send confirmation email)
-    }
-}
-
-record OrderCreated(int OrderId, List<OrderItem> Items);
+```cs
+int counter = 0;
+await Task.WhenAll(Enumerable.Range(0, 100).Select(_ =>
+    Task.Run(() => Interlocked.Increment(ref counter))));
+Console.WriteLine(counter); // Output: 100 (always correct)
 ```
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## Q. What is the role of API Gateway in microservices architecture?
+## Q. What is Multithreading with .NET, and what is a thread in C#?
 
-The **API Gateway** is the single entry point for all clients. It handles routing, authentication, rate limiting, SSL termination, and request aggregation — preventing clients from knowing about individual services.
+A **thread** is the smallest unit of execution within a process. A **process** can have multiple threads running concurrently, sharing the same memory space.
 
-```
-Client (React App / Mobile)
-          ”
-          –
-  ””———————————————
-  ”  API Gateway  ”   YARP / Ocelot / Azure API Management
-  ”               ”    - Route /orders ’ OrderService
-  ”  Auth (JWT)   ”    - Route /catalog ’ CatalogService
-  ”  Rate Limit   ”    - Aggregate /dashboard ’ multiple services
-  ”  Load Balance ”    - Strip/add headers
-  ”””———————————————
-     /      |      \
-Order   Catalog  Payment
-Service Service  Service
-```
+**Multithreading** is the ability to run multiple threads simultaneously to perform work in parallel, improving responsiveness and throughput.
+
+In .NET, threads are managed by the **CLR** and scheduled by the **OS**. Modern .NET (5+) recommends using `Task` and `async/await` over raw `Thread` for most scenarios.
 
 ```cs
-// YARP (Yet Another Reverse Proxy) — Microsoft\'s API Gateway (.NET 10)
-// dotnet add package Yarp.ReverseProxy
+// A thread in .NET = lightweight unit of execution
+Console.WriteLine($"Main thread ID: {Thread.CurrentThread.ManagedThreadId}");
+Console.WriteLine($"Is background: {Thread.CurrentThread.IsBackground}");
+Console.WriteLine($"Is thread pool: {Thread.CurrentThread.IsThreadPoolThread}");
+Console.WriteLine($"State: {Thread.CurrentThread.ThreadState}");
+```
 
-builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+**Ways to implement multithreading in .NET 10:**
 
-app.MapReverseProxy();
+```cs
+// 1. Thread (low-level — use only for dedicated long-running work)
+var t = new Thread(() => Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId}"));
+t.IsBackground = true;
+t.Start();
+t.Join();
 
-// appsettings.json
+// 2. ThreadPool (managed pool — underlying mechanism for Tasks)
+ThreadPool.QueueUserWorkItem(_ => Console.WriteLine("ThreadPool work item"));
+
+// 3. Task (preferred — async, return values, exception propagation)
+await Task.Run(() => Console.WriteLine("Task on thread pool"));
+
+// 4. Parallel class (data parallelism)
+Parallel.For(0, 4, i => Console.WriteLine($"Parallel item {i}"));
+
+// 5. async/await (I/O-bound work without blocking threads)
+async Task<string> FetchDataAsync(string url)
 {
-  "ReverseProxy": {
-    "Routes": {
-      "orders-route": {
-        "ClusterId": "orders-cluster",
-        "Match": { "Path": "/api/orders/{**catch-all}" },
-        "AuthorizationPolicy": "default"
-      },
-      "catalog-route": {
-        "ClusterId": "catalog-cluster",
-        "Match": { "Path": "/api/catalog/{**catch-all}" }
-      }
-    },
-    "Clusters": {
-      "orders-cluster": {
-        "Destinations": {
-          "primary": { "Address": "http://order-service:8080/" }
+    using var client = new HttpClient();
+    return await client.GetStringAsync(url);
+}
+
+// 6. PLINQ (parallel LINQ)
+var results = Enumerable.Range(1, 100).AsParallel().Where(n => n % 2 == 0).ToList();
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the difference between a thread and a process?
+
+| | **Process** | **Thread** |
+|-|------------|-----------|
+| Definition | An isolated running instance of a program | A unit of execution within a process |
+| Memory | Has its own address space | Shares the process address space |
+| Communication | IPC (pipes, sockets, shared memory) | Shared memory — fast but needs synchronization |
+| Isolation | Crash in one process doesn\'t affect others | Crash in one thread can crash the whole process |
+| Creation cost | High (separate memory, handles, etc.) | Lower (shares process resources) |
+| Switching cost | Expensive (context switch across processes) | Less expensive (same address space) |
+
+```cs
+// Process info
+var current = System.Diagnostics.Process.GetCurrentProcess();
+Console.WriteLine($"PID: {current.Id}");
+Console.WriteLine($"Name: {current.ProcessName}");
+Console.WriteLine($"Threads: {current.Threads.Count}");
+Console.WriteLine($"Memory: {current.WorkingSet64 / 1024 / 1024} MB");
+
+// Spawn a child process
+using var proc = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+{
+    FileName  = "dotnet",
+    Arguments = "--version",
+    RedirectStandardOutput = true,
+    UseShellExecute = false,
+});
+await proc!.WaitForExitAsync();
+Console.WriteLine(await proc.StandardOutput.ReadToEndAsync());
+
+// Thread info
+var thread = new Thread(() =>
+{
+    Console.WriteLine($"Thread ID: {Thread.CurrentThread.ManagedThreadId}");
+    Console.WriteLine($"Is pool: {Thread.CurrentThread.IsThreadPoolThread}");
+});
+thread.Start();
+thread.Join();
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you create a new thread in C#?
+
+```cs
+// 1. Thread with ThreadStart delegate (no parameters)
+var t1 = new Thread(DoWork);
+t1.Name         = "WorkerThread";
+t1.IsBackground = true; // daemon — terminates when main thread exits
+t1.Priority     = ThreadPriority.Normal;
+t1.Start();
+t1.Join(); // block caller until t1 finishes
+
+void DoWork() => Console.WriteLine($"Running on thread {Thread.CurrentThread.ManagedThreadId}");
+
+// 2. Thread with lambda
+var t2 = new Thread(() =>
+{
+    Console.WriteLine("Lambda thread");
+    Thread.Sleep(100); // simulate work
+});
+t2.Start();
+
+// 3. ParameterizedThreadStart — pass a single object parameter
+var t3 = new Thread(param =>
+{
+    string msg = (string)param!;
+    Console.WriteLine($"Message: {msg}");
+});
+t3.Start("Hello from parameter");
+
+// 4. Type-safe parameter passing via closure (preferred over ParameterizedThreadStart)
+int workerId = 42;
+string taskName = "ImportJob";
+var t4 = new Thread(() =>
+{
+    // captures workerId and taskName — fully type-safe
+    Console.WriteLine($"Worker {workerId}: {taskName}");
+});
+t4.Start();
+
+// 5. Foreground vs background threads
+// Foreground (default): app stays alive until ALL foreground threads finish
+// Background: app can exit even if background threads are still running
+var fg = new Thread(() => Thread.Sleep(5000)) { IsBackground = false }; // keeps app alive
+var bg = new Thread(() => Thread.Sleep(5000)) { IsBackground = true  }; // doesn\'t block exit
+
+// 6. Preferred modern alternative: Task.Run
+await Task.Run(() => Console.WriteLine("Preferred: Task on thread pool"));
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. Why does a delegate need to be passed to the Thread constructor, and how do you pass parameters type-safely?
+
+The `Thread` constructor requires a **delegate** (`ThreadStart` or `ParameterizedThreadStart`) because a thread needs to know *which method to execute*. The delegate is the entry point.
+
+```cs
+// ThreadStart — no parameters, no return value
+ThreadStart start = DoWork;
+var t1 = new Thread(start);
+t1.Start();
+
+void DoWork() => Console.WriteLine("No params");
+
+// ParameterizedThreadStart — one object parameter (not type-safe)
+ParameterizedThreadStart paramStart = obj =>
+{
+    int value = (int)obj!; // manual cast — runtime error if wrong type
+    Console.WriteLine($"Value: {value}");
+};
+var t2 = new Thread(paramStart);
+t2.Start(100); // pass object
+
+// … Type-safe approach — closure over strongly-typed variables
+int id    = 7;
+string name = "Alice";
+var t3 = new Thread(() =>
+{
+    // id and name captured by reference — fully type-safe, no casting
+    Console.WriteLine($"Worker {id}: {name}");
+});
+t3.Start();
+
+// … Pass a typed object via closure
+record WorkItem(int Id, string Name, DateTime Due);
+var item = new WorkItem(1, "Report", DateTime.Today);
+var t4 = new Thread(() =>
+{
+    Console.WriteLine($"Processing {item.Name} (due {item.Due:d})");
+});
+t4.Start();
+t4.Join();
+
+// Retrieving data from a thread — use a shared variable + lock, or Task<T>
+int result = 0;
+var t5 = new Thread(() => result = Compute()); // write result inside thread
+t5.Start();
+t5.Join();
+Console.WriteLine($"Result: {result}"); // safe to read after Join()
+
+int Compute() => 42;
+
+// Preferred: Task<T> — return values built-in, no shared variable needed
+int taskResult = await Task.Run(() => Compute());
+Console.WriteLine($"Task result: {taskResult}");
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the difference between `Thread.Join` and `Thread.Sleep`? What are `Thread.IsAlive` and `Thread.Join`?
+
+| | `Thread.Join` | `Thread.Sleep` |
+|-|--------------|---------------|
+| **Blocks** | The **calling** thread | The **current** thread |
+| **Until** | The target thread finishes | The timeout elapses |
+| **Purpose** | Wait for another thread | Pause execution temporarily |
+| **Returns** | `bool` (overload with timeout) | `void` |
+
+```cs
+var worker = new Thread(() =>
+{
+    Console.WriteLine("Worker started");
+    Thread.Sleep(500); // pause this thread for 500 ms
+    Console.WriteLine("Worker done");
+});
+
+worker.Start();
+Console.WriteLine($"Worker alive: {worker.IsAlive}"); // true
+
+// Join() — main thread blocks here until worker finishes
+bool finished = worker.Join(timeout: TimeSpan.FromSeconds(2));
+Console.WriteLine($"Finished in time: {finished}");   // true
+Console.WriteLine($"Worker alive: {worker.IsAlive}"); // false
+
+// Thread.Sleep(0) — yield to other threads of equal or higher priority
+Thread.Sleep(0);
+
+// Thread.Sleep(Timeout.Infinite) — sleep until interrupted
+// Thread.Interrupt() — throws ThreadInterruptedException in sleeping/waiting thread
+
+// IsAlive — true after Start() and before the thread method returns
+var t = new Thread(() => Thread.Sleep(200));
+Console.WriteLine(t.IsAlive); // false — not started yet
+t.Start();
+Console.WriteLine(t.IsAlive); // true  — running
+t.Join();
+Console.WriteLine(t.IsAlive); // false — completed
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are the different states of a Thread in C#?
+
+`Thread.ThreadState` is a flags enum — a thread can be in multiple states simultaneously.
+
+| State | Meaning |
+|-------|---------|
+| `Unstarted` | Created but `Start()` not yet called |
+| `Running` | Actively executing |
+| `WaitSleepJoin` | Blocked in `Sleep`, `Wait`, `Join`, or a lock |
+| `Background` | `IsBackground = true` |
+| `Stopped` | Completed or terminated |
+| `AbortRequested` | `Abort()` was called (removed in .NET Core) |
+| `Suspended` | `Suspend()` was called (removed in .NET Core) |
+
+```cs
+var t = new Thread(() =>
+{
+    Console.WriteLine("Working...");
+    Thread.Sleep(300);
+});
+
+Console.WriteLine(t.ThreadState); // Unstarted
+t.Start();
+Console.WriteLine(t.ThreadState); // Running | (possibly Background)
+Thread.Sleep(50);
+Console.WriteLine(t.ThreadState); // WaitSleepJoin
+t.Join();
+Console.WriteLine(t.ThreadState); // Stopped
+
+// Prefer checking IsAlive over ThreadState for simple checks
+// ThreadState is mostly useful for diagnostics
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the `ThreadPool` class and how is it used?
+
+The **ThreadPool** is a pool of pre-created worker threads managed by the CLR. It avoids the overhead of creating and destroying threads for each short-lived task.
+
+```cs
+// 1. QueueUserWorkItem — fire and forget (avoid in modern code)
+ThreadPool.QueueUserWorkItem(_ => Console.WriteLine("Pool work item"));
+
+// 2. Get/set pool limits
+ThreadPool.GetMinThreads(out int minWorker, out int minIo);
+ThreadPool.GetMaxThreads(out int maxWorker, out int maxIo);
+Console.WriteLine($"Min workers: {minWorker}, Max workers: {maxWorker}");
+
+// Set minimum threads (pre-warm the pool to avoid ramp-up latency)
+ThreadPool.SetMinThreads(workerThreads: 8, completionPortThreads: 8);
+
+// 3. Task.Run — the modern way to queue work on the thread pool
+var task = Task.Run(() =>
+{
+    Console.WriteLine($"Pool thread: {Thread.CurrentThread.IsThreadPoolThread}"); // true
+    return 42;
+});
+int result = await task;
+
+// 4. Parallel.ForEach — distributes iterations across pool threads
+Parallel.ForEach(Enumerable.Range(1, 10), i =>
+    Console.WriteLine($"Item {i} on thread {Thread.CurrentThread.ManagedThreadId}"));
+
+// 5. Long-running work should NOT use the thread pool
+// Use TaskCreationOptions.LongRunning to get a dedicated thread instead
+var longTask = Task.Factory.StartNew(() =>
+{
+    while (true) { /* background service */ Thread.Sleep(1000); }
+}, TaskCreationOptions.LongRunning);
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are `Task` and `async/await` in C#?
+
+A **`Task`** represents an asynchronous operation that may return a value (`Task<T>`). **`async/await`** is syntactic sugar that lets you write asynchronous code in a sequential, readable style.
+
+```cs
+// Task — represents an ongoing or completed operation
+Task t = Task.Run(() => Console.WriteLine("Fire and forget"));
+Task<int> t2 = Task.Run(() => 42);
+int value = await t2; // await suspends the caller, not the thread
+
+// async/await — I/O-bound (no thread blocked)
+async Task<string> GetDataAsync(string url)
+{
+    using var client = new HttpClient();
+    return await client.GetStringAsync(url); // no thread blocked during HTTP call
+}
+
+// CPU-bound — offload to thread pool via Task.Run
+async Task<int> ComputeAsync(int n)
+{
+    return await Task.Run(() =>
+    {
+        int sum = 0;
+        for (int i = 0; i < n; i++) sum += i;
+        return sum;
+    });
+}
+
+// Run multiple tasks concurrently
+var tasks = new[] { GetDataAsync("https://httpbin.org/get"), GetDataAsync("https://example.com") };
+string[] results = await Task.WhenAll(tasks);
+
+// Task.WhenAny — proceed when the first completes
+Task<string> first = await Task.WhenAny(tasks);
+Console.WriteLine("First done");
+
+// Return types
+// Task        — async void equivalent (no result)
+// Task<T>     — async with result
+// ValueTask<T>— struct, avoids heap alloc for hot paths that often complete synchronously
+// IAsyncEnumerable<T> — async stream
+
+async IAsyncEnumerable<int> GenerateAsync()
+{
+    for (int i = 0; i < 5; i++)
+    {
+        await Task.Delay(100);
+        yield return i;
+    }
+}
+
+await foreach (int n in GenerateAsync())
+    Console.Write($"{n} "); // 0 1 2 3 4
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the difference between `Task.Run` and `Task.Factory.StartNew`?
+
+| | `Task.Run` | `Task.Factory.StartNew` |
+|-|-----------|------------------------|
+| **Introduced** | .NET 4.5 | .NET 4.0 |
+| **Unwraps nested tasks** | … Automatically |  Must call `.Unwrap()` manually |
+| **Default scheduler** | `ThreadPool` | Current `TaskScheduler` |
+| **LongRunning option** |  Not supported | … `TaskCreationOptions.LongRunning` |
+| **Recommended for** | CPU-bound short tasks | Long-running or custom scheduler tasks |
+| **Simplicity** | Simpler, safer | More flexible but verbose |
+
+```cs
+// Task.Run — preferred for CPU-bound work on the thread pool
+int result = await Task.Run(() =>
+{
+    int sum = Enumerable.Range(1, 1_000_000).Sum();
+    return sum;
+});
+Console.WriteLine(result);
+
+// Task.Factory.StartNew — needed for LongRunning
+var longTask = Task.Factory.StartNew(() =>
+{
+    while (true)
+    {
+        Console.WriteLine("Background service tick");
+        Thread.Sleep(1000);
+    }
+}, TaskCreationOptions.LongRunning | TaskCreationOptions.DenyChildAttach);
+
+// Task.Run + async lambda — automatically unwraps Task<Task>
+int asyncResult = await Task.Run(async () =>
+{
+    await Task.Delay(100);
+    return 42;
+});
+
+// Task.Factory.StartNew + async lambda — must unwrap manually
+int manualResult = await await Task.Factory.StartNew(async () =>
+{
+    await Task.Delay(100);
+    return 42;
+}); // double-await because StartNew returns Task<Task<int>>
+
+// Custom TaskScheduler (advanced — e.g., UI thread, limited concurrency)
+var scheduler = new LimitedConcurrencyLevelTaskScheduler(maxDegreeOfParallelism: 2);
+var factory   = new TaskFactory(scheduler);
+await factory.StartNew(() => Console.WriteLine("Limited concurrency task"));
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you handle exceptions in multithreaded applications?
+
+```cs
+// 1. await — exceptions propagate naturally
+async Task ProcessAsync()
+{
+    try
+    {
+        await Task.Run(() => throw new InvalidOperationException("Task error"));
+    }
+    catch (InvalidOperationException ex)
+    {
+        Console.WriteLine($"Caught: {ex.Message}");
+    }
+}
+await ProcessAsync();
+
+// 2. Task.WhenAll — AggregateException wraps all exceptions
+var tasks = new[]
+{
+    Task.Run(() => throw new Exception("Error 1")),
+    Task.Run(() => throw new Exception("Error 2")),
+    Task.Run(() => Console.WriteLine("OK")),
+};
+try
+{
+    await Task.WhenAll(tasks);
+}
+catch // await unwraps first exception
+{
+    // Inspect all exceptions via the tasks themselves
+    foreach (var t in tasks.Where(t => t.IsFaulted))
+        Console.WriteLine(t.Exception!.InnerException!.Message);
+}
+
+// 3. Unhandled exceptions on raw Thread — must catch inside the thread
+var thread = new Thread(() =>
+{
+    try
+    {
+        throw new Exception("Thread crash");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Thread caught: {ex.Message}");
+    }
+});
+thread.Start();
+
+// 4. Global unhandled exception handler (last resort)
+AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+    Console.WriteLine($"Unhandled: {(e.ExceptionObject as Exception)?.Message}");
+
+TaskScheduler.UnobservedTaskException += (_, e) =>
+{
+    Console.WriteLine($"Unobserved task exception: {e.Exception.Message}");
+    e.SetObserved(); // prevent crash
+};
+
+// 5. CancellationToken — not an exception per se, but related
+var cts = new CancellationTokenSource();
+try
+{
+    await Task.Run(() =>
+    {
+        cts.Token.ThrowIfCancellationRequested();
+    }, cts.Token);
+}
+catch (OperationCanceledException)
+{
+    Console.WriteLine("Task was cancelled");
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is a deadlock and how can it be avoided? What are the four necessary conditions for deadlock?
+
+A **deadlock** occurs when two or more threads are permanently blocked, each waiting for a resource held by the other.
+
+**Four necessary conditions (Coffman conditions):**
+
+| Condition | Meaning |
+|-----------|---------|
+| **Mutual Exclusion** | A resource is held exclusively by one thread |
+| **Hold and Wait** | A thread holds a resource while waiting for another |
+| **No Preemption** | Resources cannot be forcibly taken away |
+| **Circular Wait** | Thread A waits for Thread B, which waits for Thread A |
+
+```cs
+// Classic deadlock — two threads lock in opposite orders
+object lockA = new(), lockB = new();
+
+var t1 = new Thread(() =>
+{
+    lock (lockA) { Thread.Sleep(50); lock (lockB) { Console.WriteLine("T1 done"); } }
+});
+var t2 = new Thread(() =>
+{
+    lock (lockB) { Thread.Sleep(50); lock (lockA) { Console.WriteLine("T2 done"); } }
+});
+// t1.Start(); t2.Start(); // would deadlock!
+
+// Prevention strategies:
+
+// 1. Consistent lock ordering — always acquire locks in the same order
+var t3 = new Thread(() => { lock (lockA) { lock (lockB) { Console.WriteLine("T3 done"); } } });
+var t4 = new Thread(() => { lock (lockA) { lock (lockB) { Console.WriteLine("T4 done"); } } });
+t3.Start(); t4.Start();
+
+// 2. Monitor.TryEnter with timeout — fail fast instead of blocking forever
+bool got = false;
+Monitor.TryEnter(lockA, TimeSpan.FromSeconds(1), ref got);
+if (got)
+{
+    try { /* work */ }
+    finally { Monitor.Exit(lockA); }
+}
+else
+{
+    Console.WriteLine("Could not acquire lock — skip or retry");
+}
+
+// 3. Avoid nested locks — redesign to use a single lock or lock-free structures
+
+// 4. Use async/await — no thread is blocked waiting; deadlock risk eliminated
+await Task.Run(() => { /* lock-free async work */ });
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is LiveLock?
+
+A **livelock** occurs when two or more threads keep reacting to each other\'s actions — they are actively executing but making no progress. Unlike a deadlock, threads are not blocked; they just keep changing state in response to each other indefinitely.
+
+```cs
+// Simulated livelock — two threads keep "politely yielding" to each other
+int sharedFlag = 0;
+bool thread1Done = false, thread2Done = false;
+
+var t1 = new Thread(() =>
+{
+    while (!thread1Done)
+    {
+        if (Interlocked.CompareExchange(ref sharedFlag, 1, 0) == 0)
+        {
+            Console.WriteLine("T1: doing work");
+            Thread.Sleep(50);
+            Interlocked.Exchange(ref sharedFlag, 0);
+            thread1Done = true;
         }
-      },
-      "catalog-cluster": {
-        "Destinations": {
-          "primary":   { "Address": "http://catalog-service:8080/" },
-          "secondary": { "Address": "http://catalog-service-2:8080/" }
-        },
-        "LoadBalancingPolicy": "RoundRobin"
-      }
-    }
-  }
-}
-
-// Add rate limiting
-builder.Services.AddRateLimiter(opts =>
-    opts.AddFixedWindowLimiter("api", o =>
-    {
-        o.PermitLimit = 100;
-        o.Window = TimeSpan.FromMinutes(1);
-    }));
-app.UseRateLimiter();
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you manage data consistency in microservices?
-
-Each microservice owns its database — no shared DB. Consistency is maintained through **eventual consistency** patterns.
-
-```cs
-// 1. Saga Pattern (Choreography) — services react to events
-// OrderService publishes ’ InventoryService and PaymentService consume
-
-// OrderService
-await publishEndpoint.Publish(new OrderPlaced(orderId, customerId, items));
-
-// InventoryService consumer
-public class OrderPlacedConsumer : IConsumer<OrderPlaced>
-{
-    public async Task Consume(ConsumeContext<OrderPlaced> ctx)
-    {
-        var reserved = await inventory.ReserveAsync(ctx.Message.Items);
-        if (reserved)
-            await ctx.Publish(new InventoryReserved(ctx.Message.OrderId));
         else
-            await ctx.Publish(new InventoryFailed(ctx.Message.OrderId));
+        {
+            Console.WriteLine("T1: yielding"); // keeps yielding to T2
+            Thread.Sleep(10);
+        }
     }
-}
-
-// 2. Saga Pattern (Orchestration) — MassTransit StateMachine
-public class OrderStateMachine : MassTransitStateMachine<OrderState>
-{
-    public OrderStateMachine()
-    {
-        Initially(
-            When(OrderPlacedEvent)
-                .Activity(x => x.OfInstanceType<ReserveInventoryActivity>())
-                .TransitionTo(AwaitingInventory));
-
-        During(AwaitingInventory,
-            When(InventoryReservedEvent)
-                .Activity(x => x.OfInstanceType<ChargePaymentActivity>())
-                .TransitionTo(AwaitingPayment),
-            When(InventoryFailedEvent)
-                .TransitionTo(Cancelled));
-    }
-
-    public State AwaitingInventory { get; private set; } = default!;
-    public State AwaitingPayment   { get; private set; } = default!;
-    public State Cancelled         { get; private set; } = default!;
-    public Event<OrderPlaced>         OrderPlacedEvent         { get; private set; } = default!;
-    public Event<InventoryReserved>   InventoryReservedEvent   { get; private set; } = default!;
-    public Event<InventoryFailed>     InventoryFailedEvent     { get; private set; } = default!;
-}
-
-// 3. Outbox Pattern — guarantee event delivery even if service crashes
-// Store event in DB (same transaction as business data), then publish
-await using var tx = await db.Database.BeginTransactionAsync();
-db.Orders.Add(newOrder);
-db.OutboxMessages.Add(new OutboxMessage(
-    nameof(OrderCreated),
-    JsonSerializer.Serialize(new OrderCreated(newOrder.Id))));
-await db.SaveChangesAsync(); // atomic: order + outbox message
-await tx.CommitAsync();
-// Background worker reads outbox and publishes to message bus
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are some common challenges when working with microservices?
-
-| Challenge | Description | Solution |
-|-----------|-------------|---------|
-| **Distributed tracing** | Requests span multiple services | OpenTelemetry + Jaeger/Zipkin |
-| **Data consistency** | No shared DB, eventual consistency | Saga pattern, outbox |
-| **Network failures** | Inter-service calls can fail | Retry, circuit breaker (Polly) |
-| **Service discovery** | Services need to find each other | Kubernetes DNS, Consul |
-| **Testing complexity** | Integration tests across services | Contract testing (Pact), test containers |
-| **Security** | JWT propagation, mTLS | JWT forwarding, service mesh |
-| **Configuration** | Many services, many configs | Kubernetes ConfigMaps, Azure App Config |
-| **Versioning** | API changes break consumers | Versioned APIs, backward compat |
-| **Operational overhead** | Many deployments to manage | Kubernetes, Helm, GitOps |
-
-```cs
-// Polly — resilience library for network failures
-// dotnet add package Microsoft.Extensions.Http.Resilience (.NET 8+)
-
-builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
-    .AddStandardResilienceHandler(opts =>
-    {
-        opts.Retry.MaxRetryAttempts = 3;
-        opts.Retry.Delay = TimeSpan.FromMilliseconds(200);
-        opts.Retry.BackoffType = DelayBackoffType.Exponential;
-        opts.CircuitBreaker.FailureRatio = 0.5;
-        opts.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(10);
-        opts.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(30);
-    });
-
-// OpenTelemetry — distributed tracing across services
-builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing => tracing
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddEntityFrameworkCoreInstrumentation()
-        .AddOtlpExporter(opts => opts.Endpoint = new Uri("http://jaeger:4317")));
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you deploy microservices in a containerized environment?
-
-```dockerfile
-# Dockerfile — multi-stage build for OrderService
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-WORKDIR /src
-COPY ["OrderService/OrderService.csproj", "OrderService/"]
-RUN dotnet restore "OrderService/OrderService.csproj"
-COPY . .
-RUN dotnet publish "OrderService/OrderService.csproj" -c Release -o /app/publish \
-    --no-restore /p:UseAppHost=false
-
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
-WORKDIR /app
-COPY --from=build /app/publish .
-EXPOSE 8080
-ENTRYPOINT ["dotnet", "OrderService.dll"]
-```
-
-```yaml
-# Kubernetes deployment — order-service.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: order-service
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: order-service
-  template:
-    metadata:
-      labels:
-        app: order-service
-    spec:
-      containers:
-      - name: order-service
-        image: myregistry.azurecr.io/order-service:1.2.0
-        ports:
-        - containerPort: 8080
-        env:
-        - name: ConnectionStrings__Orders
-          valueFrom:
-            secretKeyRef:
-              name: db-secrets
-              key: orders-conn-string
-        resources:
-          requests: { cpu: "100m", memory: "128Mi" }
-          limits:   { cpu: "500m", memory: "512Mi" }
-        livenessProbe:
-          httpGet: { path: /health, port: 8080 }
-          initialDelaySeconds: 10
-        readinessProbe:
-          httpGet: { path: /health/ready, port: 8080 }
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: order-service
-spec:
-  selector:
-    app: order-service
-  ports:
-  - port: 80
-    targetPort: 8080
-```
-
-```bash
-# Deploy
-kubectl apply -f order-service.yaml
-
-# Rolling update to new version
-kubectl set image deployment/order-service order-service=myregistry.azurecr.io/order-service:1.3.0
-
-# Scale
-kubectl scale deployment order-service --replicas=5
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the purpose of service discovery in microservices?
-
-**Service discovery** allows microservices to find each other\'s network locations dynamically — without hardcoded IP addresses — as services scale, restart, or move.
-
-```
-Without service discovery:
-  OrderService ’ "http://192.168.1.42:8080" (hardcoded — breaks on redeploy)
-
-With service discovery:
-  OrderService ’ "http://catalog-service" ’ Discovery resolves ’ "http://10.0.0.15:8080"
-```
-
-| Approach | Tools | .NET Integration |
-|----------|-------|-----------------|
-| **Kubernetes DNS** | K8s built-in | `http://catalog-service` resolves via kube-dns |
-| **Consul** | HashiCorp Consul | `Steeltoe.Discovery.Consul` |
-| **Eureka** | Netflix Eureka | `Steeltoe.Discovery.Eureka` |
-| **Azure Service Fabric** | Service Fabric DNS | Built-in naming service |
-
-```cs
-// Kubernetes — simplest; use service name as hostname
-builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
-{
-    // K8s DNS resolves "catalog-service" to the ClusterIP
-    client.BaseAddress = new Uri(
-        builder.Configuration["Services:Catalog"] ?? "http://catalog-service");
 });
 
-// Consul service discovery (Steeltoe)
-// dotnet add package Steeltoe.Discovery.Consul
-
-builder.Services.AddServiceDiscovery(b => b.UseConsul());
-builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
-    .AddServiceDiscovery(); // resolves "catalog-service" via Consul
-
-// appsettings.json
+var t2 = new Thread(() =>
 {
-  "Consul": { "Host": "consul-server", "Port": 8500 },
-  "Spring": {
-    "Application": { "Name": "order-service" },
-    "Cloud": { "Discovery": { "Enabled": true } }
-  }
-}
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you implement logging and monitoring in microservices?
-
-```cs
-// 1. Structured logging with Serilog — correlate across services
-// dotnet add package Serilog.AspNetCore Serilog.Sinks.OpenTelemetry
-
-builder.Host.UseSerilog((ctx, cfg) => cfg
-    .ReadFrom.Configuration(ctx.Configuration)
-    .Enrich.FromLogContext()
-    .Enrich.WithProperty("Service", "OrderService")
-    .Enrich.WithProperty("Environment", ctx.HostingEnvironment.EnvironmentName)
-    .WriteTo.Console(new JsonFormatter())
-    .WriteTo.OpenTelemetry(opts =>
-        opts.Endpoint = "http://otel-collector:4317"));
-
-// Use correlation ID middleware
-app.Use(async (ctx, next) =>
-{
-    var correlationId = ctx.Request.Headers["X-Correlation-ID"].FirstOrDefault()
-                        ?? Guid.NewGuid().ToString();
-    ctx.Response.Headers["X-Correlation-ID"] = correlationId;
-    using (Serilog.Context.LogContext.PushProperty("CorrelationId", correlationId))
-        await next(ctx);
+    while (!thread2Done)
+    {
+        if (Interlocked.CompareExchange(ref sharedFlag, 2, 0) == 0)
+        {
+            Console.WriteLine("T2: doing work");
+            Thread.Sleep(50);
+            Interlocked.Exchange(ref sharedFlag, 0);
+            thread2Done = true;
+        }
+        else
+        {
+            Console.WriteLine("T2: yielding"); // keeps yielding to T1
+            Thread.Sleep(10);
+        }
+    }
 });
 
-// 2. OpenTelemetry — metrics + tracing + logs
-builder.Services.AddOpenTelemetry()
-    .WithTracing(t => t
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddSource("OrderService")
-        .AddOtlpExporter(o => o.Endpoint = new Uri("http://otel-collector:4317")))
-    .WithMetrics(m => m
-        .AddAspNetCoreInstrumentation()
-        .AddRuntimeInstrumentation()
-        .AddOtlpExporter());
-
-// 3. Health checks with detailed status
-builder.Services.AddHealthChecks()
-    .AddNpgSql(connStr)
-    .AddRabbitMQ(rabbitUri)
-    .AddCheck("self", () => HealthCheckResult.Healthy());
-
-app.MapHealthChecks("/health/live",  new() { Predicate = _ => false });  // liveness
-app.MapHealthChecks("/health/ready", new() { Predicate = _ => true  });  // readiness
-
-// 4. Custom metrics
-var meter = new System.Diagnostics.Metrics.Meter("OrderService");
-var ordersCreated = meter.CreateCounter<long>("orders.created");
-ordersCreated.Add(1, new("status", "success"));
-
-// 5. Propagate trace context across HTTP calls (automatic with HttpClient instrumentation)
-// X-B3-TraceId / traceparent headers forwarded automatically
+// Prevention:
+// - Add randomized back-off delays (Thread.Sleep(Random.Next(10, 100)))
+// - Use a priority scheme — one thread gets precedence
+// - Use proper lock-free algorithms (e.g., Interlocked operations)
 ```
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## Q. What is the difference between monolithic and microservices architecture?
+## Q. What is the purpose of the `lock` statement in C#? What is the difference between `lock` and `Interlocked`?
 
-| Aspect | Monolith | Microservices |
-|--------|----------|---------------|
-| **Codebase** | Single deployable unit | Multiple independent services |
-| **Deployment** | Deploy entire app for any change | Deploy only changed service |
-| **Scaling** | Scale the whole app | Scale individual services |
-| **Technology** | Single stack | Polyglot — each service chooses |
-| **Data** | Single shared database | Each service owns its DB |
-| **Failure** | One bug can crash everything | Failures isolated per service |
-| **Complexity** | Simple locally, hard to scale | Complex ops, easy to scale |
-| **Team size** | Small-medium teams | Large orgs, multiple teams |
-| **Testing** | Simpler end-to-end | Complex distributed testing |
-| **Latency** | In-process calls (fast) | Network calls (slower) |
-
-```
-When to choose what:
-
-Monolith …                    Microservices …
-”———————————————              ”———————————————————————————————
-Early-stage startup            Large org with multiple teams
-Small team (<10 devs)          High scale requirements
-Unclear domain boundaries      Well-understood bounded contexts
-Simple operational needs       Independent release cadence needed
-Proof of concept               Different scaling needs per component
-
-Migration path:
-Monolith ’ Strangler Fig Pattern ’ Microservices
-  1. Identify bounded context (e.g., Payment)
-  2. Wrap it behind an interface
-  3. Extract to separate service behind API Gateway
-  4. Route requests to new service
-  5. Remove from monolith
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you handle security in microservices?
+The `lock` statement ensures **mutual exclusion** — only one thread can execute a guarded block at a time. It is syntactic sugar over `Monitor.Enter` / `Monitor.Exit`.
 
 ```cs
-// 1. JWT authentication — validate in each service
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(opts =>
-    {
-        opts.Authority = "https://identity-server"; // OIDC discovery
-        opts.Audience  = "order-service";
-        opts.TokenValidationParameters = new()
-        {
-            ValidateIssuer   = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-        };
-    });
-
-builder.Services.AddAuthorization(opts =>
-    opts.AddPolicy("orders:write", p => p.RequireClaim("scope", "orders:write")));
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapPost("/orders", CreateOrder).RequireAuthorization("orders:write");
-
-// 2. Forward JWT between services (propagate identity)
-builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
-    .AddHttpMessageHandler<JwtForwardingHandler>();
-
-public class JwtForwardingHandler(IHttpContextAccessor accessor) : DelegatingHandler
+public class SafeCounter
 {
-    protected override Task<HttpResponseMessage> SendAsync(
-        HttpRequestMessage request, CancellationToken ct)
+    private readonly object _syncRoot = new();
+    private int _count;
+
+    public void Increment()
     {
-        var token = accessor.HttpContext?.Request.Headers.Authorization.ToString();
-        if (!string.IsNullOrEmpty(token))
-            request.Headers.Authorization =
-                System.Net.Http.Headers.AuthenticationHeaderValue.Parse(token);
-        return base.SendAsync(request, ct);
+        lock (_syncRoot) // only one thread at a time
+        {
+            _count++;
+        }
+    }
+
+    public int Count
+    {
+        get { lock (_syncRoot) { return _count; } }
     }
 }
 
-// 3. mTLS — mutual TLS for service-to-service (via service mesh: Istio / Linkerd)
-// Zero-code change; sidecar proxy handles certificate verification
+var counter = new SafeCounter();
+await Task.WhenAll(Enumerable.Range(0, 1000).Select(_ =>
+    Task.Run(counter.Increment)));
+Console.WriteLine(counter.Count); // always 1000
 
-// 4. Secrets management — never store secrets in code
-// Kubernetes secrets
-var connStr = builder.Configuration["ConnectionStrings__Orders"]; // from K8s Secret
-// Azure Key Vault
-builder.Configuration.AddAzureKeyVault(new Uri("https://myvault.vault.azure.net/"),
-    new DefaultAzureCredential());
+// What lock compiles to:
+// Monitor.Enter(obj, ref lockTaken);
+// try { ... } finally { if (lockTaken) Monitor.Exit(obj); }
+
+//  Rules:
+// - Lock on a private readonly object, never on 'this', string literals, or Type objects
+// - Keep locked sections short
+// - Never call unknown code inside a lock (can cause deadlock)
 ```
 
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
+**`lock` vs `Interlocked`:**
 
-## Q. What is the role of Docker in microservices?
-
-Docker packages each microservice and its dependencies into an **image** — a portable, reproducible unit that runs consistently everywhere.
-
-```dockerfile
-# Each microservice has its own Dockerfile
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-WORKDIR /src
-COPY . .
-RUN dotnet publish -c Release -o /app
-
-FROM mcr.microsoft.com/dotnet/aspnet:10.0
-WORKDIR /app
-COPY --from=build /app .
-EXPOSE 8080
-ENTRYPOINT ["dotnet", "CatalogService.dll"]
-```
-
-```yaml
-# docker-compose.yml — run all services locally
-version: "3.9"
-services:
-  api-gateway:
-    build: ./ApiGateway
-    ports: ["5000:8080"]
-    depends_on: [order-service, catalog-service]
-
-  order-service:
-    build: ./OrderService
-    environment:
-      - ConnectionStrings__Orders=Host=postgres;Database=orders;Username=app;Password=secret
-    depends_on: [postgres, rabbitmq]
-
-  catalog-service:
-    build: ./CatalogService
-    depends_on: [postgres]
-
-  postgres:
-    image: postgres:16-alpine
-    volumes: ["pgdata:/var/lib/postgresql/data"]
-    environment:
-      POSTGRES_PASSWORD: secret
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports: ["15672:15672"]
-
-volumes:
-  pgdata:
-```
-
-```bash
-# Build and run all services
-docker compose up --build
-
-# Build a single image
-docker build -t myregistry.azurecr.io/order-service:1.0.0 ./OrderService
-
-# Push to registry
-docker push myregistry.azurecr.io/order-service:1.0.0
-
-# Run a single service
-docker run -p 8080:8080 myregistry.azurecr.io/order-service:1.0.0
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. How do you implement resilience and fault tolerance in microservices?
+| | `lock` | `Interlocked` |
+|-|--------|--------------|
+| **Use case** | Guard multi-statement critical sections | Atomic operations on single variables |
+| **Overhead** | Higher (OS kernel object) | Very low (CPU atomic instruction) |
+| **Operations** | Any code | `Increment`, `Decrement`, `Add`, `Exchange`, `CompareExchange`, `Read` |
 
 ```cs
-// Microsoft.Extensions.Http.Resilience (.NET 8+ / Polly v8)
-// dotnet add package Microsoft.Extensions.Http.Resilience
+// Interlocked — atomic operations, no lock needed for single-variable updates
+int value = 0;
 
-builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
-    .AddStandardResilienceHandler(opts =>
-    {
-        // Retry — 3 times with exponential backoff + jitter
-        opts.Retry.MaxRetryAttempts = 3;
-        opts.Retry.Delay            = TimeSpan.FromMilliseconds(200);
-        opts.Retry.BackoffType      = DelayBackoffType.Exponential;
-        opts.Retry.UseJitter        = true;
-        opts.Retry.ShouldHandle     = args =>
-            ValueTask.FromResult(args.Outcome.Exception is HttpRequestException);
+await Task.WhenAll(Enumerable.Range(0, 1000).Select(_ =>
+    Task.Run(() => Interlocked.Increment(ref value))));
+Console.WriteLine(value); // always 1000
 
-        // Circuit Breaker — open after 50% failure in 10-second window
-        opts.CircuitBreaker.FailureRatio    = 0.5;
-        opts.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(10);
-        opts.CircuitBreaker.MinimumThroughput = 10;
-        opts.CircuitBreaker.BreakDuration    = TimeSpan.FromSeconds(30);
-
-        // Timeout per attempt
-        opts.AttemptTimeout.Timeout = TimeSpan.FromSeconds(5);
-
-        // Total timeout across all retries
-        opts.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(30);
-    });
-
-// Fallback / graceful degradation
-builder.Services.AddResiliencePipeline("catalog-fallback", builder =>
+// CompareExchange — optimistic locking / spin loop
+int current, updated;
+do
 {
-    builder.AddFallback(new FallbackStrategyOptions<Product?>
+    current = value;
+    updated = current + 10;
+} while (Interlocked.CompareExchange(ref value, updated, current) != current);
+Console.WriteLine(value);
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the difference between `Monitor` and `lock` in C#? How do you use the `Monitor` class?
+
+`lock` is shorthand for `Monitor.Enter`/`Monitor.Exit`. `Monitor` gives you additional control: `TryEnter` with timeout, `Wait`, `Pulse`, and `PulseAll` for thread signalling.
+
+```cs
+object sync = new();
+
+// lock (compiles to Monitor internally)
+lock (sync) { /* critical section */ }
+
+// Monitor.Enter / Exit — explicit equivalent of lock
+bool lockTaken = false;
+try
+{
+    Monitor.Enter(sync, ref lockTaken);
+    // critical section
+}
+finally
+{
+    if (lockTaken) Monitor.Exit(sync);
+}
+
+// Monitor.TryEnter — non-blocking, with timeout
+bool acquired = Monitor.TryEnter(sync, TimeSpan.FromMilliseconds(500));
+if (acquired)
+{
+    try { /* work */ }
+    finally { Monitor.Exit(sync); }
+}
+
+// Monitor.Wait / Pulse — producer-consumer signalling
+object buffer = new();
+Queue<int> queue = new();
+
+var producer = new Thread(() =>
+{
+    for (int i = 0; i < 5; i++)
     {
-        FallbackAction = _ => ValueTask.FromResult<Product?>(Product.Default),
-        ShouldHandle   = args => ValueTask.FromResult(
-            args.Outcome.Exception is BrokenCircuitException),
-    });
+        lock (buffer)
+        {
+            queue.Enqueue(i);
+            Console.WriteLine($"Produced: {i}");
+            Monitor.Pulse(buffer); // wake one waiting thread
+        }
+        Thread.Sleep(100);
+    }
 });
 
-// Bulkhead — limit concurrent requests to a service
-builder.Services.AddResiliencePipeline("bulkhead", b =>
-    b.AddConcurrencyLimiter(permitLimit: 10, queueLimit: 20));
-
-// Health checks for circuit breaker status
-builder.Services.AddHealthChecks()
-    .AddCheck("catalog-circuit-breaker", () =>
-        circuitBreakerState == CircuitState.Closed
-            ? HealthCheckResult.Healthy()
-            : HealthCheckResult.Degraded("Circuit breaker is open"));
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are some best practices for designing microservices?
-
-| Practice | Description |
-|----------|-------------|
-| **Design around business domains** | Use Domain-Driven Design bounded contexts |
-| **Single responsibility** | Each service does one thing well |
-| **Own your data** | No shared databases between services |
-| **API-first** | Define contracts (OpenAPI/gRPC) before implementation |
-| **Async by default** | Prefer events over synchronous calls |
-| **Design for failure** | Retry, circuit breaker, fallback everywhere |
-| **Health checks** | Liveness + readiness probes |
-| **Structured logging** | Correlation IDs, JSON logs |
-| **Distributed tracing** | OpenTelemetry propagation |
-| **Versioned APIs** | Never break consumers |
-| **Small, frequent releases** | CI/CD per service |
-| **Automate everything** | Docker + Kubernetes + GitOps |
-
-```cs
-// Checklist for a new microservice:
-
-// … 1. Health endpoints
-app.MapHealthChecks("/health/live");
-app.MapHealthChecks("/health/ready");
-
-// … 2. Structured logging with correlation
-builder.Host.UseSerilog((ctx, cfg) => cfg
-    .Enrich.FromLogContext()
-    .WriteTo.Console(new JsonFormatter()));
-
-// … 3. OpenTelemetry tracing
-builder.Services.AddOpenTelemetry()
-    .WithTracing(t => t.AddAspNetCoreInstrumentation().AddOtlpExporter());
-
-// … 4. Resilient HTTP clients
-builder.Services.AddHttpClient<IDownstreamClient, DownstreamClient>()
-    .AddStandardResilienceHandler();
-
-// … 5. Versioned API
-app.MapGroup("/api/v1").MapOrderEndpoints();
-
-// … 6. Graceful shutdown
-app.Lifetime.ApplicationStopping.Register(() =>
-    logger.LogInformation("Shutting down gracefully..."));
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. Name the key components of Microservices?
-
-```
-Key Components of a Microservices System:
-
-””—————————————————————————————————————————————————————————————————————
-”  CLIENT (Browser / Mobile / 3rd-party)                              ”
-”””——————————————————————”——————————————————————————————————————————————
-                       ”
-              ””——————–”—————————
-              ”   API Gateway    ”  Routing, Auth, Rate Limit, SSL
-              ”  (YARP / Ocelot) ”
-              ”””————————”—————————
-          ””————————————”————————————
-    ””———–”————— ””——–”———— ””——–”——————
-    ”  Order    ” ”Catalog  ” ” Payment   ”    Individual Services
-    ”  Service  ” ” Service ” ” Service   ”
-    ”””—————”————— ”””————”———— ”””————”——————
-          ”            ”           ”
-    ””———–”——   ””———–”——  ””——–”———
-    ” Orders ”   ”Products”  ”Payments”    Per-service Databases
-    ”  DB    ”   ”   DB   ”  ”   DB   ”
-    ”””————————   ”””————————  ”””————————
-          ”            ”           ”
-          ”””————————————”———————————
-                  ””——–”—————
-                  ” Message  ”    Async Communication (RabbitMQ / Kafka)
-                  ”   Bus    ”
-                  ”””——————————
-                       ”
-         ””—————————————”———————————————
-   ””———–”——————              ””—————–”——————
-   ” Notification”             ”  Audit / Log ”    Event Consumers
-   ”  Service   ”             ”   Service    ”
-   ”””————————————              ”””—————————————
-```
-
-| Component | Role |
-|-----------|------|
-| **API Gateway** | Single entry point — routing, auth, rate limiting |
-| **Services** | Independent business capabilities |
-| **Service Registry** | Service discovery (Consul, K8s DNS) |
-| **Message Bus** | Async communication (RabbitMQ, Kafka, Azure Service Bus) |
-| **Configuration Server** | Centralised config (Azure App Config, Consul KV) |
-| **Identity Provider** | Authentication/authorisation (IdentityServer, Azure AD B2C) |
-| **Container Runtime** | Docker for packaging, Kubernetes for orchestration |
-| **Observability** | Logs (Serilog), Metrics (Prometheus), Traces (Jaeger) |
-| **CI/CD Pipeline** | Per-service build and deploy (GitHub Actions, Azure DevOps) |
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are the tools commonly used tools for Microservices?
-
-| Category | Tool | Purpose |
-|----------|------|---------|
-| **Service framework** | ASP.NET Core Minimal API | Build HTTP microservices |
-| **API Gateway** | YARP, Ocelot, Azure APIM | Routing, auth, rate limiting |
-| **gRPC** | Grpc.AspNetCore | High-performance service-to-service |
-| **Messaging** | MassTransit + RabbitMQ | Async pub/sub, saga orchestration |
-| **Messaging (cloud)** | Azure Service Bus, Amazon SQS | Managed message queues |
-| **Streaming** | Apache Kafka, Azure Event Hubs | High-throughput event streaming |
-| **Containers** | Docker, containerd | Package and run services |
-| **Orchestration** | Kubernetes, Azure AKS | Scale, deploy, manage containers |
-| **Service mesh** | Istio, Linkerd | mTLS, traffic management, observability |
-| **Service discovery** | K8s DNS, Consul | Locate services dynamically |
-| **Configuration** | Azure App Config, Consul KV | Centralised config + feature flags |
-| **Identity** | IdentityServer, Azure AD B2C | OAuth2/OIDC for authentication |
-| **Resilience** | Polly / M.E.Http.Resilience | Retry, circuit breaker, timeout |
-| **Tracing** | OpenTelemetry + Jaeger/Zipkin | Distributed request tracing |
-| **Metrics** | Prometheus + Grafana | Dashboards and alerting |
-| **Logging** | Serilog + ELK / Azure Monitor | Structured log aggregation |
-| **CI/CD** | GitHub Actions, Azure DevOps | Automated build and deploy |
-| **Secrets** | Azure Key Vault, HashiCorp Vault | Secrets management |
-| **Health** | ASP.NET Core Health Checks | Liveness/readiness probes |
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are the key principles to follow when designing microservices?
-
-```cs
-// 1. Single Responsibility — one service, one bounded context
-// OrderService handles order lifecycle only; Catalog handles product info
-
-// 2. Database per service — no shared DB
-//  Shared DB creates coupling
-// … Each service owns its schema; communicate via events/API
-
-// 3. Design for failure
-builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
-    .AddStandardResilienceHandler(); // retry + circuit breaker + timeout
-
-// 4. Async-first communication
-// Prefer events over synchronous calls for non-critical paths
-await publishEndpoint.Publish(new OrderShipped(orderId, trackingNumber));
-
-// 5. API versioning — never break consumers
-var v1 = app.MapGroup("/api/v1");
-var v2 = app.MapGroup("/api/v2");
-v1.MapGet("/orders/{id}", GetOrderV1);
-v2.MapGet("/orders/{id}", GetOrderV2); // new shape, v1 still works
-
-// 6. Observability from day one
-builder.Services.AddOpenTelemetry()
-    .WithTracing(t => t.AddAspNetCoreInstrumentation().AddOtlpExporter())
-    .WithMetrics(m => m.AddAspNetCoreInstrumentation().AddOtlpExporter());
-
-builder.Host.UseSerilog((ctx, cfg) => cfg
-    .Enrich.FromLogContext()
-    .WriteTo.Console(new JsonFormatter()));
-
-// 7. Idempotent consumers — safe to process same message twice
-public class OrderCreatedConsumer : IConsumer<OrderCreated>
+var consumer = new Thread(() =>
 {
-    public async Task Consume(ConsumeContext<OrderCreated> ctx)
+    for (int i = 0; i < 5; i++)
     {
-        // Check if already processed (idempotency key)
-        if (await db.ProcessedEvents.AnyAsync(e => e.Id == ctx.MessageId))
-            return; // duplicate — skip
+        lock (buffer)
+        {
+            while (queue.Count == 0)
+                Monitor.Wait(buffer); // releases lock + waits for Pulse
 
-        // ... process ...
-
-        db.ProcessedEvents.Add(new ProcessedEvent(ctx.MessageId!.Value));
-        await db.SaveChangesAsync();
+            int item = queue.Dequeue();
+            Console.WriteLine($"Consumed: {item}");
+        }
     }
-}
+});
 
-// 8. Health checks for Kubernetes
-app.MapHealthChecks("/health/live",  new() { Predicate = _ => false }); // always alive
-app.MapHealthChecks("/health/ready", new() { Predicate = _ => true  }); // checks deps
-
-// 9. Use semantic versioning for Docker images + chart versions
-// v1.2.3 — never use :latest in production
-
-// 10. 12-Factor App principles
-// Config from environment; logs to stdout; stateless processes
+consumer.Start(); producer.Start();
+consumer.Join(); producer.Join();
 ```
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## Q. How do you implement gRPC in .NET Core for service-to-service communication?
+## Q. What is the Race condition?
 
-**gRPC** is a high-performance RPC framework using Protocol Buffers (protobuf) for serialization. It provides strongly-typed contracts, bi-directional streaming, and is significantly faster than REST for internal service calls.
-
-```bash
-# Create gRPC server
-dotnet new grpc -n OrderGrpcService
-cd OrderGrpcService
-dotnet add package Grpc.AspNetCore
-```
-
-```proto
-// Protos/order.proto — shared contract (copy to both projects or use NuGet)
-syntax = "proto3";
-option csharp_namespace = "OrderGrpcService";
-
-package order;
-
-service OrderService {
-  rpc CreateOrder (CreateOrderRequest) returns (CreateOrderReply);
-  rpc GetOrder    (GetOrderRequest)    returns (OrderReply);
-  rpc StreamOrders(StreamRequest)      returns (stream OrderReply); // server streaming
-}
-
-message CreateOrderRequest {
-  string customer_id = 1;
-  repeated OrderItem items = 2;
-}
-message CreateOrderReply { string order_id = 1; }
-message GetOrderRequest  { string order_id = 1; }
-message OrderReply       { string order_id = 1; string status = 2; double total = 3; }
-message OrderItem        { string product_id = 1; int32 quantity = 2; }
-message StreamRequest    { string customer_id = 1; }
-```
-
-```xml
-<!-- Server .csproj — auto-generates C# from proto -->
-<ItemGroup>
-  <Protobuf Include="Protos\order.proto" GrpcServices="Server" />
-</ItemGroup>
-```
+A **race condition** occurs when the outcome of a program depends on the timing or ordering of thread execution. When two or more threads access shared data concurrently and at least one modifies it, without proper synchronization, the result is unpredictable.
 
 ```cs
-// ” gRPC SERVER ”——————————————————————————————————————————————————————
-// Services/OrderGrpcService.cs
-using Grpc.Core;
-using OrderGrpcService;
+// Race condition — unsynchronized increment
+int counter = 0;
 
-public class OrderGrpcServiceImpl(IOrderRepository repo) : OrderService.OrderServiceBase
+var tasks = Enumerable.Range(0, 1000)
+    .Select(_ => Task.Run(() => counter++)) // NOT atomic: read + add + write
+    .ToArray();
+await Task.WhenAll(tasks);
+Console.WriteLine(counter); // may be < 1000 — race condition!
+
+// Strategies to prevent race conditions:
+
+// 1. lock — guard the critical section
+int safeCounter = 0;
+object sync = new();
+await Task.WhenAll(Enumerable.Range(0, 1000)
+    .Select(_ => Task.Run(() => { lock (sync) safeCounter++; })));
+Console.WriteLine(safeCounter); // always 1000
+
+// 2. Interlocked — atomic update for simple variables
+int atomicCounter = 0;
+await Task.WhenAll(Enumerable.Range(0, 1000)
+    .Select(_ => Task.Run(() => Interlocked.Increment(ref atomicCounter))));
+Console.WriteLine(atomicCounter); // always 1000
+
+// 3. Concurrent collections — thread-safe without manual locking
+var bag = new System.Collections.Concurrent.ConcurrentBag<int>();
+await Task.WhenAll(Enumerable.Range(0, 1000)
+    .Select(i => Task.Run(() => bag.Add(i))));
+Console.WriteLine(bag.Count); // always 1000
+
+// 4. Immutable data / local variables — no sharing = no race
+var results = await Task.WhenAll(
+    Enumerable.Range(1, 4).Select(i => Task.Run(() => i * i)));
+Console.WriteLine(string.Join(", ", results)); // 1, 4, 9, 16
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What happens if shared resources are not protected from concurrent access? How do you protect shared resources?
+
+**Without protection:** data corruption, torn reads/writes, stale caches, non-deterministic results.
+
+```cs
+// Unprotected — torn write (int64 may not be atomically written on 32-bit)
+long shared = 0;
+// multiple threads writing concurrently = undefined behavior
+
+// Protection options (choose based on scenario):
+
+// 1. lock — simplest, general purpose
+private readonly object _lock = new();
+private int _state;
+public void Update(int value) { lock (_lock) { _state = value; } }
+public int  Read()            { lock (_lock) { return _state;  } }
+
+// 2. Interlocked — atomic single-variable ops (fastest)
+private int _count;
+public void Increment() => Interlocked.Increment(ref _count);
+public int  Count       => Interlocked.CompareExchange(ref _count, 0, 0); // atomic read
+
+// 3. ReaderWriterLockSlim — multiple readers OR one writer
+private readonly ReaderWriterLockSlim _rwLock = new();
+private Dictionary<int, string> _cache = new();
+
+public string? Get(int key)
 {
-    public override async Task<CreateOrderReply> CreateOrder(
-        CreateOrderRequest request, ServerCallContext ctx)
-    {
-        var order = await repo.CreateAsync(request.CustomerId,
-            request.Items.Select(i => (i.ProductId, i.Quantity)).ToList(),
-            ctx.CancellationToken);
+    _rwLock.EnterReadLock();
+    try { return _cache.TryGetValue(key, out var v) ? v : null; }
+    finally { _rwLock.ExitReadLock(); }
+}
+public void Set(int key, string val)
+{
+    _rwLock.EnterWriteLock();
+    try { _cache[key] = val; }
+    finally { _rwLock.ExitWriteLock(); }
+}
 
-        return new CreateOrderReply { OrderId = order.Id.ToString() };
+// 4. Concurrent collections — thread-safe without explicit locks
+var dict  = new System.Collections.Concurrent.ConcurrentDictionary<int, string>();
+var queue = new System.Collections.Concurrent.ConcurrentQueue<int>();
+var stack = new System.Collections.Concurrent.ConcurrentStack<int>();
+var bag   = new System.Collections.Concurrent.ConcurrentBag<int>();
+
+// 5. Volatile — prevent CPU/compiler reordering for simple flags
+private volatile bool _running = true;
+public void Stop() => _running = false; // visible immediately to all threads
+
+// 6. Channels (System.Threading.Channels) — async-friendly message passing
+var channel = System.Threading.Channels.Channel.CreateBounded<int>(100);
+await channel.Writer.WriteAsync(42);
+int item = await channel.Reader.ReadAsync();
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is synchronization and why is it important? Can you name the synchronization primitives in .NET?
+
+**Synchronization** is the coordination of threads to ensure correct access to shared resources, prevent race conditions, and establish ordering guarantees.
+
+**Why it matters:** Without synchronization, concurrent threads can produce corrupted data, deadlocks, or non-deterministic behaviour.
+
+**Synchronization primitives in .NET:**
+
+| Primitive | Use case |
+|-----------|---------|
+| `lock` / `Monitor` | Mutual exclusion for any code block |
+| `Mutex` | Cross-process mutual exclusion |
+| `Semaphore` / `SemaphoreSlim` | Limit concurrent access to N threads |
+| `ManualResetEvent` / `ManualResetEventSlim` | Signal multiple waiting threads at once |
+| `AutoResetEvent` | Signal one waiting thread, then auto-reset |
+| `CountdownEvent` | Wait until N operations have completed |
+| `Barrier` | Synchronize N threads at a phase boundary |
+| `ReaderWriterLockSlim` | Multiple readers / exclusive writer |
+| `SpinLock` | Busy-wait for very short critical sections |
+| `SpinWait` | Spinning with back-off before yielding |
+| `Interlocked` | Atomic operations on primitive variables |
+| `volatile` | Visibility guarantee for simple flags |
+| `SemaphoreSlim` (async) | `WaitAsync()` — async-friendly throttling |
+| `Channel<T>` | Async-safe producer/consumer messaging |
+
+```cs
+// Choosing the right primitive:
+// Short critical section on same machine ’ lock
+// Need timeout / TryEnter             ’ Monitor.TryEnter
+// Limit concurrency (e.g., DB pool)   ’ SemaphoreSlim
+// Signal all waiting threads           ’ ManualResetEventSlim
+// Signal one thread, auto-reset        ’ AutoResetEvent
+// Count-down to zero                   ’ CountdownEvent
+// Phase-by-phase parallel work         ’ Barrier
+// Concurrent reads, rare writes        ’ ReaderWriterLockSlim
+// Nanosecond-critical inner loops      ’ SpinLock
+// Cross-process lock                   ’ Mutex
+
+using var slim = new SemaphoreSlim(initialCount: 3, maxCount: 3);
+var tasks = Enumerable.Range(0, 10).Select(async i =>
+{
+    await slim.WaitAsync();
+    try
+    {
+        Console.WriteLine($"Task {i} running (max 3 concurrent)");
+        await Task.Delay(200);
+    }
+    finally { slim.Release(); }
+});
+await Task.WhenAll(tasks);
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is AutoResetEvent and how is it different from ManualResetEvent?
+
+Both derive from `EventWaitHandle` and allow threads to signal each other.
+
+| | `AutoResetEvent` | `ManualResetEvent` / `ManualResetEventSlim` |
+|-|-----------------|---------------------------------------------|
+| **Reset** | Automatically after releasing **one** waiting thread | Must call `Reset()` manually |
+| **Releases** | Exactly **one** thread per `Set()` call | **All** waiting threads when `Set()` is called |
+| **State** | Like a turnstile — one thread passes, gate closes | Like a gate — open for all until closed |
+| **Use case** | Worker thread signalling (one-at-a-time) | Broadcast event (all threads proceed) |
+
+```cs
+// AutoResetEvent — one producer signals one consumer at a time
+using var are = new AutoResetEvent(initialState: false);
+
+var producer = new Thread(() =>
+{
+    for (int i = 0; i < 3; i++)
+    {
+        Thread.Sleep(300);
+        Console.WriteLine($"Produced {i}");
+        are.Set(); // releases exactly one waiting thread
+    }
+});
+
+var consumer = new Thread(() =>
+{
+    for (int i = 0; i < 3; i++)
+    {
+        are.WaitOne(); // blocks until Set() — auto-resets after waking
+        Console.WriteLine($"Consumed {i}");
+    }
+});
+
+producer.Start(); consumer.Start();
+producer.Join();  consumer.Join();
+
+// ManualResetEventSlim — broadcast to ALL waiting threads
+using var mre = new ManualResetEventSlim(initialState: false);
+
+var workers = Enumerable.Range(0, 4).Select(i => new Thread(() =>
+{
+    mre.Wait(); // all four threads block here
+    Console.WriteLine($"Worker {i} released");
+})).ToList();
+
+workers.ForEach(w => w.Start());
+Thread.Sleep(200);
+mre.Set();  // releases ALL four workers simultaneously
+mre.Reset(); // close gate again for next round
+workers.ForEach(w => w.Join());
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the Semaphore? What is Mutex and how does it differ from other synchronization mechanisms?
+
+**Semaphore** limits how many threads can access a resource simultaneously. `SemaphoreSlim` is the lightweight, async-friendly version recommended for most in-process scenarios.
+
+**Mutex** is like a `lock` but works **across processes** and is owned by the thread that acquired it.
+
+```cs
+// SemaphoreSlim — limit concurrency to N threads (async-friendly)
+using var sem = new SemaphoreSlim(initialCount: 2, maxCount: 2);
+
+var tasks = Enumerable.Range(0, 6).Select(async i =>
+{
+    await sem.WaitAsync();
+    try
+    {
+        Console.WriteLine($"  [{i}] entered (max 2 concurrent)");
+        await Task.Delay(300);
+        Console.WriteLine($"  [{i}] leaving");
+    }
+    finally { sem.Release(); }
+});
+await Task.WhenAll(tasks);
+
+// Semaphore (kernel-level, cross-thread/process)
+using var kernelSem = new Semaphore(initialCount: 1, maximumCount: 1, name: "MyAppSemaphore");
+kernelSem.WaitOne();
+try { /* exclusive access */ }
+finally { kernelSem.Release(); }
+
+// Mutex — cross-process mutual exclusion
+using var mutex = new Mutex(initiallyOwned: false, name: "Global\\MyAppMutex");
+
+// Single-instance app pattern
+bool createdNew;
+using var singleInstance = new Mutex(initiallyOwned: true, name: "Global\\MyApp", createdNew: out createdNew);
+if (!createdNew)
+{
+    Console.WriteLine("Another instance is already running.");
+    return;
+}
+// Only one instance reaches here
+```
+
+**Comparison:**
+
+| | `lock` | `Mutex` | `SemaphoreSlim` |
+|-|--------|---------|----------------|
+| **Scope** | In-process | Cross-process | In-process |
+| **Max holders** | 1 | 1 | N (configurable) |
+| **Async** |  |  | … `WaitAsync` |
+| **Overhead** | Low | High (kernel) | Low |
+| **Thread-affinity** | Yes | Yes | No |
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the `volatile` keyword?
+
+`volatile` tells the compiler and CPU that a field may be changed by multiple threads, preventing **caching** of the variable in a CPU register and disabling certain compiler/CPU **reordering** optimisations.
+
+```cs
+// Without volatile — compiler may cache _running in a register
+// and the loop never sees the update from another thread
+public class Processor
+{
+    private volatile bool _running = true; // volatile ensures visibility
+
+    public void Run()
+    {
+        while (_running) // reads from memory each iteration, not a register
+        {
+            // process work...
+        }
+        Console.WriteLine("Stopped cleanly");
     }
 
-    public override async Task<OrderReply> GetOrder(
-        GetOrderRequest request, ServerCallContext ctx)
-    {
-        var order = await repo.GetAsync(Guid.Parse(request.OrderId), ctx.CancellationToken)
-            ?? throw new RpcException(new Status(StatusCode.NotFound, "Order not found"));
+    public void Stop() => _running = false; // immediately visible to Run()
+}
 
-        return new OrderReply
-        {
-            OrderId = order.Id.ToString(),
-            Status  = order.Status.ToString(),
-            Total   = (double)order.Total
-        };
+// volatile is appropriate for:
+// - Simple flags (bool, int, reference)
+// - Sentinel values checked in a spin loop
+
+// volatile is NOT appropriate for:
+// - Compound operations (check + set, read + increment) — use Interlocked or lock
+// - Complex objects — use lock or Concurrent collections
+
+// Difference: volatile vs Interlocked vs lock
+//   volatile: prevents caching/reordering; does NOT make compound ops atomic
+//   Interlocked: atomic operations on single primitives (Increment, CompareExchange)
+//   lock: exclusive section — any code, any type, highest overhead
+
+// Thread.MemoryBarrier — explicit full memory fence (advanced, rarely needed)
+private int _data;
+private volatile bool _ready;
+
+public void Producer()
+{
+    _data = 42;
+    Thread.MemoryBarrier(); // ensure _data write is visible before _ready write
+    _ready = true;
+}
+
+public int Consumer()
+{
+    while (!_ready) Thread.SpinWait(1);
+    Thread.MemoryBarrier();
+    return _data; // guaranteed to see 42
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are the Interlocked functions?
+
+`Interlocked` provides **atomic** operations on shared variables — safe without `lock` and with minimal overhead (single CPU instruction).
+
+```cs
+int counter = 0;
+long total   = 0;
+
+// Increment / Decrement — thread-safe ++ and --
+Interlocked.Increment(ref counter);       // counter++
+Interlocked.Decrement(ref counter);       // counter--
+Console.WriteLine(counter);               // 0
+
+// Add — thread-safe +=
+Interlocked.Add(ref counter, 10);
+Console.WriteLine(counter);               // 10
+
+// Exchange — atomically sets value, returns old value
+int previous = Interlocked.Exchange(ref counter, 100);
+Console.WriteLine($"Was {previous}, now {counter}"); // Was 10, now 100
+
+// CompareExchange — atomically: if (counter == expected) counter = newValue
+// Returns the original value
+int original = Interlocked.CompareExchange(ref counter, newValue: 200, comparand: 100);
+Console.WriteLine($"Original: {original}, Counter: {counter}"); // Original: 100, Counter: 200
+
+// Read — atomic read of a long on 32-bit systems
+long atomicRead = Interlocked.Read(ref total);
+
+// Or (C# 9+)
+Interlocked.Or(ref counter,  0b1111); // bitwise OR
+Interlocked.And(ref counter, 0b1010); // bitwise AND
+
+// Practical: lock-free spin-based update
+int value = 0;
+int current, newVal;
+do
+{
+    current = value;
+    newVal  = current * 2 + 1;
+} while (Interlocked.CompareExchange(ref value, newVal, current) != current);
+Console.WriteLine(value); // 1
+
+// Practical: reference swap
+string? sharedRef = "initial";
+string? old = Interlocked.Exchange(ref sharedRef, "updated");
+Console.WriteLine($"Was '{old}', now '{sharedRef}'");
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How can you share data between multiple threads?
+
+```cs
+// 1. Shared field with lock — simplest and most common
+public class SharedState
+{
+    private readonly object _lock = new();
+    private List<string> _items = [];
+
+    public void Add(string item)    { lock (_lock) { _items.Add(item); } }
+    public List<string> Snapshot()  { lock (_lock) { return [.._items]; } }
+}
+
+// 2. Concurrent collections — no manual lock needed
+var dict  = new System.Collections.Concurrent.ConcurrentDictionary<string, int>();
+var queue = new System.Collections.Concurrent.ConcurrentQueue<string>();
+var bag   = new System.Collections.Concurrent.ConcurrentBag<int>();
+
+await Task.WhenAll(
+    Task.Run(() => dict.TryAdd("key1", 1)),
+    Task.Run(() => dict.TryAdd("key2", 2)));
+
+// 3. Channel<T> — async-safe producer/consumer (preferred in .NET 5+)
+var channel = System.Threading.Channels.Channel.CreateUnbounded<int>();
+
+var producer = Task.Run(async () =>
+{
+    for (int i = 0; i < 5; i++)
+    {
+        await channel.Writer.WriteAsync(i);
+        Console.WriteLine($"Sent: {i}");
     }
+    channel.Writer.Complete();
+});
 
-    // Server-side streaming — push multiple responses
-    public override async Task StreamOrders(
-        StreamRequest request,
-        IServerStreamWriter<OrderReply> stream,
-        ServerCallContext ctx)
+var consumer = Task.Run(async () =>
+{
+    await foreach (int item in channel.Reader.ReadAllAsync())
+        Console.WriteLine($"Received: {item}");
+});
+
+await Task.WhenAll(producer, consumer);
+
+// 4. ThreadLocal<T> — per-thread copy (not shared, but partitions data)
+var localRng = new ThreadLocal<Random>(() => new Random());
+await Task.WhenAll(Enumerable.Range(0, 4).Select(_ =>
+    Task.Run(() => Console.WriteLine(localRng.Value!.Next(100)))));
+
+// 5. Immutable shared data — safest (no synchronization needed)
+// Prefer record types and ImmutableList<T>, ImmutableDictionary<T,V>
+using System.Collections.Immutable;
+ImmutableList<int> immutable = ImmutableList<int>.Empty.Add(1).Add(2);
+// Any thread can read immutable safely; Add() returns a new list
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you implement a producer-consumer scenario in C#?
+
+```cs
+using System.Threading.Channels;
+
+// … Modern approach: Channel<T> (preferred in .NET 5+)
+var channel = Channel.CreateBounded<int>(capacity: 10);
+
+async Task ProduceAsync()
+{
+    for (int i = 0; i < 20; i++)
     {
-        await foreach (var order in repo.GetByCustomerAsync(request.CustomerId, ctx.CancellationToken))
+        await channel.Writer.WriteAsync(i);
+        Console.WriteLine($"Produced: {i}");
+        await Task.Delay(50);
+    }
+    channel.Writer.Complete();
+}
+
+async Task ConsumeAsync(int id)
+{
+    await foreach (int item in channel.Reader.ReadAllAsync())
+    {
+        Console.WriteLine($"Consumer {id} got: {item}");
+        await Task.Delay(120);
+    }
+}
+
+// One producer, two consumers
+await Task.WhenAll(
+    ProduceAsync(),
+    ConsumeAsync(1),
+    ConsumeAsync(2));
+
+// Alternative: BlockingCollection<T> (older, synchronous API)
+var collection = new System.Collections.Concurrent.BlockingCollection<int>(boundedCapacity: 5);
+
+var producer = Task.Run(() =>
+{
+    for (int i = 0; i < 10; i++)
+    {
+        collection.Add(i); // blocks if full
+        Console.WriteLine($"Added: {i}");
+    }
+    collection.CompleteAdding();
+});
+
+var consumer = Task.Run(() =>
+{
+    foreach (int item in collection.GetConsumingEnumerable()) // blocks if empty
+        Console.WriteLine($"Consumed: {item}");
+});
+
+await Task.WhenAll(producer, consumer);
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the `CancellationToken` and how is it used in multithreading?
+
+`CancellationToken` provides a cooperative cancellation model — the producer (caller) signals cancellation; the consumer (worker) checks and responds to it. No thread is forcibly aborted.
+
+```cs
+// 1. Basic usage
+using var cts = new CancellationTokenSource();
+CancellationToken token = cts.Token;
+
+var task = Task.Run(async () =>
+{
+    for (int i = 0; i < 100; i++)
+    {
+        token.ThrowIfCancellationRequested(); // throws OperationCanceledException
+        Console.WriteLine($"Working {i}");
+        await Task.Delay(100, token); // also cancellable
+    }
+}, token);
+
+await Task.Delay(350);
+cts.Cancel(); // signal cancellation
+
+try   { await task; }
+catch (OperationCanceledException) { Console.WriteLine("Task cancelled"); }
+
+// 2. Timeout cancellation
+using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+// CancellationTokenSource.CreateLinkedTokenSource — combine multiple tokens
+using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
+    cts.Token, timeoutCts.Token);
+
+// 3. Register a callback on cancellation
+linkedCts.Token.Register(() => Console.WriteLine("Cleanup on cancellation"));
+
+// 4. Check without throwing
+if (token.IsCancellationRequested)
+{
+    Console.WriteLine("Cancelled (non-throwing check)");
+    return;
+}
+
+// 5. Pass to .NET APIs — most async methods accept CancellationToken
+using var httpClient = new HttpClient();
+try
+{
+    using var newCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+    string data = await httpClient.GetStringAsync("https://example.com", newCts.Token);
+}
+catch (TaskCanceledException) { Console.WriteLine("HTTP request timed out"); }
+
+// 6. Thread-based (non-async) polling
+void LongWork(CancellationToken ct)
+{
+    while (!ct.IsCancellationRequested)
+    {
+        Thread.Sleep(100); // do work
+    }
+    ct.ThrowIfCancellationRequested();
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you use `Concurrent` collections in C#?
+
+`System.Collections.Concurrent` provides thread-safe collections that avoid explicit `lock` statements.
+
+```cs
+using System.Collections.Concurrent;
+
+// ConcurrentDictionary<TKey, TValue>
+var dict = new ConcurrentDictionary<string, int>();
+dict.TryAdd("Alice", 100);
+dict.AddOrUpdate("Alice", 100, (key, old) => old + 50); // atomic update
+int val = dict.GetOrAdd("Bob", key => 200);             // atomic get-or-add
+Console.WriteLine(dict["Alice"]); // 150
+
+// ConcurrentQueue<T> — FIFO, lock-free
+var queue = new ConcurrentQueue<int>();
+Parallel.For(0, 10, i => queue.Enqueue(i));
+while (queue.TryDequeue(out int item))
+    Console.Write($"{item} ");
+Console.WriteLine();
+
+// ConcurrentStack<T> — LIFO
+var stack = new ConcurrentStack<int>();
+stack.PushRange([1, 2, 3, 4, 5]);
+if (stack.TryPop(out int top)) Console.WriteLine($"Popped: {top}"); // 5
+
+// ConcurrentBag<T> — unordered, optimised for same-thread add/take
+var bag = new ConcurrentBag<int>();
+await Task.WhenAll(Enumerable.Range(0, 100).Select(i =>
+    Task.Run(() => bag.Add(i))));
+Console.WriteLine($"Bag count: {bag.Count}"); // 100
+
+// BlockingCollection<T> — bounded buffer with blocking Add/Take
+var bounded = new BlockingCollection<int>(boundedCapacity: 5);
+
+var prod = Task.Run(() =>
+{
+    for (int i = 0; i < 10; i++)
+    {
+        bounded.Add(i);                         // blocks when full
+        Console.WriteLine($"Produced: {i}");
+    }
+    bounded.CompleteAdding();
+});
+
+var cons = Task.Run(() =>
+{
+    foreach (int n in bounded.GetConsumingEnumerable()) // blocks when empty
+        Console.WriteLine($"Consumed: {n}");
+});
+
+await Task.WhenAll(prod, cons);
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the difference between `Parallel.For` and `Task.Run`?
+
+| | `Parallel.For` / `Parallel.ForEach` | `Task.Run` |
+|-|-------------------------------------|-----------|
+| **Purpose** | Data parallelism — divide a collection across cores | Run a single unit of work asynchronously |
+| **Blocking** | Blocks the calling thread until all iterations complete | Non-blocking — returns a `Task` |
+| **Partitioning** | Automatic (Partitioner) | Manual |
+| **Degree of parallelism** | `MaxDegreeOfParallelism` option | Manual via `SemaphoreSlim` |
+| **Use case** | CPU-bound loops over data | Single async or CPU-bound job |
+
+```cs
+// Parallel.For — best for CPU-bound data processing
+var results = new int[10];
+Parallel.For(0, 10, new ParallelOptions { MaxDegreeOfParallelism = 4 }, i =>
+{
+    results[i] = i * i; // safe because each i writes to a different index
+    Console.WriteLine($"i={i} on thread {Thread.CurrentThread.ManagedThreadId}");
+});
+Console.WriteLine(string.Join(", ", results));
+
+// Parallel.ForEach
+var files = Directory.GetFiles(".", "*.cs");
+Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = 2 }, file =>
+{
+    int lines = File.ReadLines(file).Count();
+    Console.WriteLine($"{Path.GetFileName(file)}: {lines} lines");
+});
+
+// Task.Run — single async unit of work
+var task = Task.Run(() =>
+{
+    long sum = 0;
+    for (long i = 0; i < 1_000_000; i++) sum += i;
+    return sum;
+});
+Console.WriteLine(await task);
+
+//  Parallel.For with async — use Parallel.ForEachAsync (.NET 6+)
+await Parallel.ForEachAsync(files, new ParallelOptions { MaxDegreeOfParallelism = 4 },
+    async (file, ct) =>
+    {
+        string content = await File.ReadAllTextAsync(file, ct);
+        Console.WriteLine($"{Path.GetFileName(file)}: {content.Length} chars");
+    });
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are the advantages and disadvantages of multithreading?
+
+**Advantages:**
+
+| Advantage | Detail |
+|-----------|--------|
+| **Improved throughput** | Utilize multiple CPU cores for CPU-bound work |
+| **Responsiveness** | UI thread stays responsive while background work runs |
+| **Parallelism** | Independent tasks run simultaneously |
+| **Better resource utilisation** | Threads run while others wait on I/O |
+| **Scalability** | Scale to available hardware cores |
+
+**Disadvantages:**
+
+| Disadvantage | Detail |
+|-------------|--------|
+| **Complexity** | Harder to design, debug, and reason about |
+| **Race conditions** | Unsynchronized shared state leads to bugs |
+| **Deadlocks / livelocks** | Threads block each other permanently |
+| **Overhead** | Context switches, synchronization, memory |
+| **Difficult testing** | Bugs are timing-dependent and non-reproducible |
+| **Priority inversion** | High-priority thread blocked by low-priority one |
+
+```cs
+// When to use multithreading:
+// … CPU-bound: image processing, data crunching, compression
+// … Parallel independent tasks: batch file processing
+// … Background work: keep UI responsive
+// … I/O-bound: async/await without dedicated threads
+
+// When to AVOID:
+//  Simple sequential logic — adds complexity with no benefit
+//  Shared state that\'s complex to synchronize
+//  Very short tasks — thread creation overhead exceeds benefit
+
+// Modern guideline:
+// CPU-bound: Parallel.For, Parallel.ForEachAsync, Task.Run
+// I/O-bound: async/await (no extra threads needed)
+// Producer/consumer: Channel<T>
+// Avoid raw Thread() — use Task-based APIs instead
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How does multithreading improve performance over a single-threaded solution?
+
+```cs
+// Single-threaded: tasks run sequentially — total time = sum of each
+var sw = System.Diagnostics.Stopwatch.StartNew();
+
+int r1 = HeavyCompute(1);
+int r2 = HeavyCompute(2);
+int r3 = HeavyCompute(3);
+int r4 = HeavyCompute(4);
+
+sw.Stop();
+Console.WriteLine($"Sequential: {sw.ElapsedMilliseconds} ms, results: {r1+r2+r3+r4}");
+
+// Multi-threaded: tasks run in parallel — total time  max of each
+sw.Restart();
+
+int[] results = await Task.WhenAll(
+    Task.Run(() => HeavyCompute(1)),
+    Task.Run(() => HeavyCompute(2)),
+    Task.Run(() => HeavyCompute(3)),
+    Task.Run(() => HeavyCompute(4)));
+
+sw.Stop();
+Console.WriteLine($"Parallel:   {sw.ElapsedMilliseconds} ms, results: {results.Sum()}");
+
+int HeavyCompute(int seed)
+{
+    Thread.Sleep(500); // simulate 500 ms CPU work
+    return seed * seed;
+}
+// Sequential: ~2000 ms
+// Parallel:   ~500 ms  (4x speedup on 4+ cores)
+
+// I/O-bound: async/await saves threads entirely
+sw.Restart();
+var fetches = Enumerable.Range(1, 4).Select(i =>
+    Task.Run(() => { Thread.Sleep(300); return i; })); // simulate I/O
+int[] ioResults = await Task.WhenAll(fetches);
+sw.Stop();
+Console.WriteLine($"Async I/O: {sw.ElapsedMilliseconds} ms"); // ~300 ms
+
+// Amdahl\'s Law: speedup is limited by the sequential portion
+// If 20% of code is sequential, max speedup = 1 / 0.2 = 5x regardless of cores
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. When should multithreading be used and when should it be avoided in C#?
+
+```cs
+// … USE multithreading when:
+
+// 1. CPU-bound parallel work — multiple independent CPU-intensive tasks
+var primes = await Task.Run(() =>
+    Enumerable.Range(2, 1_000_000)
+              .AsParallel()
+              .Where(IsPrime)
+              .Count());
+
+// 2. UI responsiveness — background work while UI stays responsive
+// (WPF/MAUI: always run long work off the UI thread)
+await Task.Run(() => ProcessLargeFile("data.csv")); // off UI thread
+
+// 3. I/O-bound parallelism — multiple concurrent HTTP/DB calls
+var responses = await Task.WhenAll(
+    httpClient.GetStringAsync("https://api1.example.com"),
+    httpClient.GetStringAsync("https://api2.example.com"));
+
+// 4. Background services — polling, cleanup, monitoring
+var cts = new CancellationTokenSource();
+Task bgService = Task.Factory.StartNew(async () =>
+{
+    while (!cts.Token.IsCancellationRequested)
+    {
+        await DoMaintenanceAsync();
+        await Task.Delay(TimeSpan.FromMinutes(5), cts.Token);
+    }
+}, TaskCreationOptions.LongRunning);
+
+//  AVOID multithreading when:
+
+// 1. Simple sequential logic — no gain, only complexity
+// BAD:
+int badResult = await Task.Run(() => 2 + 2);
+
+// GOOD:
+int goodResult = 2 + 2;
+
+// 2. Tasks are too short — thread overhead > benefit
+// BAD: threading a 1 s operation
+// GOOD: batch small items, then parallelize the batch
+
+// 3. Heavy shared state — if everything needs a lock, parallelism is lost
+
+// 4. Ordering matters — parallel tasks don\'t preserve order
+
+bool IsPrime(int n)
+{
+    if (n < 2) return false;
+    for (int i = 2; i * i <= n; i++)
+        if (n % i == 0) return false;
+    return true;
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How can you ensure mutual exclusion without using `lock` or `Monitor`?
+
+```cs
+// 1. SemaphoreSlim(1,1) — async-compatible mutual exclusion
+var sem = new SemaphoreSlim(1, 1);
+
+async Task CriticalSectionAsync()
+{
+    await sem.WaitAsync(); // async — doesn\'t block a thread
+    try { /* exclusive work */ await Task.Delay(100); }
+    finally { sem.Release(); }
+}
+
+// 2. Mutex — cross-process mutual exclusion
+using var mutex = new Mutex(false, "Global\\MyAppMutex");
+mutex.WaitOne();
+try { /* exclusive work */ }
+finally { mutex.ReleaseMutex(); }
+
+// 3. SpinLock — busy-wait for very short sections (no kernel transition)
+var spinLock = new SpinLock(enableThreadOwnerTracking: false);
+bool taken = false;
+try
+{
+    spinLock.Enter(ref taken);
+    // ultra-short critical section
+    Console.WriteLine("SpinLock acquired");
+}
+finally { if (taken) spinLock.Exit(); }
+
+// 4. Interlocked.CompareExchange — optimistic lock-free CAS
+int lockFlag = 0;
+while (Interlocked.CompareExchange(ref lockFlag, 1, 0) != 0)
+    Thread.SpinWait(1); // spin until we set flag 0’1
+try { /* exclusive work */ }
+finally { Interlocked.Exchange(ref lockFlag, 0); }
+
+// 5. ReaderWriterLockSlim — multiple readers, exclusive writer
+var rwLock = new ReaderWriterLockSlim();
+// Writer
+rwLock.EnterWriteLock();
+try { /* exclusive write */ }
+finally { rwLock.ExitWriteLock(); }
+// Reader
+rwLock.EnterReadLock();
+try { /* concurrent reads */ }
+finally { rwLock.ExitReadLock(); }
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. Explain the difference between `Barrier` and `CountdownEvent`. Provide a real-world scenario for each.
+
+| | `Barrier` | `CountdownEvent` |
+|-|-----------|-----------------|
+| **Purpose** | Synchronize N threads at each **phase boundary** | Wait until N operations have signalled completion |
+| **Reusable** | … Automatically resets for each phase |  One-shot (or manually reset) |
+| **Participants** | Fixed at creation (can be added/removed) | Count set at creation |
+| **Direction** | All threads wait for each other | One thread waits; many threads signal |
+
+```cs
+// Barrier — pipeline with phases
+// Real-world: parallel rendering pipeline where all threads must finish
+// Phase 1 (geometry) before any starts Phase 2 (shading)
+
+int workers = 4;
+using var barrier = new Barrier(participants: workers, postPhaseAction: b =>
+    Console.WriteLine($"\n--- Phase {b.CurrentPhaseNumber + 1} complete ---\n"));
+
+var tasks = Enumerable.Range(0, workers).Select(id => Task.Run(() =>
+{
+    Console.WriteLine($"Worker {id}: Phase 1 (geometry)");
+    Thread.Sleep(Random.Shared.Next(100, 400));
+    barrier.SignalAndWait(); // wait for all to finish Phase 1
+
+    Console.WriteLine($"Worker {id}: Phase 2 (shading)");
+    Thread.Sleep(Random.Shared.Next(100, 300));
+    barrier.SignalAndWait(); // wait for all to finish Phase 2
+
+    Console.WriteLine($"Worker {id}: Phase 3 (output)");
+}));
+await Task.WhenAll(tasks);
+
+// CountdownEvent — wait for N async completions
+// Real-world: download N files concurrently; proceed only when all are done
+
+int fileCount = 5;
+using var countdown = new CountdownEvent(initialCount: fileCount);
+
+for (int i = 0; i < fileCount; i++)
+{
+    int fileId = i;
+    Task.Run(() =>
+    {
+        Thread.Sleep(Random.Shared.Next(200, 600)); // simulate download
+        Console.WriteLine($"File {fileId} downloaded");
+        countdown.Signal(); // decrement the count
+    });
+}
+
+countdown.Wait(); // block until count reaches 0
+Console.WriteLine("All files downloaded — proceeding with processing");
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are the issues with `Thread.Abort()`? How do you gracefully stop a thread?
+
+**`Thread.Abort()` is removed in .NET Core / .NET 5+.** It was unsafe because it injected a `ThreadAbortException` at an arbitrary point, potentially corrupting state, leaving locks acquired, or skipping `finally` blocks.
+
+```cs
+//  Thread.Abort — NOT available in .NET 5+
+// var t = new Thread(...);
+// t.Abort(); // throws PlatformNotSupportedException on .NET 5+
+
+// … Graceful cancellation via CancellationToken (recommended)
+using var cts = new CancellationTokenSource();
+
+var worker = Task.Run(async () =>
+{
+    while (!cts.Token.IsCancellationRequested)
+    {
+        Console.WriteLine("Working...");
+        await Task.Delay(300, cts.Token);
+    }
+    Console.WriteLine("Gracefully stopped");
+}, cts.Token);
+
+await Task.Delay(1000);
+cts.Cancel(); // cooperative cancellation
+try   { await worker; }
+catch (OperationCanceledException) { Console.WriteLine("Task cancelled"); }
+
+// … Volatile flag — simple polling (no Task)
+public class BackgroundWorker
+{
+    private volatile bool _stop;
+    private Thread? _thread;
+
+    public void Start()
+    {
+        _thread = new Thread(() =>
         {
-            await stream.WriteAsync(new OrderReply
+            while (!_stop)
             {
-                OrderId = order.Id.ToString(),
-                Status  = order.Status.ToString(),
-                Total   = (double)order.Total
+                Console.WriteLine("Tick");
+                Thread.Sleep(200);
+            }
+            Console.WriteLine("Worker stopped");
+        }) { IsBackground = true };
+        _thread.Start();
+    }
+
+    public void Stop()
+    {
+        _stop = true;
+        _thread?.Join(timeout: TimeSpan.FromSeconds(2));
+    }
+}
+
+var bw = new BackgroundWorker();
+bw.Start();
+await Task.Delay(700);
+bw.Stop();
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you achieve thread synchronization using `ReaderWriterLockSlim`? What are its advantages over `ReaderWriterLock`?
+
+`ReaderWriterLockSlim` allows **multiple concurrent readers** and **exclusive writers**, improving throughput for read-heavy workloads.
+
+| | `ReaderWriterLock` | `ReaderWriterLockSlim` |
+|-|-------------------|----------------------|
+| **Performance** | Slower | Faster (optimised internals) |
+| **Recursive support** | Via flags | Opt-in (`LockRecursionPolicy`) |
+| **Upgradeable read lock** |  | … `EnterUpgradeableReadLock` |
+| **Recommendation** | Legacy (avoid) | … Use this |
+
+```cs
+public class ThreadSafeCache<TKey, TValue> where TKey : notnull
+{
+    private readonly Dictionary<TKey, TValue> _dict = new();
+    private readonly ReaderWriterLockSlim _lock = new();
+
+    public TValue? Get(TKey key)
+    {
+        _lock.EnterReadLock(); // multiple readers concurrently
+        try
+        {
+            return _dict.TryGetValue(key, out var val) ? val : default;
+        }
+        finally { _lock.ExitReadLock(); }
+    }
+
+    public void Set(TKey key, TValue value)
+    {
+        _lock.EnterWriteLock(); // exclusive — blocks all readers and writers
+        try { _dict[key] = value; }
+        finally { _lock.ExitWriteLock(); }
+    }
+
+    // Upgradeable lock — check then conditionally write (no double-locking)
+    public TValue GetOrAdd(TKey key, Func<TKey, TValue> factory)
+    {
+        _lock.EnterUpgradeableReadLock();
+        try
+        {
+            if (_dict.TryGetValue(key, out var existing)) return existing;
+
+            _lock.EnterWriteLock(); // upgrade to write
+            try
+            {
+                var value = factory(key);
+                _dict[key] = value;
+                return value;
+            }
+            finally { _lock.ExitWriteLock(); }
+        }
+        finally { _lock.ExitUpgradeableReadLock(); }
+    }
+
+    public void Dispose() => _lock.Dispose();
+}
+
+// Usage
+var cache = new ThreadSafeCache<string, int>();
+await Task.WhenAll(
+    Task.Run(() => cache.Set("x", 42)),
+    Task.Run(() => Console.WriteLine(cache.Get("x"))),
+    Task.Run(() => Console.WriteLine(cache.GetOrAdd("y", _ => 99))));
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. Discuss the differences between `volatile`, `Interlocked`, and `Thread.MemoryBarrier`. When should each be used?
+
+| | `volatile` | `Interlocked` | `Thread.MemoryBarrier` |
+|-|-----------|--------------|----------------------|
+| **Prevents caching** | … | … (implicit) | … (explicit fence) |
+| **Prevents reordering** | Partial (acquire/release) | … | … (full fence) |
+| **Atomic compound ops** |  | … |  |
+| **Overhead** | Minimal | Low (single CPU instruction) | Low–Medium |
+| **Use case** | Simple flags; visibility | Atomic read/modify/write | Custom lock-free algorithms |
+
+```cs
+// volatile — prevent caching of a simple flag
+private volatile bool _shutdown = false;
+
+void Worker()
+{
+    while (!_shutdown) { /* work */ }  // always reads from memory
+}
+void Stop() => _shutdown = true; // immediately visible
+
+// Interlocked — atomic compound operation on a single variable
+int counter = 0;
+Interlocked.Increment(ref counter);               // atomic read + add + write
+int old = Interlocked.Exchange(ref counter, 100); // atomic swap
+int orig = Interlocked.CompareExchange(ref counter, 200, 100); // CAS
+
+// Thread.MemoryBarrier — full memory fence in custom lock-free code
+private int _data;
+private int _flag;
+
+void Produce()
+{
+    _data = 99;
+    Thread.MemoryBarrier(); // STORE fence: _data write visible before _flag write
+    _flag = 1;
+}
+
+int Consume()
+{
+    while (Volatile.Read(ref _flag) == 0) { } // spin
+    Thread.MemoryBarrier(); // LOAD fence: _flag read before _data read
+    return _data; // guaranteed to see 99
+}
+
+// Volatile.Read / Volatile.Write — explicit volatile semantics without field keyword
+int val = Volatile.Read(ref _flag);
+Volatile.Write(ref _flag, 1);
+
+// Rule of thumb:
+// One thread writes, one thread reads a simple flag  ’ volatile
+// Atomic increment / compare-and-swap               ’ Interlocked
+// Custom lock-free algorithm with ordering needs    ’ MemoryBarrier / Volatile.Read/Write
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. Explain thread-local storage and data partitioning in C# multithreading.
+
+**Thread-local storage (TLS)** gives each thread its own private copy of a variable — no sharing, no synchronization needed.  
+**Data partitioning** divides a dataset into independent chunks and assigns each chunk to a separate thread.
+
+```cs
+// 1. ThreadLocal<T> — per-thread instance
+var localRng = new ThreadLocal<Random>(() => new Random(), trackAllValues: true);
+
+await Task.WhenAll(Enumerable.Range(0, 4).Select(i => Task.Run(() =>
+{
+    // Each thread has its own Random — no lock needed
+    int roll = localRng.Value!.Next(1, 7);
+    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId}: rolled {roll}");
+})));
+
+// See all per-thread values
+Console.WriteLine($"Instances created: {localRng.Values.Count}");
+localRng.Dispose();
+
+// 2. [ThreadStatic] — simpler but no initializer
+[ThreadStatic] private static int _threadId;
+
+// 3. Data partitioning — PLINQ
+var numbers = Enumerable.Range(1, 10_000_000);
+long sum = numbers.AsParallel()
+                  .WithDegreeOfParallelism(4)
+                  .Where(n => n % 2 == 0)
+                  .Select(n => (long)n)
+                  .Sum();
+Console.WriteLine($"Sum of evens: {sum}");
+
+// 4. Data partitioning — Parallel.For with thread-local accumulator (no shared state)
+long total = 0;
+Parallel.For(
+    fromInclusive: 0L,
+    toExclusive:   10_000_000L,
+    localInit:    () => 0L,                          // per-thread local
+    body:         (i, _, local) => local + i,        // accumulate locally
+    localFinally: local => Interlocked.Add(ref total, local) // merge once
+);
+Console.WriteLine($"Parallel total: {total}");
+
+// 5. Partitioner — custom partition strategy
+var partitioner = Partitioner.Create(0, 10_000_000, rangeSize: 500_000);
+Parallel.ForEach(partitioner, range =>
+{
+    long localSum = 0;
+    for (long i = range.Item1; i < range.Item2; i++) localSum += i;
+    Interlocked.Add(ref total, localSum);
+});
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you combine async/await with multithreading? How does `TaskScheduler` fit in?
+
+`async/await` is primarily an **I/O-bound** model — it doesn\'t create new threads. When you need CPU-bound work alongside async, combine `Task.Run` with `await`. `TaskScheduler` controls *where* tasks execute.
+
+```cs
+// 1. CPU-bound work + async I/O together
+async Task<int> ProcessFileAsync(string path, CancellationToken ct)
+{
+    // I/O-bound: no thread blocked
+    string content = await File.ReadAllTextAsync(path, ct);
+
+    // CPU-bound: offload to thread pool, don\'t block the async context
+    int wordCount = await Task.Run(() => content.Split().Length, ct);
+    return wordCount;
+}
+
+// 2. Concurrent CPU + I/O
+var tasks = Directory.GetFiles(".", "*.cs")
+    .Select(f => ProcessFileAsync(f, CancellationToken.None));
+int[] counts = await Task.WhenAll(tasks);
+Console.WriteLine($"Total words: {counts.Sum()}");
+
+// 3. TaskScheduler — controls execution context
+// Default: ThreadPoolTaskScheduler (Task.Run uses this)
+// CurrentThread: runs on the current thread (synchronous; testing)
+// LimitedConcurrency: caps concurrent tasks
+
+public class LimitedConcurrencyLevelTaskScheduler(int maxParallelism)
+    : TaskScheduler
+{
+    private readonly LinkedList<Task> _tasks = new();
+    private int _running;
+
+    protected override void QueueTask(Task task)
+    {
+        lock (_tasks) _tasks.AddLast(task);
+        TryExecuteNextTask();
+    }
+
+    private void TryExecuteNextTask()
+    {
+        lock (_tasks)
+        {
+            if (_running >= maxParallelism || _tasks.Count == 0) return;
+            _running++;
+            var task = _tasks.First!.Value;
+            _tasks.RemoveFirst();
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                TryExecuteTask(task);
+                lock (_tasks) { _running--; TryExecuteNextTask(); }
             });
         }
     }
+
+    protected override bool TryExecuteTaskInline(Task task, bool prev) => false;
+    protected override IEnumerable<Task> GetScheduledTasks() { lock (_tasks) return [.._tasks]; }
 }
 
-// Program.cs (server)
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddGrpc(opt =>
-{
-    opt.EnableDetailedErrors = builder.Environment.IsDevelopment();
-    opt.MaxReceiveMessageSize = 4 * 1024 * 1024; // 4 MB
-});
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+var scheduler = new LimitedConcurrencyLevelTaskScheduler(maxParallelism: 2);
+var factory   = new TaskFactory(CancellationToken.None,
+    TaskCreationOptions.None, TaskContinuationOptions.None, scheduler);
 
-var app = builder.Build();
-app.MapGrpcService<OrderGrpcServiceImpl>();
-app.MapGet("/", () => "gRPC server. Use a gRPC client to communicate.");
-app.Run();
-```
-
-```xml
-<!-- Client .csproj -->
-<ItemGroup>
-  <PackageReference Include="Grpc.Net.ClientFactory" Version="2.*" />
-  <PackageReference Include="Google.Protobuf"         Version="3.*" />
-  <PackageReference Include="Grpc.Tools"              Version="2.*" PrivateAssets="All" />
-  <Protobuf Include="Protos\order.proto" GrpcServices="Client" />
-</ItemGroup>
-```
-
-```cs
-// ” gRPC CLIENT ”——————————————————————————————————————————————————————
-// Program.cs (consumer service)
-builder.Services.AddGrpcClient<OrderService.OrderServiceClient>(o =>
-{
-    o.Address = new Uri(builder.Configuration["Services:OrderGrpc"]!);
-})
-.ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
-{
-    PooledConnectionIdleTimeout = TimeSpan.FromMinutes(5),
-    KeepAlivePingDelay          = TimeSpan.FromSeconds(60),
-    KeepAlivePingTimeout        = TimeSpan.FromSeconds(30),
-    EnableMultipleHttp2Connections = true
-})
-.AddStandardResilienceHandler(); // retry + circuit breaker
-
-// Usage in a controller / service
-public class CheckoutService(OrderService.OrderServiceClient grpcClient)
-{
-    public async Task<string> PlaceOrderAsync(string customerId, List<(string, int)> items)
+await Task.WhenAll(Enumerable.Range(0, 6)
+    .Select(i => factory.StartNew(() =>
     {
-        var request = new CreateOrderRequest { CustomerId = customerId };
-        request.Items.AddRange(items.Select(i =>
-            new OrderItem { ProductId = i.Item1, Quantity = i.Item2 }));
-
-        var reply = await grpcClient.CreateOrderAsync(request);
-        return reply.OrderId;
-    }
-
-    // Consume server-side stream
-    public async IAsyncEnumerable<OrderReply> StreamCustomerOrdersAsync(string customerId)
-    {
-        using var stream = grpcClient.StreamOrders(new StreamRequest { CustomerId = customerId });
-        await foreach (var order in stream.ResponseStream.ReadAllAsync())
-            yield return order;
-    }
-}
+        Console.WriteLine($"Task {i} on thread {Thread.CurrentThread.ManagedThreadId}");
+        Thread.Sleep(200);
+    })));
 ```
-
-**gRPC vs REST:**
-| | gRPC | REST |
-|--|------|------|
-| **Protocol** | HTTP/2 + protobuf | HTTP/1.1 + JSON |
-| **Performance** | ~7–10— faster | Baseline |
-| **Streaming** | Client/server/bidirectional | Limited (SSE) |
-| **Contract** | Strongly typed `.proto` | OpenAPI/Swagger |
-| **Browser support** | Limited (needs gRPC-Web) | Universal |
-| **Best for** | Internal service mesh | Public APIs |
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## Q. How do you use message brokers with MassTransit and RabbitMQ in .NET?
+## Q. What is parallelism? How do you control the degree of parallelism using the `Parallel` class?
 
-**MassTransit** is an open-source service bus abstraction for .NET that supports RabbitMQ, Azure Service Bus, Kafka, and more. It provides publish/subscribe, request/reply, and saga patterns.
+**Parallelism** is executing multiple operations simultaneously on multiple CPU cores. **Degree of parallelism (DOP)** is how many threads/tasks run concurrently.
 
-```bash
-dotnet add package MassTransit.RabbitMQ
-dotnet add package MassTransit.EntityFrameworkCore  # for saga persistence
+```cs
+// Parallel.For with MaxDegreeOfParallelism
+var options = new ParallelOptions
+{
+    MaxDegreeOfParallelism = 4,       // at most 4 threads
+    CancellationToken      = CancellationToken.None,
+};
+
+var results = new int[20];
+Parallel.For(0, 20, options, i =>
+{
+    results[i] = i * i;
+    Console.WriteLine($"  [{i}] on thread {Thread.CurrentThread.ManagedThreadId}");
+});
+Console.WriteLine(string.Join(", ", results));
+
+// Parallel.ForEach — over collections
+var files = Directory.EnumerateFiles(".", "*.cs").ToList();
+Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = 2 }, file =>
+    Console.WriteLine($"{Path.GetFileName(file)} — {new FileInfo(file).Length} bytes"));
+
+// Parallel.ForEachAsync — async-compatible (.NET 6+)
+await Parallel.ForEachAsync(files, new ParallelOptions { MaxDegreeOfParallelism = 3 },
+    async (file, ct) =>
+    {
+        string content = await File.ReadAllTextAsync(file, ct);
+        Console.WriteLine($"{Path.GetFileName(file)}: {content.Length} chars");
+    });
+
+// PLINQ — parallel LINQ
+long sum = Enumerable.Range(1, 10_000_000)
+    .AsParallel()
+    .WithDegreeOfParallelism(Environment.ProcessorCount)
+    .Where(n => n % 2 == 0)
+    .Select(n => (long)n)
+    .Sum();
+Console.WriteLine($"Sum: {sum}");
+
+// Choosing DOP:
+// CPU-bound: Environment.ProcessorCount  (fully utilise all cores)
+// I/O-bound: higher than CPU count is fine (threads spend time waiting)
+// Mixed:     experiment; start with 2 — ProcessorCount for I/O
+
+Console.WriteLine($"CPU cores: {Environment.ProcessorCount}");
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. Describe lock contention and how to mitigate it.
+
+**Lock contention** occurs when multiple threads compete to acquire the same lock. The thread that can\'t acquire the lock blocks, waiting — wasting CPU time and reducing throughput.
+
+```cs
+// High contention — all threads fight for one lock
+object sharedLock = new();
+int counter = 0;
+
+// BAD: all 1000 tasks contend on a single lock
+await Task.WhenAll(Enumerable.Range(0, 1000).Select(_ =>
+    Task.Run(() => { lock (sharedLock) counter++; })));
+
+// … Mitigation 1: Interlocked — no lock needed for simple atomic ops
+int atomicCounter = 0;
+await Task.WhenAll(Enumerable.Range(0, 1000).Select(_ =>
+    Task.Run(() => Interlocked.Increment(ref atomicCounter))));
+
+// … Mitigation 2: Lock striping — partition data across multiple locks
+const int Stripes = 16;
+var locks    = Enumerable.Range(0, Stripes).Select(_ => new object()).ToArray();
+var counters = new int[Stripes];
+
+await Task.WhenAll(Enumerable.Range(0, 1000).Select(i =>
+    Task.Run(() =>
+    {
+        int stripe = i % Stripes;
+        lock (locks[stripe]) counters[stripe]++;
+    })));
+Console.WriteLine($"Total: {counters.Sum()}"); // 1000
+
+// … Mitigation 3: ReaderWriterLockSlim — allow concurrent reads
+var rwl = new ReaderWriterLockSlim();
+var dict = new Dictionary<string, int> { ["key"] = 0 };
+
+// Many readers can proceed simultaneously
+await Task.WhenAll(Enumerable.Range(0, 100).Select(_ => Task.Run(() =>
+{
+    rwl.EnterReadLock();
+    try { _ = dict["key"]; }
+    finally { rwl.ExitReadLock(); }
+})));
+
+// … Mitigation 4: Reduce lock scope — keep critical section minimal
+int result;
+lock (sharedLock) result = counter; // read fast under lock
+Console.WriteLine(ExpensiveProcess(result)); // heavy work OUTSIDE lock
+
+// … Mitigation 5: ConcurrentDictionary — built-in lock striping
+var cd = new System.Collections.Concurrent.ConcurrentDictionary<int, int>();
+await Task.WhenAll(Enumerable.Range(0, 1000).Select(i =>
+    Task.Run(() => cd.AddOrUpdate(i % 10, 1, (_, v) => v + 1))));
+
+int ExpensiveProcess(int v) => v * 2;
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is lazy initialization in C# multithreading and how does it affect startup performance?
+
+**Lazy initialization** defers the creation of an expensive object until it is first accessed. This reduces startup time and avoids allocating resources that may never be needed.
+
+```cs
+// 1. Lazy<T> — thread-safe by default (LazyThreadSafetyMode.ExecutionAndPublication)
+var heavyService = new Lazy<DatabaseService>(() =>
+{
+    Console.WriteLine("Initializing DatabaseService...");
+    return new DatabaseService("Server=localhost;");
+});
+
+Console.WriteLine("App started (no DB init yet)");
+// DB not initialized until first .Value access
+Console.WriteLine(heavyService.Value.Query("SELECT 1")); // initialized here
+Console.WriteLine(heavyService.Value.Query("SELECT 2")); // reuses same instance
+
+// 2. Thread-safety modes
+var lazy1 = new Lazy<int>(() => 42,
+    LazyThreadSafetyMode.ExecutionAndPublication); // default — safe, single init
+var lazy2 = new Lazy<int>(() => 42,
+    LazyThreadSafetyMode.PublicationOnly);          // allows multiple inits, first wins
+var lazy3 = new Lazy<int>(() => 42,
+    LazyThreadSafetyMode.None);                     // no thread safety — fastest, single-thread only
+
+// 3. Lazy<T> in a service / singleton
+public sealed class AppServices
+{
+    private static readonly Lazy<AppServices> _instance =
+        new(() => new AppServices(), LazyThreadSafetyMode.ExecutionAndPublication);
+
+    public static AppServices Instance => _instance.Value;
+    private AppServices() { Console.WriteLine("AppServices initialized"); }
+    public void DoWork() => Console.WriteLine("Working");
+}
+
+AppServices.Instance.DoWork(); // initialized on first access
+
+// 4. LazyInitializer — static helper, struct-friendly (no wrapper object)
+DatabaseService? _db = null;
+DatabaseService db = LazyInitializer.EnsureInitialized(
+    ref _db, () => new DatabaseService("Server=prod;"));
+
+// 5. Impact on startup
+// Without lazy: all services created at startup — slow, wastes memory for unused services
+// With lazy:    only what\'s needed is created — faster startup, lower memory footprint
+
+class DatabaseService(string connStr)
+{
+    public string Query(string sql)
+    {
+        Console.WriteLine($"Query [{sql}] on {connStr}");
+        return "result";
+    }
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. Explain `SpinLock` in C# multithreading. How does it differ from `lock` / `Monitor`?
+
+`SpinLock` is a mutual exclusion primitive that **busy-waits** (spins) in a tight loop rather than yielding the thread to the OS. This avoids kernel transitions, making it faster for **very short** critical sections — but wasteful for longer ones.
+
+| | `lock` / `Monitor` | `SpinLock` |
+|-|-------------------|-----------|
+| **Blocking** | Suspends thread (kernel sleep) | Busy-wait (CPU spinning) |
+| **Best for** | Sections taking > ~1 s | Sections taking < ~1 s |
+| **CPU usage while waiting** | Low (thread suspended) | High (continuous spin) |
+| **Overhead per acquire** | Higher (kernel transition) | Lower (no kernel call) |
+| **Struct** | Class | `struct` — avoid copying |
+| **Thread affinity** | No | Must release on same thread |
+
+```cs
+// SpinLock usage
+var spinLock = new SpinLock(enableThreadOwnerTracking: false);
+int sharedCounter = 0;
+
+await Task.WhenAll(Enumerable.Range(0, 1000).Select(_ => Task.Run(() =>
+{
+    bool taken = false;
+    try
+    {
+        spinLock.Enter(ref taken); // busy-wait until acquired
+        sharedCounter++;           // very short critical section
+    }
+    finally
+    {
+        if (taken) spinLock.Exit(useMemoryBarrier: false);
+    }
+})));
+
+Console.WriteLine(sharedCounter); // 1000
+
+// SpinWait — adaptive spinning with back-off (yield after many spins)
+var sw = new SpinWait();
+volatile bool ready = false;
+Task.Run(() => { Thread.Sleep(100); ready = true; });
+
+while (!ready)
+    sw.SpinOnce(); // spins first, then yields, then sleeps
+Console.WriteLine("Ready!");
+
+// TryEnter — non-blocking
+bool acquired = false;
+spinLock.TryEnter(ref acquired);
+if (acquired)
+{
+    try { /* work */ }
+    finally { spinLock.Exit(); }
+}
+
+//  Rules:
+// - Never use SpinLock for I/O-bound or blocking code
+// - Never await inside a SpinLock (deadlock risk on thread pool)
+// - Don\'t copy the SpinLock struct — always pass by ref
+// - Use Interlocked instead when operating on a single variable
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How are threads different from TPL?
+
+| | Raw `Thread` | Task Parallel Library (TPL) |
+|-|-------------|----------------------------|
+| **Abstraction** | Low-level OS thread | High-level task abstraction |
+| **Thread reuse** | No — new thread each time | Yes — reuses thread pool threads |
+| **Return values** | Not built-in | `Task<T>` returns results |
+| **Exception handling** | Manual (inside thread body) | Propagated via `await` / `.Result` |
+| **Cancellation** | Manual flag/volatile | `CancellationToken` built-in |
+| **Async/await** | Not supported | Native support |
+| **Composition** | Manual `Join`, no chaining | `WhenAll`, `WhenAny`, continuations |
+| **Parallel loops** | Manual partitioning | `Parallel.For`, `Parallel.ForEach` |
+| **Best for** | Long-running, dedicated background threads | Everything else |
+
+```cs
+// Thread — low-level, full control
+var thread = new Thread(() =>
+{
+    Console.WriteLine($"Raw thread: {Thread.CurrentThread.ManagedThreadId}");
+    Thread.Sleep(200);
+    Console.WriteLine("Thread done");
+});
+thread.IsBackground = true;
+thread.Start();
+thread.Join();
+
+// TPL — high-level, composable, async-friendly
+int result = await Task.Run(() =>
+{
+    Console.WriteLine($"TPL thread: {Thread.CurrentThread.ManagedThreadId}");
+    Thread.Sleep(200);
+    return 42;
+});
+Console.WriteLine($"Task result: {result}");
+
+// TPL continuation chaining
+var pipeline = Task.Run(() => "raw data")
+    .ContinueWith(t => t.Result.ToUpper())
+    .ContinueWith(t => $"Processed: {t.Result}");
+Console.WriteLine(await pipeline);
+
+// TPL: parallel loop — 4 cores, no manual thread management
+await Parallel.ForEachAsync(Enumerable.Range(0, 8), async (i, ct) =>
+{
+    await Task.Delay(100, ct);
+    Console.WriteLine($"Item {i} done");
+});
+```
+## Q. What is the difference between Task and Thread in C#?
+
+`Thread` is a low-level OS construct for concurrent execution. `Task` is a higher-level abstraction from the Task Parallel Library (TPL) that runs work on the **thread pool** and supports `async`/`await`.
+
+| Feature                   | `Thread`                         | `Task`                              |
+|---------------------------|----------------------------------|-------------------------------------|
+| Abstraction level         | Low-level (OS thread)            | High-level (thread pool / async)    |
+| Creation cost             | High (new OS thread each time)   | Low (reuses thread pool threads)    |
+| Return value              | No built-in support              | `Task<T>` returns a result          |
+| Exception handling        | Manual (unhandled = crash)       | Propagated via `await` / `.Result`  |
+| Cancellation              | Manual (`Thread.Abort` removed)  | `CancellationToken` built-in        |
+| Async/await               | Not supported                    | Native support                      |
+| Recommended for           | Long-running dedicated work      | Everything else (preferred)         |
+
+**Thread example (rare in modern .NET):**
+
+```cs
+var thread = new Thread(() =>
+    Console.WriteLine($"Thread: {Thread.CurrentThread.ManagedThreadId}"));
+thread.IsBackground = true;
+thread.Start();
+thread.Join();
+```
+
+**Task example (preferred):**
+
+```cs
+var result = await Task.Run(() =>
+{
+    Console.WriteLine($"Thread pool ID: {Thread.CurrentThread.ManagedThreadId}");
+    return 42;
+});
+Console.WriteLine(result); // Output: 42
+```
+
+**Long-running task (equivalent to a dedicated thread):**
+
+```cs
+var longRunning = Task.Factory.StartNew(() =>
+{
+    while (true) { /* background service loop */ }
+}, TaskCreationOptions.LongRunning);
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is `ConfigureAwait(false)` and when should it be used?
+
+When a `Task` is awaited, by default .NET tries to **resume on the original synchronisation context** (e.g., the UI thread, or an ASP.NET Classic request context). `ConfigureAwait(false)` instructs the runtime to resume on **any available thread-pool thread** instead, which avoids unnecessary context switches and potential deadlocks.
+
+```cs
+// ” 1. Default behaviour (ConfigureAwait(true) / omitted) ”———————
+// Resumes on the captured synchronisation context (e.g. UI thread)
+async Task LoadAndDisplayAsync()
+{
+    var data = await FetchDataAsync();   // resumes on UI thread  important for WPF/WinForms
+    label.Text = data;                   // … safe — UI update on UI thread
+}
+
+// ” 2. Library code — always use ConfigureAwait(false) ”——————————
+// Library methods should NOT capture the caller\'s context
+public static async Task<string> FetchDataAsync(string url)
+{
+    using var client = new HttpClient();
+    // ConfigureAwait(false) — resume on any thread pool thread
+    string json = await client.GetStringAsync(url).ConfigureAwait(false);
+    return json;   // no context-sensitive work here
+}
+
+// ” 3. Deadlock scenario (ASP.NET Classic / WPF without ConfigureAwait) ”
+// BAD: .Result on async method in single-threaded context causes deadlock
+// string result = FetchDataAsync("https://example.com").Result; //  DEADLOCK
+
+// GOOD: await end-to-end, or use ConfigureAwait(false) in the library
+public static async Task<string> SafeFetchAsync(string url)
+{
+    using var client = new HttpClient();
+    return await client.GetStringAsync(url).ConfigureAwait(false);
+}
+
+// ” 4. ASP.NET Core — no SynchronisationContext, so ConfigureAwait(false)
+//    is not required for correctness, but still a good habit in library code
+public async Task<IActionResult> GetAsync()
+{
+    // In ASP.NET Core, SynchronisationContext is null — both are equivalent
+    var data = await FetchDataAsync("https://api.example.com/data");
+    return Ok(data);
+}
+
+// ” 5. ConfigureAwait in a loop ”—————————————————————————————————
+public static async Task ProcessItemsAsync(IEnumerable<int> ids)
+{
+    foreach (int id in ids)
+    {
+        var result = await LoadItemAsync(id).ConfigureAwait(false);
+        Console.WriteLine(result);
+    }
+}
+
+static Task<string> LoadItemAsync(int id) => Task.FromResult($"Item-{id}");
+```
+
+**When to use / not use `ConfigureAwait(false)`:**
+
+| Scenario | Use `ConfigureAwait(false)`? | Reason |
+|----------|------------------------------|--------|
+| Library / NuGet package code | … Always | Don\'t impose context on callers |
+| ASP.NET Core controller / middleware | Optional | No SynchronisationContext |
+| WPF / WinForms UI method |  No | Need to return to UI thread |
+| ASP.NET Classic (System.Web) | … Yes | Avoid deadlocks on captured context |
+| Unit test with `async` | … Yes | Test runners may have a context |
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is `IAsyncEnumerable<T>` and how do you use `await foreach` in C#?
+
+`IAsyncEnumerable<T>` (C# 8 / .NET Standard 2.1+) enables **asynchronous streaming** — producing and consuming items one at a time without buffering the entire result set in memory. It combines the pull-based iteration of `IEnumerable<T>` with asynchrony.
+
+```cs
+using System.Runtime.CompilerServices;
+
+// ” 1. Producing an async stream ”————————————————————————————————
+// Use `yield return` inside an `async` method returning IAsyncEnumerable<T>
+static async IAsyncEnumerable<int> GenerateNumbersAsync(
+    int count,
+    [EnumeratorCancellation] CancellationToken ct = default)
+{
+    for (int i = 1; i <= count; i++)
+    {
+        ct.ThrowIfCancellationRequested();
+        await Task.Delay(50, ct);   // simulate async work (DB query, HTTP, etc.)
+        yield return i;
+    }
+}
+
+// ” 2. Consuming with `await foreach` ”———————————————————————————
+await foreach (int number in GenerateNumbersAsync(5))
+    Console.WriteLine(number);   // prints 1..5 as they arrive
+
+// ” 3. CancellationToken support ”————————————————————————————————
+using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+try
+{
+    await foreach (int n in GenerateNumbersAsync(100, cts.Token))
+        Console.WriteLine(n);
+}
+catch (OperationCanceledException)
+{
+    Console.WriteLine("Stream cancelled.");
+}
+
+// ” 4. ConfigureAwait on IAsyncEnumerable ”———————————————————————
+await foreach (int n in GenerateNumbersAsync(5).ConfigureAwait(false))
+    Console.WriteLine(n);
+
+// ” 5. Real-world: streaming database rows ”——————————————————————
+// (EF Core 3+ supports IAsyncEnumerable via AsAsyncEnumerable())
+// async IAsyncEnumerable<Order> StreamOrdersAsync(AppDbContext db)
+// {
+//     await foreach (var order in db.Orders.AsAsyncEnumerable())
+//         yield return order;
+// }
+
+// ” 6. Stream large file lines without loading all into memory ”——
+static async IAsyncEnumerable<string> ReadLinesAsync(
+    string path,
+    [EnumeratorCancellation] CancellationToken ct = default)
+{
+    await using var fs = File.OpenRead(path);
+    using var reader = new StreamReader(fs);
+    string? line;
+    while ((line = await reader.ReadLineAsync(ct)) is not null)
+        yield return line;
+}
+
+// ” 7. LINQ-style on async streams (System.Linq.Async NuGet) ”————
+// var evens = GenerateNumbersAsync(10).Where(n => n % 2 == 0);
+// await foreach (var n in evens) Console.WriteLine(n);
+
+// ” 8. Collect to list when needed ”——————————————————————————————
+var items = new List<int>();
+await foreach (int n in GenerateNumbersAsync(5))
+    items.Add(n);
+Console.WriteLine(string.Join(", ", items));  // 1, 2, 3, 4, 5
+```
+
+**`IAsyncEnumerable<T>` vs alternatives:**
+
+| Approach | Buffering | Back-pressure | Best for |
+|----------|-----------|---------------|----------|
+| `Task<List<T>>` | All items at once | No | Small result sets |
+| `IAsyncEnumerable<T>` | One item at a time | Yes (pull) | Large / infinite streams |
+| `Channel<T>` | Configurable | Yes | Producer-consumer pipelines |
+| `IObservable<T>` (Rx) | Push-based | Complex | Event-driven streams |
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are the pitfalls of `async void` methods in C#?
+
+`async void` is allowed only for event handlers. Using it anywhere else creates silent, hard-to-debug failures because **exceptions escape the caller\'s context** and cannot be awaited.
+
+```cs
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+// PROBLEM 1 — Unhandled exceptions crash the process
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+async void FireAndForget()                 //  async void — avoid
+{
+    await Task.Delay(100);
+    throw new InvalidOperationException("Oops!");  // crashes the process — cannot be caught by caller
+}
+
+try
+{
+    FireAndForget();    // returns immediately — exception is NOT catchable here
+}
+catch (Exception)
+{
+    //  Never reached — the exception happens after the await
+    Console.WriteLine("This will never print");
+}
+
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+// PROBLEM 2 — Cannot be awaited or composed
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+async void LoadAsync() { await Task.Delay(500); Console.WriteLine("Done"); }
+
+// await LoadAsync();     //  compile error — void is not awaitable
+// Task t = LoadAsync();  //  compile error — returns void, not Task
+
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+// CORRECT ALTERNATIVES
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+
+// ” 1. Return Task — preferred for all non-event-handler async methods
+async Task LoadDataAsync()
+{
+    await Task.Delay(100);
+    Console.WriteLine("Data loaded");
+}
+await LoadDataAsync();   // … awaitable, exception propagates normally
+
+// ” 2. async void is ONLY acceptable for event handlers
+// (because event delegates have a void return signature)
+public class MyForm
+{
+    private Button _btn = new Button();
+
+    public MyForm()
+    {
+        _btn.Click += OnButtonClickAsync;   // … event handler — async void OK
+    }
+
+    private async void OnButtonClickAsync(object? sender, EventArgs e)
+    {
+        try
+        {
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            // … Always wrap async void event handlers in try/catch
+            Console.Error.WriteLine($"Event handler error: {ex.Message}");
+        }
+    }
+}
+
+// ” 3. Fire-and-forget with proper error handling ”———————————————
+static Task StartBackgroundWork()
+{
+    return Task.Run(async () =>
+    {
+        try
+        {
+            await Task.Delay(100);
+            Console.WriteLine("Background work done");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Background error: {ex.Message}");
+        }
+    });
+}
+
+_ = StartBackgroundWork();   // discard Task intentionally — fire-and-forget pattern
+
+// ” 4. Top-level async in older frameworks ”——————————————————————
+// BEFORE C# 7.1: Main couldn\'t be async ’ temptation to use async void
+// async void Main() { }  // 
+
+// C# 7.1+: async Main is fully supported
+// static async Task Main(string[] args) { await DoWorkAsync(); }  // …
+```
+
+**`async void` rules:**
+
+| Rule | Reason |
+|------|--------|
+| Never use `async void` except for event handlers | Exceptions crash the process |
+| Always `try/catch` inside `async void` event handlers | Last line of defence |
+| Replace `async void` with `async Task` everywhere else | Awaitable, composable, testable |
+| For fire-and-forget, use `_ = task` with internal error handling | Explicitly marks the intent |
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## # 14. MEMORY MANAGEMENT AND GARBAGE COLLECTION
+
+<br>
+
+## Q. What is garbage collection in .NET and how does it work?
+
+The **Garbage Collector (GC)** is an automatic memory manager in the .NET runtime that allocates and reclaims heap memory for managed objects, eliminating the need for manual `free`/`delete` calls.
+
+**How it works:**
+1. Objects are allocated on the **managed heap**
+2. The GC periodically checks which objects are **reachable** (via roots: stack variables, static fields, GC handles)
+3. **Unreachable** objects are swept — their memory is reclaimed
+4. **Surviving** objects are **compacted** (defragmentation) and promoted to higher generations
+
+```mermaid
+flowchart TD
+    A["Object Created\n(new keyword)"] --> B["Allocated in\nGeneration 0 (Gen 0)"]
+    B --> C{"GC Collection\ntriggered?"}
+    C -->|"Still reachable\n(has root)"| D["Survive ’ Promoted\nto Generation 1"]
+    C -->|"Unreachable\n(no root)"| E["Memory Reclaimed\n(swept)"]
+    D --> F{"Next GC\ncollection?"}
+    F -->|"Still reachable"| G["Promote to\nGeneration 2\n(long-lived)"]
+    F -->|"Unreachable"| E
+    G --> H{"Large Object?\n≥ 85KB"}
+    H -->|Yes| I["Large Object Heap\n(LOH) — Gen 2"]
+    H -->|No| G
+
+    style E fill:#e74c3c,color:#fff
+    style G fill:#27ae60,color:#fff
+    style I fill:#8e44ad,color:#fff
 ```
 
 ```cs
-// ” 1. DEFINE MESSAGES (contracts — shared library) ”—————————————————
-namespace Contracts;
+// Objects on managed heap — GC manages lifetime automatically
+var list = new List<string>();          // heap allocation
+list.Add("item");                       // more heap
+list = null;                           // now unreachable ’ eligible for GC
 
-// Events (past tense — something happened)
-public record OrderPlaced(Guid OrderId, string CustomerId, decimal Total, DateTimeOffset PlacedAt);
-public record OrderShipped(Guid OrderId, string TrackingNumber, DateTimeOffset ShippedAt);
-public record PaymentProcessed(Guid OrderId, bool Success, string? FailureReason);
+// You never need to free managed objects — GC handles it
+string s = new string('x', 1000);
+s = null; // GC will reclaim when it runs next collection
 
-// Commands (imperative — do something)
-public record ProcessPayment(Guid OrderId, decimal Amount, string PaymentToken);
-public record SendOrderConfirmation(Guid OrderId, string CustomerEmail);
+// GC roots — objects reachable from these are NOT collected:
+// - Local variables on the stack
+// - Static fields
+// - CPU registers
+// - GC handles (pinned, strong, weak)
 
-// ” 2. PRODUCER — PUBLISH EVENT ”—————————————————————————————————————
-public class OrderService(IPublishEndpoint publishEndpoint, AppDbContext db)
+// Check GC memory info
+var gcInfo = GC.GetGCMemoryInfo();
+Console.WriteLine($"Heap size: {gcInfo.HeapSizeBytes:N0} bytes");
+Console.WriteLine($"Fragmented: {gcInfo.FragmentedBytes:N0} bytes");
+Console.WriteLine($"Total available: {gcInfo.TotalAvailableMemoryBytes:N0} bytes");
+
+// GC notifications (server scenarios)
+GC.RegisterForFullGCNotification(10, 10);
+Console.WriteLine($"GC latency mode: {System.Runtime.GCSettings.LatencyMode}");
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are Generation 0, Generation 1, and Generation 2 in garbage collection? How does the GC know when to clean up?
+
+The GC uses a **generational** model based on the observation that recently allocated objects tend to die young. Objects are promoted through generations as they survive collections.
+
+| Generation | Contains | GC frequency | Notes |
+|-----------|---------|------------|-------|
+| **Gen 0** | Newly allocated objects | Very frequent (ms) | Cheapest collection |
+| **Gen 1** | Survived one Gen 0 | Less frequent | Buffer between Gen 0 and Gen 2 |
+| **Gen 2** | Long-lived objects | Infrequent (seconds) | Static fields, caches, singletons |
+| **LOH** | Objects ≥ 85,000 bytes | With Gen 2 | Large Object Heap — not compacted by default |
+
+```cs
+// Objects start in Gen 0
+var obj = new object();
+Console.WriteLine(GC.GetGeneration(obj)); // 0
+
+// Force promotion for demonstration
+GC.Collect(0); // collect Gen 0
+GC.WaitForPendingFinalizers();
+Console.WriteLine(GC.GetGeneration(obj)); // 1 (survived ’ promoted)
+
+GC.Collect(1);
+GC.WaitForPendingFinalizers();
+Console.WriteLine(GC.GetGeneration(obj)); // 2 (survived again)
+
+// Large objects go straight to LOH (Gen 2)
+var large = new byte[100_000]; // ≥ 85KB → LOH
+Console.WriteLine(GC.GetGeneration(large)); // 2
+
+// How GC knows when to collect:
+// 1. Gen 0 budget exhausted (allocations exceed threshold)
+// 2. System memory pressure
+// 3. Explicit GC.Collect() call
+// 4. AppDomain unload
+
+// GC phases: Mark ’ Sweep ’ Compact
+// Mark   — traverse from roots, mark all reachable objects
+// Sweep  — identify unreachable objects
+// Compact — slide live objects together, update references
+
+// Gen 0 metrics
+Console.WriteLine($"Gen 0 collections: {GC.CollectionCount(0)}");
+Console.WriteLine($"Gen 1 collections: {GC.CollectionCount(1)}");
+Console.WriteLine($"Gen 2 collections: {GC.CollectionCount(2)}");
+Console.WriteLine($"Total memory: {GC.GetTotalMemory(false):N0} bytes");
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. Does the garbage collector clean up primitive types?
+
+**Primitive types** (value types like `int`, `double`, `bool`, `struct`) allocated on the **stack** are NOT managed by the GC — they are freed automatically when the stack frame is popped.
+
+Only **reference types** on the **managed heap** are managed by the GC.
+
+```cs
+// Value types on the stack — NO GC involvement
+int x = 42;          // stack — freed when method returns
+double d = 3.14;     // stack
+bool flag = true;    // stack
+
+// Value types inside a class — ON the heap (as part of the object)
+class DataHolder
+{
+    public int Count;     // on heap because DataHolder is a reference type
+    public double Value;  // on heap
+}
+var holder = new DataHolder(); // holder reference on stack, object on heap ’ GC manages
+
+// Struct on the stack
+struct Point { public int X, Y; }
+Point p = new Point { X = 1, Y = 2 }; // entirely on stack — NO GC
+
+// Struct on the heap (boxed or inside a class/array)
+object boxed = p;          // boxing — copied to heap ’ GC manages
+Point[] points = new Point[10]; // array on heap, but Point values inline in array
+
+// Summary:
+// Primitive/value types on stack ’ freed by stack unwind (no GC)
+// Reference types on heap ’ GC manages
+// Boxed value types on heap ’ GC manages
+// Value types as fields of heap objects ’ GC manages (as part of parent object)
+
+Console.WriteLine($"Is value type: {typeof(int).IsValueType}");    // True
+Console.WriteLine($"Is value type: {typeof(string).IsValueType}"); // False
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How does the garbage collector behave when a class has a destructor (finalizer)?
+
+Objects with **finalizers** are placed on the **finalization queue** when they become unreachable. The GC must run the finalizer before reclaiming memory, which requires **at least two GC cycles**.
+
+```cs
+// Object WITH finalizer — two-cycle collection
+public class ResourceWithFinalizer
+{
+    public ResourceWithFinalizer() => Console.WriteLine("Created");
+
+    // Finalizer (destructor syntax) — called by GC on a dedicated finalizer thread
+    ~ResourceWithFinalizer()
+    {
+        Console.WriteLine("Finalized by GC");
+        // GC thread — do NOT use Thread.CurrentThread, allocate large objects, etc.
+    }
+}
+
+// Cycle 1: object found unreachable ’ moved to finalization queue (NOT reclaimed yet)
+// Cycle 2: finalizer thread runs, GC reclaims memory
+
+// … Dispose pattern — call GC.SuppressFinalize to skip the second cycle
+public class ManagedResource : IDisposable
+{
+    private bool _disposed;
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        if (disposing)
+        {
+            // free managed resources
+        }
+        // free unmanaged resources
+        _disposed = true;
+    }
+
+    ~ManagedResource()
+    {
+        Dispose(disposing: false); // safety net — unmanaged only
+    }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this); // remove from finalization queue ’ single cycle
+    }
+}
+
+// Always use 'using' to call Dispose deterministically
+using var res = new ManagedResource();
+// Dispose called here — GC.SuppressFinalize prevents finalizer run
+
+// Impact on GC:
+// Without Dispose: 2 GC cycles, finalizer thread overhead, delayed reclamation
+// With Dispose + SuppressFinalize: 1 GC cycle, no finalizer overhead
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. Can the garbage collector reclaim unmanaged resources? Can you force garbage collection? Is it a good practice?
+
+**Unmanaged resources** (file handles, sockets, native memory via `Marshal.AllocHGlobal`, COM objects) are **NOT managed by the GC**. They must be released explicitly via `IDisposable` / finalizers.
+
+```cs
+//  GC cannot free unmanaged resources — you must do it
+var handle = System.Runtime.InteropServices.Marshal.AllocHGlobal(1024);
+// ... use handle
+System.Runtime.InteropServices.Marshal.FreeHGlobal(handle); // manual cleanup required
+
+// … Wrap in SafeHandle or IDisposable for automatic cleanup
+public class NativeBuffer : IDisposable
+{
+    private IntPtr _ptr;
+    private bool _disposed;
+
+    public NativeBuffer(int size)
+        => _ptr = System.Runtime.InteropServices.Marshal.AllocHGlobal(size);
+
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            System.Runtime.InteropServices.Marshal.FreeHGlobal(_ptr);
+            _ptr = IntPtr.Zero;
+            _disposed = true;
+            GC.SuppressFinalize(this);
+        }
+    }
+
+    ~NativeBuffer() => Dispose(); // safety net
+}
+
+using var buf = new NativeBuffer(1024);
+
+// Forcing GC — GC.Collect()
+GC.Collect();                         // collect all generations
+GC.Collect(0);                        // collect Gen 0 only
+GC.Collect(2, GCCollectionMode.Forced); // forced full collection
+GC.WaitForPendingFinalizers();        // wait for finalizer thread to complete
+GC.Collect();                         // collect finalizable objects
+
+//  Is it good practice to force GC?
+//  Almost never — reasons:
+// - Promotes objects to higher generations unnecessarily (Gen 0 ’ Gen 1 ’ Gen 2)
+// - Disrupts GC\'s self-tuning heuristics
+// - Causes latency spikes (stop-the-world pause)
+// - Rarely improves performance; often makes it worse
+
+// … Acceptable rare cases:
+// 1. After a known large allocation is no longer needed
+// 2. In unit tests verifying finalizer behaviour
+// 3. Before performance-sensitive benchmarks (baseline memory)
+// 4. Out-of-process tooling / diagnostics
+
+void ProcessLargeBatch()
+{
+    LoadLargeDataSet();
+    GC.Collect(2, GCCollectionMode.Aggressive, blocking: true, compacting: true); // rare justified case
+}
+
+void LoadLargeDataSet() { }
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you detect memory leaks in .NET applications?
+
+```cs
+// Common causes of managed memory leaks:
+// 1. Event handlers not unsubscribed (most common)
+// 2. Static fields holding object references
+// 3. Caches with no eviction policy
+// 4. Closures capturing large objects
+// 5. Long-lived collections growing unbounded
+
+// 1. Event leak — subscriber held alive by publisher\'s event
+public class Publisher
+{
+    public event EventHandler? Updated;
+}
+
+public class Subscriber
+{
+    public Subscriber(Publisher pub)
+        => pub.Updated += OnUpdated; // pub holds reference to 'this'
+
+    private void OnUpdated(object? sender, EventArgs e) { }
+
+    // Fix: implement IDisposable and unsubscribe
+}
+
+// 2. Detect with GC.GetTotalMemory
+long before = GC.GetTotalMemory(forceFullCollection: true);
+var list = new List<byte[]>();
+for (int i = 0; i < 100; i++) list.Add(new byte[1024 * 1024]); // 100 MB
+long after = GC.GetTotalMemory(false);
+Console.WriteLine($"Leaked: {(after - before) / 1024 / 1024} MB");
+list.Clear();
+
+// 3. WeakReference — holds reference without preventing GC
+var weakRef = new WeakReference<byte[]>(new byte[1024]);
+GC.Collect();
+if (weakRef.TryGetTarget(out var target))
+    Console.WriteLine("Still alive");
+else
+    Console.WriteLine("Collected");
+
+// 4. Tools for detecting leaks:
+// - dotnet-counters: dotnet counters monitor --process-id <pid>
+// - dotnet-dump:     dotnet dump collect --process-id <pid>
+// - Visual Studio Diagnostic Tools ’ Memory Usage ’ Snapshots
+// - JetBrains dotMemory, Redgate ANTS, PerfView
+
+// 5. MemoryDiagnoser in BenchmarkDotNet
+// [MemoryDiagnoser]
+// public class MyBenchmark { ... }
+
+// 6. ObjectPooling to reduce pressure
+var pool = System.Buffers.ArrayPool<byte>.Shared;
+byte[] rented = pool.Rent(1024);
+try { /* use buffer */ }
+finally { pool.Return(rented); } // returned to pool — no GC pressure
+
+byte[] target2 = [];
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is a finalizer in C#? What is `GC.SuppressFinalize` and when should you use it?
+
+```cs
+// Finalizer — called by GC before reclaiming object memory
+// Syntax: ~ClassName() { }
+// - Runs on the dedicated finalizer thread
+// - Non-deterministic timing
+// - Do NOT call managed code that may have been collected
+// - Only for unmanaged resource cleanup as a SAFETY NET
+
+public class FileWrapper : IDisposable
+{
+    private IntPtr _fileHandle;
+    private bool _disposed;
+
+    public FileWrapper(string path)
+        => _fileHandle = OpenFile(path); // OS handle
+
+    // Finalizer — safety net if Dispose was not called
+    ~FileWrapper()
+    {
+        Console.WriteLine("Finalizer: cleaning up (Dispose was not called!)");
+        Dispose(disposing: false);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        if (disposing)
+        {
+            // safe to access managed objects here
+        }
+        CloseFile(_fileHandle); // unmanaged cleanup always
+        _fileHandle = IntPtr.Zero;
+        _disposed = true;
+    }
+
+    // GC.SuppressFinalize — tells GC: "finalizer not needed, skip finalization queue"
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this); // … skip finalizer — memory reclaimed in ONE cycle
+    }
+
+    private static IntPtr OpenFile(string path) => new(1);
+    private static void CloseFile(IntPtr h) { }
+}
+
+// Always call Dispose with 'using'
+using var fw = new FileWrapper("data.bin");
+// Dispose called ’ GC.SuppressFinalize ’ no finalizer overhead
+
+// GC.ReRegisterForFinalize — re-register for finalization (rare use: resurrection pattern)
+public class ResurrectableResource : IDisposable
+{
+    ~ResurrectableResource() => Console.WriteLine("Finalized");
+
+    public void Reset()
+    {
+        GC.ReRegisterForFinalize(this); // will finalize again when unreachable
+    }
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        Console.WriteLine("Disposed");
+    }
+}
+
+// GC.KeepAlive — prevents GC from collecting object before a certain point
+void UseHandle(IntPtr handle)
+{
+    var resource = new FileWrapper("file");
+    _ = handle; // use handle
+    GC.KeepAlive(resource); // ensure resource is NOT collected before this point
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is `GC.Collect` vs `GC.WaitForPendingFinalizers`?
+
+```cs
+// GC.Collect — triggers a garbage collection
+GC.Collect();         // collect all generations (0, 1, 2)
+GC.Collect(0);        // collect Gen 0 only
+GC.Collect(2, GCCollectionMode.Forced, blocking: true, compacting: true);
+// GCCollectionMode: Default, Forced, Optimized, Aggressive (.NET 6+)
+
+// GC.WaitForPendingFinalizers — blocks until finalizer thread completes all queued finalizers
+GC.WaitForPendingFinalizers();
+
+// Why use both together?
+// After Collect() — unreachable finalizable objects are queued for finalization
+// WaitForPendingFinalizers() — waits for finalizer thread to process that queue
+// Second Collect() — reclaims the now-finalized objects
+
+// Standard pattern when you MUST force GC (tests, benchmarks):
+GC.Collect();
+GC.WaitForPendingFinalizers();
+GC.Collect(); // reclaim objects that were waiting for finalization
+
+// Example — verifying finalizer runs in tests
+bool finalized = false;
+
+void CreateObject()
+{
+    var obj = new FinalizableObj(() => finalized = true);
+}
+
+CreateObject();           // obj goes out of scope
+GC.Collect();
+GC.WaitForPendingFinalizers();
+Console.WriteLine($"Finalized: {finalized}"); // True
+
+// GC.GetTotalMemory(forceFullCollection: true) — combines Collect + WaitForPendingFinalizers
+long memory = GC.GetTotalMemory(forceFullCollection: true);
+Console.WriteLine($"Memory after full GC: {memory:N0} bytes");
+
+class FinalizableObj(Action onFinalize)
+{
+    ~FinalizableObj() => onFinalize();
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is a `WeakReference` in C#?
+
+A **`WeakReference<T>`** holds a reference to an object without preventing it from being garbage collected. Useful for caches and observer patterns where you don\'t want to force objects to stay alive.
+
+```cs
+// WeakReference<T> — does NOT prevent GC collection
+var data = new byte[1024 * 1024]; // 1 MB
+var weak = new WeakReference<byte[]>(data);
+
+data = null!; // remove strong reference
+GC.Collect();
+
+if (weak.TryGetTarget(out byte[]? target))
+    Console.WriteLine($"Still alive: {target.Length} bytes");
+else
+    Console.WriteLine("Collected by GC");
+
+// WeakReference cache pattern — auto-evicts entries under memory pressure
+public class WeakCache<TKey, TValue> where TKey : notnull where TValue : class
+{
+    private readonly Dictionary<TKey, WeakReference<TValue>> _cache = new();
+
+    public void Set(TKey key, TValue value)
+        => _cache[key] = new WeakReference<TValue>(value);
+
+    public TValue? Get(TKey key)
+    {
+        if (_cache.TryGetValue(key, out var wr) && wr.TryGetTarget(out var val))
+            return val;
+        _cache.Remove(key); // clean up dead entry
+        return null;
+    }
+}
+
+var cache = new WeakCache<int, string>();
+cache.Set(1, "hello");
+
+string? val = cache.Get(1);
+Console.WriteLine(val ?? "not found"); // hello
+
+// WeakReference (non-generic, legacy) — avoid, use WeakReference<T> instead
+object obj = new { Name = "test" };
+var legacyWeak = new WeakReference(obj);
+Console.WriteLine(legacyWeak.IsAlive); // True
+obj = null!;
+GC.Collect();
+Console.WriteLine(legacyWeak.IsAlive); // False
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the `Lazy<T>` class? What is the difference between `Lazy` and `Lazy<T>`?
+
+`Lazy<T>` defers creation of an expensive object until it is first accessed. It is thread-safe by default.
+
+```cs
+// Lazy<T> — deferred, thread-safe initialization
+var lazyConfig = new Lazy<AppConfig>(() =>
+{
+    Console.WriteLine("Loading config..."); // only runs on first access
+    return new AppConfig { Timeout = 30 };
+});
+
+// Value not yet created
+Console.WriteLine(lazyConfig.IsValueCreated); // False
+
+// First access — triggers initialization
+AppConfig config = lazyConfig.Value;           // "Loading config..."
+Console.WriteLine(lazyConfig.IsValueCreated); // True
+Console.WriteLine(lazyConfig.Value.Timeout);  // 30 — second access, no re-init
+
+// Thread safety modes
+var lazy1 = new Lazy<ExpensiveObject>(LazyThreadSafetyMode.ExecutionAndPublication); // default — lock on init
+var lazy2 = new Lazy<ExpensiveObject>(LazyThreadSafetyMode.PublicationOnly);         // race: one winner
+var lazy3 = new Lazy<ExpensiveObject>(LazyThreadSafetyMode.None);                    // no thread safety
+
+// Common pattern: lazy singleton in a class
+public class DataService
+{
+    private static readonly Lazy<DataService> _instance
+        = new(() => new DataService());
+
+    public static DataService Instance => _instance.Value;
+
+    private DataService() { }
+    public void Query() => Console.WriteLine("Querying data");
+}
+
+DataService.Instance.Query();
+
+// Lazy (non-generic) — does NOT exist as a public API
+// 'Lazy' by itself is not a type — always use Lazy<T>
+// The question likely refers to:
+// € Lazy<T>  — built-in BCL class
+// € Custom lazy patterns (lazy fields, lazy properties)
+
+// Lazy property pattern (no Lazy<T> class)
+private ExpensiveObject? _resource;
+ExpensiveObject Resource => _resource ??= new ExpensiveObject();
+
+record AppConfig { public int Timeout { get; init; } }
+class ExpensiveObject { }
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is a `MemoryCache` in C#?
+
+`MemoryCache` is an in-process, thread-safe cache provided by `Microsoft.Extensions.Caching.Memory`. It stores key-value pairs in memory with optional expiration, size limits, and eviction callbacks.
+
+```cs
+using Microsoft.Extensions.Caching.Memory;
+
+// Create cache
+var cache = new MemoryCache(new MemoryCacheOptions
+{
+    SizeLimit = 1024 // max entries (in size units you define)
+});
+
+// Set with absolute expiration
+cache.Set("user:1", new User(1, "Alice"), new MemoryCacheEntryOptions
+{
+    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
+    Size = 1 // count this entry as 1 unit toward SizeLimit
+});
+
+// Set with sliding expiration (refreshed on each access)
+cache.Set("session:abc", new SessionData(), new MemoryCacheEntryOptions
+{
+    SlidingExpiration = TimeSpan.FromMinutes(20),
+    Size = 1
+});
+
+// Get
+if (cache.TryGetValue("user:1", out User? user))
+    Console.WriteLine($"From cache: {user?.Name}");
+
+// GetOrCreate — atomic check-and-create
+User cachedUser = cache.GetOrCreate("user:2", entry =>
+{
+    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+    entry.Size = 1;
+    return new User(2, "Bob"); // factory — called only on cache miss
+})!;
+
+// Async GetOrCreateAsync
+User cachedUser2 = await cache.GetOrCreateAsync("user:3", async entry =>
+{
+    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+    entry.Size = 1;
+    return await LoadUserFromDbAsync(3);
+}) ?? throw new Exception("Not found");
+
+// Eviction callback
+cache.Set("temp:key", "value", new MemoryCacheEntryOptions
+{
+    AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30),
+    Size = 1
+}.RegisterPostEvictionCallback((key, value, reason, state) =>
+    Console.WriteLine($"Evicted '{key}': {reason}")));
+
+// Remove manually
+cache.Remove("user:1");
+
+// In ASP.NET Core — register via DI
+// services.AddMemoryCache();
+// Then inject IMemoryCache into your service
+
+static Task<User> LoadUserFromDbAsync(int id) => Task.FromResult(new User(id, $"User{id}"));
+record User(int Id, string Name);
+record SessionData;
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is a `Mutex` in C#?
+
+A `Mutex` (mutual exclusion) is a synchronization primitive that restricts access to a resource to **one thread at a time**, and uniquely supports **cross-process** synchronization via a named mutex.
+
+```cs
+// 1. Local mutex — single-process synchronization
+using var mutex = new Mutex();
+
+Thread t1 = new(() =>
+{
+    mutex.WaitOne(); // acquire
+    try   { Console.WriteLine("T1 in critical section"); Thread.Sleep(100); }
+    finally { mutex.ReleaseMutex(); }
+});
+
+Thread t2 = new(() =>
+{
+    mutex.WaitOne();
+    try   { Console.WriteLine("T2 in critical section"); }
+    finally { mutex.ReleaseMutex(); }
+});
+
+t1.Start(); t2.Start(); t1.Join(); t2.Join();
+
+// 2. Named mutex — cross-process (e.g., single-instance application)
+const string MutexName = "Global\\MyApp_SingleInstance";
+
+bool createdNew;
+using var globalMutex = new Mutex(initiallyOwned: true, MutexName, out createdNew);
+
+if (!createdNew)
+{
+    Console.WriteLine("Another instance is already running.");
+    return;
+}
+
+try
+{
+    Console.WriteLine("Application running...");
+    Thread.Sleep(5000); // simulate work
+}
+finally
+{
+    globalMutex.ReleaseMutex();
+}
+
+// 3. Mutex with timeout
+using var timedMutex = new Mutex();
+bool acquired = timedMutex.WaitOne(TimeSpan.FromSeconds(5));
+if (acquired)
+{
+    try { Console.WriteLine("Acquired with timeout"); }
+    finally { timedMutex.ReleaseMutex(); }
+}
+else
+{
+    Console.WriteLine("Timed out waiting for mutex");
+}
+
+// Note: for single-process scenarios prefer lock/Monitor or SemaphoreSlim
+// Mutex is heavier — use only when cross-process sync is needed
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is `Semaphore` vs `SemaphoreSlim` in C#?
+
+| | `Semaphore` | `SemaphoreSlim` |
+|-|------------|----------------|
+| **Cross-process** | … Named semaphores |  In-process only |
+| **Async support** |  | … `WaitAsync()` |
+| **Performance** | Heavier (OS kernel) | Lighter (user-mode) |
+| **Use when** | Cross-process throttling | In-process async throttling |
+
+```cs
+// SemaphoreSlim — preferred for async in-process scenarios
+var semaphore = new SemaphoreSlim(initialCount: 3, maxCount: 3); // allow 3 concurrent
+
+var tasks = Enumerable.Range(1, 10).Select(async i =>
+{
+    await semaphore.WaitAsync(); // acquire slot (async — no thread blocking)
+    try
+    {
+        Console.WriteLine($"Task {i} running (slots left: {semaphore.CurrentCount})");
+        await Task.Delay(500); // simulate work
+    }
+    finally
+    {
+        semaphore.Release(); // release slot
+        Console.WriteLine($"Task {i} done");
+    }
+});
+
+await Task.WhenAll(tasks); // max 3 tasks run concurrently
+
+// Named Semaphore — cross-process throttling
+using var namedSemaphore = new Semaphore(initialCount: 2, maximumCount: 2, name: "Global\\MySemaphore");
+bool entered = namedSemaphore.WaitOne(TimeSpan.FromSeconds(5));
+if (entered)
+{
+    try { Console.WriteLine("Entered semaphore"); }
+    finally { namedSemaphore.Release(); }
+}
+
+// Rate-limiting with SemaphoreSlim (throttle API calls)
+var throttle = new SemaphoreSlim(5); // max 5 concurrent HTTP calls
+async Task<string> FetchAsync(HttpClient client, string url)
+{
+    await throttle.WaitAsync();
+    try   { return await client.GetStringAsync(url); }
+    finally { throttle.Release(); }
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is a deadlock in C#?
+
+A **deadlock** occurs when two or more threads each hold a resource that the other needs, causing all threads to wait indefinitely.
+
+```cs
+// Classic deadlock — two threads, two locks acquired in opposite order
+object lock1 = new();
+object lock2 = new();
+
+Thread t1 = new(() =>
+{
+    lock (lock1)
+    {
+        Thread.Sleep(50); // give t2 time to acquire lock2
+        lock (lock2) { Console.WriteLine("T1: acquired both locks"); }
+    }
+});
+
+Thread t2 = new(() =>
+{
+    lock (lock2)
+    {
+        Thread.Sleep(50);
+        lock (lock1) { Console.WriteLine("T2: acquired both locks"); }
+    }
+});
+
+// t1.Start(); t2.Start();  DEADLOCK! Both threads wait forever
+
+// Prevention 1: consistent lock ordering
+Thread safe1 = new(() => { lock (lock1) { lock (lock2) { Console.WriteLine("safe1"); } } });
+Thread safe2 = new(() => { lock (lock1) { lock (lock2) { Console.WriteLine("safe2"); } } });
+safe1.Start(); safe2.Start(); safe1.Join(); safe2.Join();
+
+// Prevention 2: use Monitor.TryEnter with timeout
+Thread tryLock = new(() =>
+{
+    if (Monitor.TryEnter(lock1, TimeSpan.FromSeconds(1)))
+    {
+        try
+        {
+            if (Monitor.TryEnter(lock2, TimeSpan.FromSeconds(1)))
+            {
+                try { Console.WriteLine("Acquired both"); }
+                finally { Monitor.Exit(lock2); }
+            }
+            else { Console.WriteLine("Could not acquire lock2 — backoff"); }
+        }
+        finally { Monitor.Exit(lock1); }
+    }
+});
+tryLock.Start(); tryLock.Join();
+
+// Prevention 3: prefer async/await + SemaphoreSlim over blocking locks
+// Prevention 4: CancellationToken in async operations prevents indefinite waits
+// Prevention 5: use higher-level concurrency primitives (Channel<T>, Dataflow)
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the `Interlocked` class in C#?
+
+`Interlocked` provides **atomic** operations on shared variables — thread-safe without locks, using CPU atomic instructions.
+
+```cs
+// Interlocked.Increment / Decrement — atomic ++ and --
+int counter = 0;
+var threads = Enumerable.Range(0, 10).Select(_ => new Thread(() =>
+{
+    for (int i = 0; i < 1000; i++)
+        Interlocked.Increment(ref counter); // atomic — no race condition
+})).ToList();
+
+threads.ForEach(t => t.Start());
+threads.ForEach(t => t.Join());
+Console.WriteLine(counter); // always 10,000
+
+// Without Interlocked: counter++ is NOT atomic (read-modify-write race)
+// counter++ ’ IL: ldloc, ldc.i4.1, add, stloc — three non-atomic operations
+
+// Interlocked.Add — atomic addition
+long total = 0;
+Interlocked.Add(ref total, 100);
+Console.WriteLine(total); // 100
+
+// Interlocked.Exchange — atomically set and return old value
+int state = 0;
+int oldState = Interlocked.Exchange(ref state, 1);
+Console.WriteLine($"Old: {oldState}, New: {state}"); // Old: 0, New: 1
+
+// Interlocked.CompareExchange — set if current value equals expected (CAS)
+int value = 5;
+int original = Interlocked.CompareExchange(ref value, newValue: 10, comparand: 5);
+Console.WriteLine($"Original: {original}, Value: {value}"); // Original: 5, Value: 10
+
+// CAS loop — lock-free update pattern
+long sharedLong = 0;
+void AddLockFree(long amount)
+{
+    long current, updated;
+    do
+    {
+        current = Interlocked.Read(ref sharedLong);
+        updated = current + amount;
+    } while (Interlocked.CompareExchange(ref sharedLong, updated, current) != current);
+}
+
+// Interlocked.Read — atomic 64-bit read on 32-bit systems
+long safeRead = Interlocked.Read(ref sharedLong);
+
+// Interlocked.MemoryBarrier / MemoryBarrierProcessWide — memory fences
+Interlocked.MemoryBarrier(); // full fence — prevents CPU/compiler reordering
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the difference between `Task` and `ValueTask`?
+
+| | `Task` / `Task<T>` | `ValueTask` / `ValueTask<T>` |
+|-|-------------------|---------------------------|
+| **Allocation** | Always heap allocated | No allocation if synchronous |
+| **Caching** | Can be cached/reused | Single await only |
+| **Overhead** | Higher for hot paths | Lower for sync-fast paths |
+| **Use when** | General async work | High-throughput, often-sync methods |
+
+```cs
+// Task — standard async, always allocates
+async Task<int> GetCountAsync()
+{
+    await Task.Delay(100); // genuinely async
+    return 42;
+}
+
+// ValueTask — avoids allocation when result is immediately available
+async ValueTask<int> GetCachedCountAsync()
+{
+    if (_cache.TryGetValue("count", out int cached))
+        return cached; // synchronous fast path — NO Task allocation
+
+    int value = await LoadFromDbAsync(); // async slow path
+    _cache["count"] = value;
+    return value;
+}
+
+// Using ValueTask
+int count = await GetCachedCountAsync();
+
+// Rules for ValueTask:
+// … Await it exactly once
+// … Don\'t store and await later (use AsTask() first)
+// … Don\'t await from multiple consumers
+// … Use when method frequently returns synchronously
+
+// Converting ValueTask to Task when you need to share/store
+ValueTask<int> vt = GetCachedCountAsync();
+Task<int> task = vt.AsTask(); // convert — now safely multi-awaitable
+int r1 = await task;
+int r2 = await task; // … safe after AsTask()
+
+// IValueTaskSource — advanced: reuse ValueTask with pool (avoid this unless profiling shows need)
+
+Dictionary<string, int> _cache = new();
+Task<int> LoadFromDbAsync() => Task.FromResult(100);
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is `CancellationToken` and `CancellationTokenSource` in C#?
+
+```cs
+// CancellationTokenSource — creates and controls cancellation
+using var cts = new CancellationTokenSource();
+CancellationToken token = cts.Token;
+
+// Cancel after timeout
+using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+// Cancel after delay
+cts.CancelAfter(TimeSpan.FromSeconds(5));
+
+// Manual cancel
+// cts.Cancel(); // triggers cancellation
+
+// CancellationToken — passed to async methods to observe cancellation
+async Task<string> FetchDataAsync(string url, CancellationToken ct = default)
+{
+    using var client = new HttpClient();
+    // Pass token to async I/O — cancels automatically
+    return await client.GetStringAsync(url, ct);
+}
+
+// Full usage example
+using var source = new CancellationTokenSource();
+CancellationToken ct = source.Token;
+
+// Register a callback on cancellation
+ct.Register(() => Console.WriteLine("Operation was cancelled"));
+
+Task workTask = Task.Run(async () =>
+{
+    for (int i = 0; i < 100; i++)
+    {
+        ct.ThrowIfCancellationRequested(); // poll and throw OperationCanceledException
+        await Task.Delay(100, ct);         // also respects cancellation
+        Console.WriteLine($"Step {i}");
+    }
+}, ct);
+
+await Task.Delay(350);
+source.Cancel(); // cancel after ~350ms
+
+try
+{
+    await workTask;
+}
+catch (OperationCanceledException)
+{
+    Console.WriteLine("Task was cancelled gracefully");
+}
+
+// Linked tokens — cancel when ANY source fires
+using var userCts    = new CancellationTokenSource();
+using var timeoutCts2 = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+using var linked     = CancellationTokenSource.CreateLinkedTokenSource(
+    userCts.Token, timeoutCts2.Token);
+
+await FetchDataAsync("https://example.com", linked.Token);
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the difference between `Task.WhenAll` and `Task.WhenAny`?
+
+| | `Task.WhenAll` | `Task.WhenAny` |
+|-|---------------|---------------|
+| **Completes when** | ALL tasks complete | FIRST task completes |
+| **Exception** | Waits for all; aggregates | Returns immediately; others keep running |
+| **Use for** | Fan-out parallel work | Timeout, race, first-success patterns |
+
+```cs
+// Task.WhenAll — wait for all, collect all results
+async Task WhenAllExample()
+{
+    Task<string> task1 = FetchAsync("https://api.example.com/users");
+    Task<string> task2 = FetchAsync("https://api.example.com/orders");
+    Task<string> task3 = FetchAsync("https://api.example.com/products");
+
+    string[] results = await Task.WhenAll(task1, task2, task3); // parallel fetch
+    Console.WriteLine($"Users: {results[0].Length} chars");
+    Console.WriteLine($"Orders: {results[1].Length} chars");
+}
+
+// Task.WhenAny — first to complete wins
+async Task WhenAnyExample()
+{
+    // Pattern 1: timeout
+    using var cts = new CancellationTokenSource();
+    Task<string> fetch   = FetchAsync("https://slow-api.example.com");
+    Task<string> timeout = Task.Delay(TimeSpan.FromSeconds(5)).ContinueWith(_ => "timeout");
+
+    Task<string> first = await Task.WhenAny(fetch, timeout);
+    string result = await first;
+    Console.WriteLine(result == "timeout" ? "Request timed out" : $"Got: {result.Length} chars");
+
+    // Pattern 2: first successful result from multiple endpoints
+    var endpoints = new[]
+    {
+        FetchAsync("https://api1.example.com/data"),
+        FetchAsync("https://api2.example.com/data"),
+        FetchAsync("https://api3.example.com/data"),
+    };
+    Task<string> winner = await Task.WhenAny(endpoints);
+    Console.WriteLine($"Fastest result: {(await winner).Length} chars");
+}
+
+// WhenAll exception handling — see all failures
+Task[] failingTasks =
+[
+    Task.Run(() => throw new Exception("Task 1")),
+    Task.Run(() => throw new Exception("Task 2")),
+];
+
+try { await Task.WhenAll(failingTasks); }
+catch
+{
+    foreach (var t in failingTasks.Where(t => t.IsFaulted))
+        Console.WriteLine(t.Exception!.InnerException!.Message);
+}
+
+static Task<string> FetchAsync(string url) =>
+    Task.FromResult($"data-from-{url}");
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is `ConcurrentDictionary` in C#?
+
+`ConcurrentDictionary<TKey, TValue>` is a thread-safe dictionary in `System.Collections.Concurrent` that allows multiple threads to read and write concurrently without external locking.
+
+```cs
+using System.Collections.Concurrent;
+
+var dict = new ConcurrentDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+// Thread-safe add or update
+dict["count"] = 0;
+
+// TryAdd — adds only if key doesn\'t exist
+bool added = dict.TryAdd("item1", 10);
+
+// AddOrUpdate — atomic add-or-update
+dict.AddOrUpdate(
+    key: "count",
+    addValue: 1,
+    updateValueFactory: (_, current) => current + 1);
+
+// GetOrAdd — atomic get-or-create
+int value = dict.GetOrAdd("hits", key =>
+{
+    Console.WriteLine($"Creating default for {key}");
+    return 0;
+});
+
+// GetOrAdd with factory object (avoid closure allocation)
+int value2 = dict.GetOrAdd("hits", static (key, seed) => seed, addValueFactoryArgument: 42);
+
+// Parallel increment
+var counter = new ConcurrentDictionary<string, long>();
+var tasks = Enumerable.Range(0, 100).Select(_ => Task.Run(() =>
+{
+    for (int i = 0; i < 1000; i++)
+        counter.AddOrUpdate("total", 1L, (_, v) => v + 1L);
+}));
+await Task.WhenAll(tasks);
+Console.WriteLine(counter["total"]); // always 100,000
+
+// TryGetValue / TryRemove / TryUpdate
+if (dict.TryGetValue("count", out int count))
+    Console.WriteLine($"count = {count}");
+
+dict.TryRemove("item1", out _);
+
+// Snapshot iteration (safe but may not be perfectly consistent)
+foreach (var (key, val) in dict)
+    Console.WriteLine($"{key} = {val}");
+
+// Keys / Values — snapshot copies
+ICollection<string> keys = dict.Keys;
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is `BlockingCollection` in C#? What is the difference between `ConcurrentBag` and `ConcurrentQueue`?
+
+**`BlockingCollection<T>`** provides bounded, blocking producer-consumer patterns. It wraps any `IProducerConsumerCollection<T>` (defaults to `ConcurrentQueue<T>`).
+
+| | `ConcurrentQueue<T>` | `ConcurrentBag<T>` |
+|-|---------------------|-------------------|
+| **Order** | FIFO | Unordered |
+| **Best for** | Producer-consumer pipelines | Work-stealing (same thread adds+removes) |
+| **Thread affinity** | None | Optimized for thread-local access |
+
+```cs
+// BlockingCollection — bounded producer-consumer queue
+var collection = new BlockingCollection<int>(boundedCapacity: 100);
+
+// Producer — blocks when collection is full
+Task producer = Task.Run(() =>
+{
+    for (int i = 0; i < 20; i++)
+    {
+        collection.Add(i);                 // blocks if at capacity
+        Console.WriteLine($"Produced: {i}");
+    }
+    collection.CompleteAdding();           // signal no more items
+});
+
+// Consumer — blocks when collection is empty
+Task consumer = Task.Run(() =>
+{
+    foreach (int item in collection.GetConsumingEnumerable()) // blocks until item or completed
+        Console.WriteLine($"Consumed: {item}");
+});
+
+await Task.WhenAll(producer, consumer);
+
+// ConcurrentQueue — FIFO, producer-consumer pipeline
+var queue = new ConcurrentQueue<string>();
+queue.Enqueue("first");
+queue.Enqueue("second");
+
+if (queue.TryDequeue(out string? item)) Console.WriteLine(item); // first
+if (queue.TryPeek(out string? next))    Console.WriteLine(next); // second
+
+// ConcurrentBag — unordered, thread-local optimization
+var bag = new ConcurrentBag<int>();
+Parallel.For(0, 10, i => bag.Add(i)); // each thread adds to local bag
+
+while (bag.TryTake(out int bagItem))
+    Console.Write($"{bagItem} "); // unordered output
+Console.WriteLine();
+
+// ConcurrentStack — LIFO
+var stack = new ConcurrentStack<int>();
+stack.Push(1); stack.Push(2); stack.Push(3);
+if (stack.TryPop(out int top)) Console.WriteLine(top); // 3
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the difference between server GC and workstation GC? How do you configure GC with `GCSettings`?
+
+| | **Workstation GC** | **Server GC** |
+|-|------------------|--------------|
+| **Default for** | Desktop, single-process apps | ASP.NET Core, server workloads |
+| **Threads** | 1 GC thread | 1 GC thread per CPU core |
+| **Heap** | 1 heap | 1 heap per CPU core |
+| **Throughput** | Lower | Higher |
+| **Latency** | Lower pauses | Higher pauses (more work per GC) |
+| **Memory** | Lower | Higher |
+
+```cs
+using System.Runtime;
+
+// Check current mode
+Console.WriteLine($"Server GC: {GCSettings.IsServerGC}");
+Console.WriteLine($"Latency mode: {GCSettings.LatencyMode}");
+
+// GCLatencyMode — balance throughput vs pause time
+// Configure for interactive/low-latency scenario
+GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
+// Minimizes Gen 2 collections — good for UI, real-time
+
+// Briefly suppress GC during critical section
+GC.TryStartNoGCRegion(1024 * 1024 * 10); // request 10 MB no-GC region
+try
+{
+    // Critical path — GC will not run here if memory is available
+    PerformLatencySensitiveWork();
+}
+finally
+{
+    GC.EndNoGCRegion();
+    GCSettings.LatencyMode = GCLatencyMode.Interactive; // restore
+}
+
+// Configure in runtimeconfig.json (preferred over code):
+// {
+//   "runtimeOptions": {
+//     "configProperties": {
+//       "System.GC.Server": true,
+//       "System.GC.Concurrent": true,
+//       "System.GC.HeapHardLimit": 1073741824
+//     }
+//   }
+// }
+
+// Or in .csproj:
+// <ServerGarbageCollection>true</ServerGarbageCollection>
+// <GarbageCollectionAdaptationMode>0</GarbageCollectionAdaptationMode>
+
+// Optimize GC in .NET:
+// 1. Reduce allocations — use stackalloc, Span<T>, ArrayPool<T>
+// 2. Avoid boxing — use generics instead of object
+// 3. Dispose IDisposable objects promptly (using statement)
+// 4. Use object pooling for large, frequently-allocated objects
+// 5. Prefer value types (struct) for small, short-lived data
+// 6. Avoid large object heap (LOH) fragmentation — pool large arrays
+
+void PerformLatencySensitiveWork() { }
+
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you implement the `IDisposable` pattern correctly in C#?
+
+`IDisposable` is used to release **unmanaged resources** (file handles, database connections, sockets, native memory) deterministically — without waiting for the garbage collector. The complete "dispose pattern" combines a public `Dispose()` method with a `~finalizer` as a safety net.
+
+```cs
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+// 1. Simple IDisposable — no finalizer needed (wraps another IDisposable)
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+public class FileProcessor : IDisposable
+{
+    private StreamReader? _reader;
+    private bool _disposed;
+
+    public FileProcessor(string path)
+        => _reader = new StreamReader(path);
+
+    public string? ReadLine() => _reader?.ReadLine();
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _reader?.Dispose();   // dispose managed resource
+        _reader = null;
+        _disposed = true;
+    }
+}
+
+// Usage — always use `using` for IDisposable
+using var processor = new FileProcessor("data.txt");
+string? line = processor.ReadLine();
+
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+// 2. Full Dispose Pattern — when you hold UNMANAGED resources directly
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+public class NativeResourceHolder : IDisposable
+{
+    // Managed resource (another IDisposable)
+    private Stream? _stream;
+
+    // Unmanaged resource (IntPtr, SafeHandle, etc.)
+    private IntPtr _nativeHandle;
+
+    private bool _disposed;
+
+    public NativeResourceHolder(string path)
+    {
+        _stream       = File.OpenRead(path);
+        _nativeHandle = AllocateNativeResource();   // hypothetical P/Invoke
+    }
+
+    // ” Public entry point ”———————————————————————————————————
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);   // no need for finalizer — Dispose already ran
+    }
+
+    // ” Core logic — called by both Dispose() and finalizer ”——
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+
+        if (disposing)
+        {
+            // Safe to access managed objects here (Dispose called)
+            _stream?.Dispose();
+            _stream = null;
+        }
+
+        // Always release unmanaged resources
+        if (_nativeHandle != IntPtr.Zero)
+        {
+            FreeNativeResource(_nativeHandle);   // hypothetical P/Invoke
+            _nativeHandle = IntPtr.Zero;
+        }
+
+        _disposed = true;
+    }
+
+    // ” Finalizer — safety net if caller forgot Dispose() ”————
+    ~NativeResourceHolder() => Dispose(disposing: false);
+
+    private static IntPtr AllocateNativeResource() => new IntPtr(1);   // placeholder
+    private static void FreeNativeResource(IntPtr handle) { }           // placeholder
+}
+
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+// 3. Preferred modern approach — wrap unmanaged handle in SafeHandle
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+using Microsoft.Win32.SafeHandles;
+
+public class SafeResourceHolder : IDisposable
+{
+    private SafeFileHandle? _handle;
+    private Stream?         _stream;
+    private bool            _disposed;
+
+    public SafeResourceHolder(string path)
+    {
+        _handle = File.OpenHandle(path);
+        _stream = new FileStream(_handle, FileAccess.Read);
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _stream?.Dispose();   // disposes both stream and handle
+        _disposed = true;
+        // No finalizer needed — SafeHandle has its own
+    }
+}
+
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+// 4. IAsyncDisposable — for async cleanup (C# 8+)
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+public class AsyncDbConnection : IAsyncDisposable
+{
+    private bool _disposed;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_disposed) return;
+        await CloseConnectionAsync();   // async teardown
+        _disposed = true;
+    }
+
+    private static Task CloseConnectionAsync() => Task.Delay(10);
+}
+
+await using var conn = new AsyncDbConnection();
+// ... use conn ...
+// DisposeAsync called automatically at end of scope
+```
+
+**Dispose pattern summary:**
+
+| Scenario | Use |
+|----------|-----|
+| Wraps only other `IDisposable` | Simple `Dispose()` — no finalizer |
+| Holds unmanaged resource directly | Full pattern with `Dispose(bool)` + finalizer |
+| Unmanaged handle | `SafeHandle` subclass — preferred over raw `IntPtr` |
+| Async teardown required | `IAsyncDisposable` + `await using` |
+| Always call GC.SuppressFinalize | After successful `Dispose()` to skip finalizer queue |
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the Large Object Heap (LOH) and how does it affect memory and GC performance?
+
+The .NET GC splits the managed heap into the **Small Object Heap (SOH)** for objects < 85,000 bytes and the **Large Object Heap (LOH)** for objects ≥ 85,000 bytes. The LOH is treated differently and can cause **memory pressure** and **fragmentation**.
+
+```cs
+// ” 1. What goes to the LOH ”—————————————————————————————————————
+// Any single managed object >= 85,000 bytes (default threshold)
+// Most common: large arrays (byte[], int[], string with >40K chars)
+
+byte[] small = new byte[84_999];  // SOH — Gen 0
+byte[] large = new byte[85_000];  // LOH — collected only during Gen 2 GC
+
+// ” 2. LOH is collected only with Gen 2 (Full GC) ”———————————————
+// SOH: Gen 0 ’ Gen 1 ’ Gen 2 (short-lived objects collected quickly)
+// LOH: always collected together with Gen 2 ’ more expensive, less frequent
+
+// ” 3. LOH fragmentation ”————————————————————————————————————————
+// LOH is NOT compacted by default (unlike SOH)
+// Allocate and free many large arrays ’ holes appear ’ OutOfMemoryException
+// even when total free memory is enough (fragmentation)
+void DemonstrateFragmentation()
+{
+    var arrays = new List<byte[]>();
+    for (int i = 0; i < 100; i++)
+        arrays.Add(new byte[100_000]);   // 100 — 100KB = 10 MB on LOH
+
+    // Release every other one
+    for (int i = 0; i < arrays.Count; i += 2)
+        arrays[i] = null!;
+
+    GC.Collect();   // compacts SOH but NOT LOH by default — fragmented holes remain
+}
+
+// ” 4. Force LOH compaction (one-time, expensive) ”———————————————
+GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+GC.Collect();   // compacts LOH this one time, then resets to NoCompaction
+
+// ” 5. Best practice: ArrayPool<T> to avoid LOH allocations ”—————
+using System.Buffers;
+
+void ProcessData(int size)
+{
+    //  Allocates a new large array — goes to LOH, increases GC pressure
+    // byte[] buffer = new byte[size];
+
+    // … Rent from pool — reuses existing arrays, no LOH pressure
+    byte[] buffer = ArrayPool<byte>.Shared.Rent(size);
+    try
+    {
+        // Use buffer (may be slightly larger than requested)
+        Array.Clear(buffer, 0, size);
+        Console.WriteLine($"Processing {buffer.Length} bytes");
+    }
+    finally
+    {
+        ArrayPool<byte>.Shared.Return(buffer);   // return to pool — NOT freed
+    }
+}
+
+ProcessData(200_000);   // large but no LOH allocation
+
+// ” 6. Span<T> and Memory<T> — zero-copy, stack-friendly slices ”—
+byte[] fullBuffer = new byte[1_000_000];
+
+// Span<T> — stack-allocated slice reference (cannot be stored in heap fields)
+Span<byte> slice = fullBuffer.AsSpan(0, 100);
+slice.Fill(0xFF);
+
+// Memory<T> — heap-compatible async-friendly slice
+Memory<byte> memSlice = fullBuffer.AsMemory(100, 200);
+await ProcessMemoryAsync(memSlice);
+
+static async Task ProcessMemoryAsync(Memory<byte> mem)
+{
+    await Task.Yield();
+    Console.WriteLine($"Processing {mem.Length} bytes asynchronously");
+}
+
+// ” 7. Monitor LOH size ”—————————————————————————————————————————
+long lohSize = GC.GetGCMemoryInfo().GenerationInfo[3].SizeAfterBytes;
+Console.WriteLine($"LOH size after GC: {lohSize / 1024:N0} KB");
+```
+
+**LOH rules of thumb:**
+
+| Rule | Reason |
+|------|--------|
+| Objects ≥ 85 KB go to LOH | Default GC threshold |
+| LOH collected only with Gen 2 GC | More expensive, less frequent |
+| LOH is NOT compacted by default | Fragmentation risk |
+| Use `ArrayPool<T>.Shared.Rent()` | Reuse large arrays, avoid LOH pressure |
+| Use `Span<T>` / `Memory<T>` | Zero-copy slices, no allocation |
+| Compact LOH only when needed | `GCLargeObjectHeapCompactionMode.CompactOnce` |
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are `Span<T>` and `Memory<T>` in C# and how do they reduce allocations?
+
+`Span<T>` and `Memory<T>` are **allocation-free slice types** that let you work with contiguous regions of memory — whether from arrays, stack, or native memory — without copying.
+
+```cs
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+// Span<T> — stack-only, synchronous, ultra-fast
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+
+// ” 1. Slice an array without copying ”———————————————————————————
+int[] numbers = [10, 20, 30, 40, 50, 60, 70];
+Span<int> middle = numbers.AsSpan(2, 3);   // [30, 40, 50] — no copy
+middle[1] = 99;                             // mutates the original array
+Console.WriteLine(numbers[3]);              // 99
+
+// ” 2. Parse substrings without allocating a new string ”—————————
+ReadOnlySpan<char> date = "2026-06-01".AsSpan();
+int year  = int.Parse(date[..4]);     // "2026"
+int month = int.Parse(date[5..7]);    // "06"
+int day   = int.Parse(date[8..]);     // "01"
+Console.WriteLine(new DateTime(year, month, day)); // 01/06/2026
+
+// ” 3. Stack-allocated Span (stackalloc) ”————————————————————————
+// No heap allocation at all
+Span<byte> stackBuffer = stackalloc byte[256];
+stackBuffer.Fill(0);
+Console.WriteLine(stackBuffer.Length);   // 256
+
+// ” 4. String split without allocating substrings ”———————————————
+static int CountCommas(ReadOnlySpan<char> text)
+{
+    int count = 0;
+    foreach (var c in text)
+        if (c == ',') count++;
+    return count;
+}
+Console.WriteLine(CountCommas("a,b,c,d".AsSpan()));   // 3
+
+// ” 5. Span across native memory (unsafe) ”———————————————————————
+// unsafe {
+//     byte* ptr = stackalloc byte[100];
+//     Span<byte> native = new Span<byte>(ptr, 100);
+// }
+
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+// Memory<T> — heap-compatible, works with async
+// ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+
+// ” 6. Memory<T> in async methods ”———————————————————————————————
+byte[] buffer = new byte[4096];
+Memory<byte> mem = buffer.AsMemory(0, 1024);
+
+async Task ReadToMemoryAsync(Stream stream, Memory<byte> destination)
+{
+    int bytesRead = await stream.ReadAsync(destination);  // no copy — writes directly
+    Console.WriteLine($"Read {bytesRead} bytes");
+}
+
+// ” 7. ReadOnlyMemory<T> for strings and read-only data ”—————————
+ReadOnlyMemory<char> roMem = "Hello, World!".AsMemory(7, 5);  // "World"
+Console.WriteLine(new string(roMem.Span));  // World
+
+// ” 8. MemoryPool<T> for reusable large buffers ”—————————————————
+using IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent(minBufferSize: 4096);
+Memory<byte> pooledMem = owner.Memory;
+// use pooledMem...
+// IMemoryOwner.Dispose() returns memory to pool automatically
+
+// ” 9. Performance comparison ”———————————————————————————————————
+// Traditional (allocates):       string sub = str.Substring(start, length);
+// Span-based (zero alloc):       ReadOnlySpan<char> sub = str.AsSpan(start, length);
+
+static bool StartsWithHttp(string url)
+{
+    ReadOnlySpan<char> span = url;
+    return span.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+        || span.StartsWith("http://", StringComparison.OrdinalIgnoreCase);
+}
+```
+
+**`Span<T>` vs `Memory<T>` vs `string`:**
+
+| Feature | `Span<T>` | `Memory<T>` | `string` / `T[]` |
+|---------|-----------|-------------|-----------------|
+| Stack-only | … Yes |  No |  No |
+| Works in `async` |  No | … Yes | … Yes |
+| Slicing | Zero-copy | Zero-copy | Allocates new object |
+| Mutation | … Yes | … Yes | `string` immutable |
+| Works with `stackalloc` | … Yes |  No |  No |
+| GC pressure | None (stack) | Low (slice only) | High (new object) |
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## # 15. ADVANCED C# FEATURES
+
+<br>
+
+## Q. How does unsafe code and pointers work in C#?
+
+**Unsafe code** enables direct memory manipulation using pointers — useful for performance-critical interop, image processing, and working with unmanaged APIs.
+
+```cs
+// ” 1. Enable unsafe code in .csproj ”———————————————————————————————
+// <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+// ” 2. Pointer basics ”———————————————————————————————————————————————
+unsafe
+{
+    int value = 42;
+    int* ptr  = &value;           // take address
+    Console.WriteLine(*ptr);      // dereference: 42
+    *ptr = 100;
+    Console.WriteLine(value);     // 100 — modified via pointer
+
+    // Pointer arithmetic
+    int[] arr = { 10, 20, 30, 40, 50 };
+    fixed (int* p = arr)          // pin array so GC doesn\'t move it
+    {
+        for (int i = 0; i < arr.Length; i++)
+            Console.Write(*(p + i) + " "); // 10 20 30 40 50
+    }
+}
+
+// ” 3. stackalloc — allocate on stack (no GC) ”———————————————————————
+unsafe
+{
+    // Stack-allocated buffer — no heap allocation, no GC pressure
+    int* numbers = stackalloc int[8];
+    for (int i = 0; i < 8; i++) numbers[i] = i * i;
+    for (int i = 0; i < 8; i++) Console.Write(numbers[i] + " "); // 0 1 4 9 16 25 36 49
+}
+
+// Preferred: stackalloc with Span<T> (no unsafe keyword needed)
+Span<int> safeStack = stackalloc int[8];
+for (int i = 0; i < 8; i++) safeStack[i] = i * i;
+
+// ” 4. Structs with fixed-size arrays ”———————————————————————————————
+public unsafe struct NetworkHeader
+{
+    public fixed byte IpAddress[4];     // inline array — no pointer chasing
+    public ushort Port;
+    public uint Sequence;
+}
+
+unsafe
+{
+    NetworkHeader header = new();
+    header.IpAddress[0] = 192;
+    header.IpAddress[1] = 168;
+    header.IpAddress[2] = 1;
+    header.IpAddress[3] = 1;
+    header.Port = 8080;
+    Console.WriteLine($"IP: {header.IpAddress[0]}.{header.IpAddress[1]}.{header.IpAddress[2]}.{header.IpAddress[3]}:{header.Port}");
+}
+
+// ” 5. Interop with native libraries ”———————————————————————————————
+[System.Runtime.InteropServices.DllImport("msvcrt.dll", CallingConvention = System.Runtime.InteropServices.CallingConvention.Cdecl)]
+private static unsafe extern void* memcpy(void* dest, void* src, nint count);
+
+// Modern interop: LibraryImport + Span<T> (avoids unsafe, .NET 7+)
+[System.Runtime.InteropServices.LibraryImport("msvcrt.dll")]
+private static partial void memset_s(nint dest, nint destSize, int value, nint count);
+
+// ” 6. Performance: unsafe struct copy ”——————————————————————————————
+public static unsafe void FastCopy(byte[] src, byte[] dst, int length)
+{
+    fixed (byte* pSrc = src, pDst = dst)
+    {
+        Buffer.MemoryCopy(pSrc, pDst, dst.Length, length); // hardware-accelerated
+    }
+}
+
+// Modern alternative: Span<T> (preferred)
+public static void SafeCopy(ReadOnlySpan<byte> src, Span<byte> dst)
+    => src[..dst.Length].CopyTo(dst); // no unsafe, no pointers
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are advanced C# patterns — pattern matching, records, and primary constructors?
+
+Modern C# (10–14) provides expressive patterns and type features that reduce boilerplate and improve code clarity.
+
+```cs
+// ” 1. Extended pattern matching (C# 8–12) ”——————————————————————————
+public record Shape;
+public record Circle(double Radius) : Shape;
+public record Rectangle(double Width, double Height) : Shape;
+public record Triangle(double Base, double Height) : Shape;
+
+static string Describe(Shape shape) => shape switch
+{
+    Circle { Radius: 0 }                => "Degenerate circle",
+    Circle { Radius: > 100 }            => "Huge circle",
+    Circle c                            => $"Circle r={c.Radius:F1}",
+    Rectangle { Width: var w, Height: var h } when w == h
+                                        => $"Square {w}x{h}",
+    Rectangle(var w, var h)             => $"Rect {w}x{h}",
+    Triangle(var b, var h)              => $"Triangle b={b} h={h}",
+    null                                => "null",
+    _                                   => "unknown"
+};
+
+// List patterns (C# 11+)
+static string DescribeList(int[] arr) => arr switch
+{
+    []          => "empty",
+    [var x]     => $"one element: {x}",
+    [var x, var y] => $"two elements: {x}, {y}",
+    [1, 2, ..]  => "starts with 1, 2",
+    [.., 99]    => "ends with 99",
+    _           => $"{arr.Length} elements"
+};
+
+Console.WriteLine(DescribeList([]));         // empty
+Console.WriteLine(DescribeList([42]));       // one element: 42
+Console.WriteLine(DescribeList([1, 2, 5])); // starts with 1, 2
+
+// ” 2. Records — immutable data with value semantics ”————————————————
+public record OrderLine(string ProductId, int Quantity, decimal UnitPrice)
+{
+    public decimal Total => Quantity * UnitPrice;
+
+    // Custom deconstruct
+    public void Deconstruct(out string sku, out decimal total)
+        => (sku, total) = (ProductId, Total);
+}
+
+var line = new OrderLine("SKU-001", 3, 9.99m);
+Console.WriteLine(line);       // OrderLine { ProductId = SKU-001, Quantity = 3, UnitPrice = 9.99 }
+
+var modified = line with { Quantity = 5 }; // non-destructive update
+Console.WriteLine(modified.Total); // 49.95
+
+var (sku, total) = line;       // custom deconstruct
+Console.WriteLine($"{sku}: £{total:F2}");
+
+// Record struct (C# 10+) — value type record
+public record struct Point(double X, double Y)
+{
+    public double Distance => Math.Sqrt(X * X + Y * Y);
+}
+
+// ” 3. Primary constructors (C# 12) ”—————————————————————————————————
+// For classes (not just records)
+public class OrderService(
+    IOrderRepository repository,
+    IPublishEndpoint  publishEndpoint,
+    ILogger<OrderService> logger)
 {
     public async Task<Order> PlaceOrderAsync(PlaceOrderRequest req, CancellationToken ct)
     {
+        // Parameters are captured as fields automatically
+        logger.LogInformation("Placing order for {Customer}", req.CustomerId);
         var order = new Order(req.CustomerId, req.Items);
-        db.Orders.Add(order);
-        await db.SaveChangesAsync(ct);
-
-        // Publish event — all subscribers receive it
-        await publishEndpoint.Publish(
-            new OrderPlaced(order.Id, order.CustomerId, order.Total, DateTimeOffset.UtcNow),
-            ct);
-
+        await repository.AddAsync(order, ct);
+        await publishEndpoint.Publish(new OrderPlaced(order.Id), ct);
         return order;
     }
 }
 
-// ” 3. CONSUMER — HANDLE EVENT ”——————————————————————————————————————
-public class OrderPlacedConsumer(IEmailService email, ILogger<OrderPlacedConsumer> logger)
-    : IConsumer<OrderPlaced>
+// ” 4. Required members (C# 11) ”—————————————————————————————————————
+public class ProductDto
 {
-    public async Task Consume(ConsumeContext<OrderPlaced> context)
-    {
-        var evt = context.Message;
-        logger.LogInformation("Processing OrderPlaced {OrderId}", evt.OrderId);
-
-        // Send confirmation email
-        await email.SendOrderConfirmationAsync(evt.CustomerId, evt.OrderId);
-
-        // Optionally respond (for request/reply pattern)
-        // await context.RespondAsync(new OrderConfirmationSent(evt.OrderId));
-    }
+    public required string Name  { get; init; }
+    public required decimal Price { get; init; }
+    public string? Description  { get; init; }
 }
 
-// Payment consumer with retry/error handling
-public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
-{
-    public async Task Consume(ConsumeContext<ProcessPayment> context)
-    {
-        var cmd = context.Message;
-        try
-        {
-            var result = await ProcessPaymentInternalAsync(cmd);
-            await context.Publish(new PaymentProcessed(cmd.OrderId, result.Success, null));
-        }
-        catch (PaymentGatewayException ex)
-        {
-            // Throw to trigger MassTransit retry policy
-            throw new Exception($"Payment gateway error: {ex.Message}", ex);
-        }
-    }
+// Compile error if required members not set:
+// var p = new ProductDto(); 
+var p = new ProductDto { Name = "Laptop", Price = 999m }; // …
 
-    private Task<PaymentResult> ProcessPaymentInternalAsync(ProcessPayment cmd)
-        => Task.FromResult(new PaymentResult(true)); // stub
+// ” 5. Generic math (C# 11+) ”———————————————————————————————————————
+using System.Numerics;
+
+static T Average<T>(IEnumerable<T> values) where T : INumber<T>
+{
+    T sum   = values.Aggregate(T.Zero, (acc, n) => acc + n);
+    T count = T.CreateChecked(values.Count());
+    return sum / count;
 }
 
-record PaymentResult(bool Success);
+Console.WriteLine(Average([1, 2, 3, 4, 5]));           // 3
+Console.WriteLine(Average([1.5, 2.5, 3.5]));            // 2.5
+Console.WriteLine(Average(new decimal[] { 10m, 20m })); // 15
 
-// ” 4. SAGA — COORDINATE LONG-RUNNING WORKFLOW ”—————————————————————
-public class OrderStateMachine : MassTransitStateMachine<OrderSagaState>
-{
-    public State Placed    { get; private set; } = null!;
-    public State Paid      { get; private set; } = null!;
-    public State Shipped   { get; private set; } = null!;
-
-    public Event<OrderPlaced>       OrderPlaced       { get; private set; } = null!;
-    public Event<PaymentProcessed>  PaymentProcessed  { get; private set; } = null!;
-    public Event<OrderShipped>      OrderShipped      { get; private set; } = null!;
-
-    public OrderStateMachine()
-    {
-        InstanceState(x => x.CurrentState);
-
-        Event(() => OrderPlaced,      e => e.CorrelateById(m => m.Message.OrderId));
-        Event(() => PaymentProcessed, e => e.CorrelateById(m => m.Message.OrderId));
-        Event(() => OrderShipped,     e => e.CorrelateById(m => m.Message.OrderId));
-
-        Initially(
-            When(OrderPlaced)
-                .Then(ctx => ctx.Saga.CustomerId = ctx.Message.CustomerId)
-                .Publish(ctx => new ProcessPayment(ctx.Saga.CorrelationId, ctx.Message.Total, "token"))
-                .TransitionTo(Placed));
-
-        During(Placed,
-            When(PaymentProcessed, ctx => ctx.Message.Success)
-                .TransitionTo(Paid),
-            When(PaymentProcessed, ctx => !ctx.Message.Success)
-                .Finalize()); // failed — end saga
-
-        During(Paid,
-            When(OrderShipped)
-                .TransitionTo(Shipped)
-                .Finalize());
-    }
-}
-
-public class OrderSagaState : SagaStateMachineInstance
-{
-    public Guid   CorrelationId { get; set; }
-    public string CurrentState  { get; set; } = null!;
-    public string CustomerId    { get; set; } = null!;
-}
-
-// ” 5. REGISTRATION ”—————————————————————————————————————————————————
-builder.Services.AddMassTransit(x =>
-{
-    x.AddConsumer<OrderPlacedConsumer>();
-    x.AddConsumer<ProcessPaymentConsumer>();
-    x.AddSagaStateMachine<OrderStateMachine, OrderSagaState>()
-        .EntityFrameworkRepository(r =>
-        {
-            r.ExistingDbContext<AppDbContext>();
-            r.UsePostgres();
-        });
-
-    x.UsingRabbitMq((ctx, cfg) =>
-    {
-        cfg.Host("rabbitmq://localhost", h =>
-        {
-            h.Username("guest");
-            h.Password("guest");
-        });
-
-        // Retry policy — exponential backoff, 3 attempts
-        cfg.UseMessageRetry(r => r.Exponential(3,
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(10),
-            TimeSpan.FromSeconds(2)));
-
-        // Dead-letter queue after exhausted retries
-        cfg.UseDelayedRedelivery(r => r.Intervals(
-            TimeSpan.FromMinutes(5),
-            TimeSpan.FromMinutes(15),
-            TimeSpan.FromHours(1)));
-
-        cfg.ConfigureEndpoints(ctx); // auto-configure queues from registered consumers
-    });
-});
+// ” 6. Interceptors (C# 12, preview) ”———————————————————————————————
+// Allow source generators to intercept specific call sites
+// Used by EF Core compiled models, System.Text.Json, ASP.NET Core Minimal APIs
 ```
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## Q. What are distributed patterns in microservices (Outbox, Circuit Breaker, Idempotency)?
-
-**Distributed patterns** address the fundamental challenges of reliability and consistency when services communicate over a network.
-
-```cs
-// ” 1. OUTBOX PATTERN — guaranteed event delivery ”———————————————————
-// Problem: DB save and message publish can fail independently ’ lost messages
-// Solution: Write event to outbox table in SAME transaction as domain changes
-
-// Outbox message entity
-public class OutboxMessage
-{
-    public Guid     Id           { get; init; } = Guid.NewGuid();
-    public string   Type         { get; init; } = null!; // full type name
-    public string   Payload      { get; init; } = null!; // JSON
-    public DateTime CreatedAt    { get; init; } = DateTime.UtcNow;
-    public DateTime? ProcessedAt { get; set; }
-}
-
-// Service — writes domain change + outbox in same transaction
-public class OrderService(AppDbContext db)
-{
-    public async Task PlaceOrderAsync(PlaceOrderRequest req, CancellationToken ct)
-    {
-        var order = new Order(req.CustomerId, req.Items);
-        var evt   = new OrderPlaced(order.Id, order.CustomerId, order.Total, DateTimeOffset.UtcNow);
-
-        db.Orders.Add(order);
-        db.OutboxMessages.Add(new OutboxMessage
-        {
-            Type    = typeof(OrderPlaced).FullName!,
-            Payload = JsonSerializer.Serialize(evt)
-        });
-
-        await db.SaveChangesAsync(ct); // atomic — either both succeed or both fail
-    }
-}
-
-// Background processor — reads outbox and publishes to broker
-public class OutboxProcessor(AppDbContext db, IPublishEndpoint bus) : BackgroundService
-{
-    protected override async Task ExecuteAsync(CancellationToken ct)
-    {
-        while (!ct.IsCancellationRequested)
-        {
-            var messages = await db.OutboxMessages
-                .Where(m => m.ProcessedAt == null)
-                .OrderBy(m => m.CreatedAt)
-                .Take(50)
-                .ToListAsync(ct);
-
-            foreach (var msg in messages)
-            {
-                var type    = Type.GetType(msg.Type)!;
-                var payload = JsonSerializer.Deserialize(msg.Payload, type)!;
-                await bus.Publish(payload, type, ct);
-                msg.ProcessedAt = DateTime.UtcNow;
-            }
-
-            await db.SaveChangesAsync(ct);
-            await Task.Delay(TimeSpan.FromSeconds(5), ct);
-        }
-    }
-}
-
-// ” 2. CIRCUIT BREAKER — stop cascading failures ”————————————————————
-// Using Microsoft.Extensions.Http.Resilience (.NET 8+)
-builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
-    .AddResilienceHandler("catalog-pipeline", p =>
-    {
-        // Retry: 3 attempts, exponential backoff
-        p.AddRetry(new HttpRetryStrategyOptions
-        {
-            MaxRetryAttempts = 3,
-            BackoffType      = DelayBackoffType.Exponential,
-            UseJitter        = true,
-            Delay            = TimeSpan.FromMilliseconds(500)
-        });
-
-        // Circuit breaker: open after 50% failure rate over 10-second sampling
-        p.AddCircuitBreaker(new HttpCircuitBreakerStrategyOptions
-        {
-            SamplingDuration          = TimeSpan.FromSeconds(10),
-            FailureRatio              = 0.5,
-            MinimumThroughput         = 5,
-            BreakDuration             = TimeSpan.FromSeconds(30)
-        });
-
-        // Total timeout per full request (including retries)
-        p.AddTimeout(TimeSpan.FromSeconds(10));
-    });
-
-// ” 3. IDEMPOTENCY KEY — safe retries ”———————————————————————————————
-// Ensure duplicate requests produce the same result
-public class IdempotentOrderService(AppDbContext db)
-{
-    public async Task<OrderResult> PlaceOrderAsync(
-        PlaceOrderRequest req,
-        Guid idempotencyKey, // client-generated key
-        CancellationToken ct)
-    {
-        // Check if already processed
-        var existing = await db.IdempotencyRecords
-            .FirstOrDefaultAsync(r => r.Key == idempotencyKey, ct);
-        if (existing != null)
-            return JsonSerializer.Deserialize<OrderResult>(existing.Response)!;
-
-        var order = new Order(req.CustomerId, req.Items);
-        db.Orders.Add(order);
-
-        var result = new OrderResult(order.Id, order.Status.ToString());
-        db.IdempotencyRecords.Add(new IdempotencyRecord
-        {
-            Key      = idempotencyKey,
-            Response = JsonSerializer.Serialize(result),
-            ExpiresAt = DateTime.UtcNow.AddDays(1)
-        });
-
-        await db.SaveChangesAsync(ct);
-        return result;
-    }
-}
-
-// ” 4. CORRELATION ID — trace requests across services ”——————————————
-public class CorrelationIdMiddleware(RequestDelegate next)
-{
-    public async Task InvokeAsync(HttpContext ctx)
-    {
-        const string header = "X-Correlation-Id";
-        if (!ctx.Request.Headers.TryGetValue(header, out var correlationId))
-            correlationId = Guid.NewGuid().ToString();
-
-        ctx.Response.Headers[header] = correlationId;
-
-        using (Serilog.Context.LogContext.PushProperty("CorrelationId", (string)correlationId!))
-            await next(ctx);
-    }
-}
-
-// Registration
-app.UseMiddleware<CorrelationIdMiddleware>();
-
-// Propagate to downstream HTTP calls
-builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
-    .AddHttpMessageHandler<CorrelationIdPropagationHandler>();
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## # 15. PERFORMANCE AND OPTIMIZATION
+## # 16. PERFORMANCE AND OPTIMIZATION
 
 <br>
 
@@ -31027,7 +29757,2061 @@ public class RequestEventCounters : EventSource
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## # 16. DEPLOYMENT
+## # 17. MICROSERVICES AND DISTRIBUTED SYSTEMS
+
+<br>
+
+## Q. What are microservices and why are they used?
+
+**Microservices** is an architectural style where an application is composed of small, independently deployable services, each responsible for a specific business capability and communicating via APIs.
+
+```
+Monolith                         Microservices
+””—————————————————————————      ””———————————  ””———————————  ””———————————
+”  UI + Business + Data   ”      ”  Order    ”  ”  Catalog  ”  ”  Payment  ”
+”  (all in one process)   ”  ’   ”  Service  ”  ”  Service  ”  ”  Service  ”
+”””—————————————————————————      ”””———————————  ”””———————————  ”””———————————
+                                                                   
+                                 Each has its own DB, deploy, scale, team
+```
+
+**Why use microservices?**
+
+| Benefit | Detail |
+|---------|--------|
+| **Independent deployment** | Deploy Order Service without touching Payment Service |
+| **Independent scaling** | Scale only the Catalog Service during a sale |
+| **Technology diversity** | Each service can use a different language/DB |
+| **Fault isolation** | Catalog failure doesn\'t bring down Orders |
+| **Team autonomy** | Small teams own end-to-end services |
+| **Faster release cycles** | Smaller, focused deployments |
+
+**When NOT to use microservices:**
+- Small teams / early-stage products — start with a monolith
+- When services need very frequent synchronous coordination (distributed monolith anti-pattern)
+- When operational complexity (containers, service mesh, distributed tracing) outweighs benefits
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you implement microservices in .NET Core?
+
+Each microservice is a separate ASP.NET Core Web API project with its own database, deployed independently as a Docker container.
+
+```cs
+// 1. Create a minimal microservice (OrderService)
+// dotnet new webapi -n OrderService
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<OrderDbContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("Orders")));
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<OrderService>();
+
+// Register HttpClient for inter-service calls
+builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
+    client.BaseAddress = new Uri(builder.Configuration["Services:Catalog"]!));
+
+var app = builder.Build();
+app.MapOrderEndpoints(); // feature-sliced minimal API endpoints
+app.Run();
+
+// 2. Typed HttpClient for service-to-service communication
+public class CatalogClient(HttpClient client)
+{
+    public async Task<CatalogItem?> GetItemAsync(int id, CancellationToken ct = default)
+    {
+        var response = await client.GetAsync($"/api/catalog/{id}", ct);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CatalogItem>(cancellationToken: ct);
+    }
+}
+
+// 3. Simple endpoint
+app.MapPost("/orders", async (CreateOrderRequest req, OrderService svc, CancellationToken ct) =>
+{
+    var order = await svc.CreateAsync(req, ct);
+    return Results.Created($"/orders/{order.Id}", order);
+});
+
+// 4. Health checks — required for Kubernetes probes
+builder.Services.AddHealthChecks()
+    .AddNpgSql(connStr, name: "database")
+    .AddUrlGroup(new Uri("http://catalog-service/health"), name: "catalog");
+
+app.MapHealthChecks("/health");
+app.MapHealthChecks("/health/ready", new() { Predicate = r => r.Tags.Contains("ready") });
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are the main advantages of using microservices architecture?
+
+| Advantage | Description |
+|-----------|-------------|
+| **Independent scaling** | Scale only bottleneck services |
+| **Independent deployment** | Deploy/rollback one service without affecting others |
+| **Technology flexibility** | Python ML model + C# API + Go service in same system |
+| **Fault isolation** | Circuit breakers prevent cascade failures |
+| **Team autonomy** | Teams own and deploy their service end-to-end |
+| **Smaller codebases** | Easier to understand, test, and onboard |
+| **Faster iteration** | Frequent small releases without full-system regression |
+| **Horizontal scalability** | Run 10 instances of Order Service, 2 of Admin |
+
+```
+Example: E-Commerce Platform
+
+””—————————————   ””——————————————   ””—————————————   ””—————————————
+”  API Gateway ””–” Order Service””–”Catalog Svc  ”   ”Payment Svc  ”
+” (YARP/Ocelot)”   ”  (C# + PG)  ”   ”(C# + PG)    ”   ”(C# + Redis) ”
+”””—————————————   ”””——————————————   ”””—————————————   ”””—————————————
+                         ”                                      ”
+                  ””————–”——————                    ””———————–”——————
+                  ” RabbitMQ /  ”                    ”  Notification  ”
+                  ” Azure SB    ””————————————————–”  Service       ”
+                  ”””—————————————                    ”””————————————————
+
+Each service:
+ - Owns its database (no shared DB)
+ - Has its own Docker image
+ - Has its own CI/CD pipeline
+ - Scales independently in Kubernetes
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you handle communication between microservices in .NET Core?
+
+**Synchronous** (request-response): HTTP/REST, gRPC
+**Asynchronous** (event-driven): message queues (RabbitMQ, Azure Service Bus, Kafka)
+
+```cs
+// 1. HTTP REST — typed HttpClient via IHttpClientFactory
+builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
+    client.BaseAddress = new Uri("http://catalog-service"));
+
+public class CatalogClient(HttpClient client)
+{
+    public Task<Product?> GetProductAsync(int id) =>
+        client.GetFromJsonAsync<Product>($"/products/{id}");
+}
+
+// 2. gRPC — binary protocol, strongly-typed contracts (.proto files)
+// dotnet add package Grpc.AspNetCore
+// Service: catalog.proto ’ generated CatalogService.CatalogServiceClient
+
+builder.Services.AddGrpcClient<CatalogService.CatalogServiceClient>(opts =>
+    opts.Address = new Uri("https://catalog-service:5001"));
+
+public class OrderService(CatalogService.CatalogServiceClient grpcClient)
+{
+    public async Task<ProductInfo> GetProductInfoAsync(int id)
+    {
+        var reply = await grpcClient.GetProductAsync(new ProductRequest { Id = id });
+        return new ProductInfo(reply.Name, reply.Price);
+    }
+}
+
+// 3. Async messaging — MassTransit + RabbitMQ
+// dotnet add package MassTransit.RabbitMQ
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<OrderCreatedConsumer>();
+    x.UsingRabbitMq((ctx, cfg) =>
+    {
+        cfg.Host("rabbitmq://localhost");
+        cfg.ConfigureEndpoints(ctx);
+    });
+});
+
+// Publisher
+public class OrderService(IPublishEndpoint publish)
+{
+    public async Task CreateOrderAsync(CreateOrderRequest req)
+    {
+        // ... create order in DB ...
+        await publish.Publish(new OrderCreated(orderId, req.Items));
+    }
+}
+
+// Consumer in another service
+public class OrderCreatedConsumer : IConsumer<OrderCreated>
+{
+    public async Task Consume(ConsumeContext<OrderCreated> ctx)
+    {
+        var msg = ctx.Message;
+        // process the event (e.g., send confirmation email)
+    }
+}
+
+record OrderCreated(int OrderId, List<OrderItem> Items);
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the role of API Gateway in microservices architecture?
+
+The **API Gateway** is the single entry point for all clients. It handles routing, authentication, rate limiting, SSL termination, and request aggregation — preventing clients from knowing about individual services.
+
+```
+Client (React App / Mobile)
+          ”
+          –
+  ””———————————————
+  ”  API Gateway  ”   YARP / Ocelot / Azure API Management
+  ”               ”    - Route /orders ’ OrderService
+  ”  Auth (JWT)   ”    - Route /catalog ’ CatalogService
+  ”  Rate Limit   ”    - Aggregate /dashboard ’ multiple services
+  ”  Load Balance ”    - Strip/add headers
+  ”””———————————————
+     /      |      \
+Order   Catalog  Payment
+Service Service  Service
+```
+
+```cs
+// YARP (Yet Another Reverse Proxy) — Microsoft\'s API Gateway (.NET 10)
+// dotnet add package Yarp.ReverseProxy
+
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
+app.MapReverseProxy();
+
+// appsettings.json
+{
+  "ReverseProxy": {
+    "Routes": {
+      "orders-route": {
+        "ClusterId": "orders-cluster",
+        "Match": { "Path": "/api/orders/{**catch-all}" },
+        "AuthorizationPolicy": "default"
+      },
+      "catalog-route": {
+        "ClusterId": "catalog-cluster",
+        "Match": { "Path": "/api/catalog/{**catch-all}" }
+      }
+    },
+    "Clusters": {
+      "orders-cluster": {
+        "Destinations": {
+          "primary": { "Address": "http://order-service:8080/" }
+        }
+      },
+      "catalog-cluster": {
+        "Destinations": {
+          "primary":   { "Address": "http://catalog-service:8080/" },
+          "secondary": { "Address": "http://catalog-service-2:8080/" }
+        },
+        "LoadBalancingPolicy": "RoundRobin"
+      }
+    }
+  }
+}
+
+// Add rate limiting
+builder.Services.AddRateLimiter(opts =>
+    opts.AddFixedWindowLimiter("api", o =>
+    {
+        o.PermitLimit = 100;
+        o.Window = TimeSpan.FromMinutes(1);
+    }));
+app.UseRateLimiter();
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you manage data consistency in microservices?
+
+Each microservice owns its database — no shared DB. Consistency is maintained through **eventual consistency** patterns.
+
+```cs
+// 1. Saga Pattern (Choreography) — services react to events
+// OrderService publishes ’ InventoryService and PaymentService consume
+
+// OrderService
+await publishEndpoint.Publish(new OrderPlaced(orderId, customerId, items));
+
+// InventoryService consumer
+public class OrderPlacedConsumer : IConsumer<OrderPlaced>
+{
+    public async Task Consume(ConsumeContext<OrderPlaced> ctx)
+    {
+        var reserved = await inventory.ReserveAsync(ctx.Message.Items);
+        if (reserved)
+            await ctx.Publish(new InventoryReserved(ctx.Message.OrderId));
+        else
+            await ctx.Publish(new InventoryFailed(ctx.Message.OrderId));
+    }
+}
+
+// 2. Saga Pattern (Orchestration) — MassTransit StateMachine
+public class OrderStateMachine : MassTransitStateMachine<OrderState>
+{
+    public OrderStateMachine()
+    {
+        Initially(
+            When(OrderPlacedEvent)
+                .Activity(x => x.OfInstanceType<ReserveInventoryActivity>())
+                .TransitionTo(AwaitingInventory));
+
+        During(AwaitingInventory,
+            When(InventoryReservedEvent)
+                .Activity(x => x.OfInstanceType<ChargePaymentActivity>())
+                .TransitionTo(AwaitingPayment),
+            When(InventoryFailedEvent)
+                .TransitionTo(Cancelled));
+    }
+
+    public State AwaitingInventory { get; private set; } = default!;
+    public State AwaitingPayment   { get; private set; } = default!;
+    public State Cancelled         { get; private set; } = default!;
+    public Event<OrderPlaced>         OrderPlacedEvent         { get; private set; } = default!;
+    public Event<InventoryReserved>   InventoryReservedEvent   { get; private set; } = default!;
+    public Event<InventoryFailed>     InventoryFailedEvent     { get; private set; } = default!;
+}
+
+// 3. Outbox Pattern — guarantee event delivery even if service crashes
+// Store event in DB (same transaction as business data), then publish
+await using var tx = await db.Database.BeginTransactionAsync();
+db.Orders.Add(newOrder);
+db.OutboxMessages.Add(new OutboxMessage(
+    nameof(OrderCreated),
+    JsonSerializer.Serialize(new OrderCreated(newOrder.Id))));
+await db.SaveChangesAsync(); // atomic: order + outbox message
+await tx.CommitAsync();
+// Background worker reads outbox and publishes to message bus
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are some common challenges when working with microservices?
+
+| Challenge | Description | Solution |
+|-----------|-------------|---------|
+| **Distributed tracing** | Requests span multiple services | OpenTelemetry + Jaeger/Zipkin |
+| **Data consistency** | No shared DB, eventual consistency | Saga pattern, outbox |
+| **Network failures** | Inter-service calls can fail | Retry, circuit breaker (Polly) |
+| **Service discovery** | Services need to find each other | Kubernetes DNS, Consul |
+| **Testing complexity** | Integration tests across services | Contract testing (Pact), test containers |
+| **Security** | JWT propagation, mTLS | JWT forwarding, service mesh |
+| **Configuration** | Many services, many configs | Kubernetes ConfigMaps, Azure App Config |
+| **Versioning** | API changes break consumers | Versioned APIs, backward compat |
+| **Operational overhead** | Many deployments to manage | Kubernetes, Helm, GitOps |
+
+```cs
+// Polly — resilience library for network failures
+// dotnet add package Microsoft.Extensions.Http.Resilience (.NET 8+)
+
+builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
+    .AddStandardResilienceHandler(opts =>
+    {
+        opts.Retry.MaxRetryAttempts = 3;
+        opts.Retry.Delay = TimeSpan.FromMilliseconds(200);
+        opts.Retry.BackoffType = DelayBackoffType.Exponential;
+        opts.CircuitBreaker.FailureRatio = 0.5;
+        opts.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(10);
+        opts.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(30);
+    });
+
+// OpenTelemetry — distributed tracing across services
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddEntityFrameworkCoreInstrumentation()
+        .AddOtlpExporter(opts => opts.Endpoint = new Uri("http://jaeger:4317")));
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you deploy microservices in a containerized environment?
+
+```dockerfile
+# Dockerfile — multi-stage build for OrderService
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+COPY ["OrderService/OrderService.csproj", "OrderService/"]
+RUN dotnet restore "OrderService/OrderService.csproj"
+COPY . .
+RUN dotnet publish "OrderService/OrderService.csproj" -c Release -o /app/publish \
+    --no-restore /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "OrderService.dll"]
+```
+
+```yaml
+# Kubernetes deployment — order-service.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+      - name: order-service
+        image: myregistry.azurecr.io/order-service:1.2.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ConnectionStrings__Orders
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: orders-conn-string
+        resources:
+          requests: { cpu: "100m", memory: "128Mi" }
+          limits:   { cpu: "500m", memory: "512Mi" }
+        livenessProbe:
+          httpGet: { path: /health, port: 8080 }
+          initialDelaySeconds: 10
+        readinessProbe:
+          httpGet: { path: /health/ready, port: 8080 }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+spec:
+  selector:
+    app: order-service
+  ports:
+  - port: 80
+    targetPort: 8080
+```
+
+```bash
+# Deploy
+kubectl apply -f order-service.yaml
+
+# Rolling update to new version
+kubectl set image deployment/order-service order-service=myregistry.azurecr.io/order-service:1.3.0
+
+# Scale
+kubectl scale deployment order-service --replicas=5
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the purpose of service discovery in microservices?
+
+**Service discovery** allows microservices to find each other\'s network locations dynamically — without hardcoded IP addresses — as services scale, restart, or move.
+
+```
+Without service discovery:
+  OrderService ’ "http://192.168.1.42:8080" (hardcoded — breaks on redeploy)
+
+With service discovery:
+  OrderService ’ "http://catalog-service" ’ Discovery resolves ’ "http://10.0.0.15:8080"
+```
+
+| Approach | Tools | .NET Integration |
+|----------|-------|-----------------|
+| **Kubernetes DNS** | K8s built-in | `http://catalog-service` resolves via kube-dns |
+| **Consul** | HashiCorp Consul | `Steeltoe.Discovery.Consul` |
+| **Eureka** | Netflix Eureka | `Steeltoe.Discovery.Eureka` |
+| **Azure Service Fabric** | Service Fabric DNS | Built-in naming service |
+
+```cs
+// Kubernetes — simplest; use service name as hostname
+builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
+{
+    // K8s DNS resolves "catalog-service" to the ClusterIP
+    client.BaseAddress = new Uri(
+        builder.Configuration["Services:Catalog"] ?? "http://catalog-service");
+});
+
+// Consul service discovery (Steeltoe)
+// dotnet add package Steeltoe.Discovery.Consul
+
+builder.Services.AddServiceDiscovery(b => b.UseConsul());
+builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
+    .AddServiceDiscovery(); // resolves "catalog-service" via Consul
+
+// appsettings.json
+{
+  "Consul": { "Host": "consul-server", "Port": 8500 },
+  "Spring": {
+    "Application": { "Name": "order-service" },
+    "Cloud": { "Discovery": { "Enabled": true } }
+  }
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you implement logging and monitoring in microservices?
+
+```cs
+// 1. Structured logging with Serilog — correlate across services
+// dotnet add package Serilog.AspNetCore Serilog.Sinks.OpenTelemetry
+
+builder.Host.UseSerilog((ctx, cfg) => cfg
+    .ReadFrom.Configuration(ctx.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithProperty("Service", "OrderService")
+    .Enrich.WithProperty("Environment", ctx.HostingEnvironment.EnvironmentName)
+    .WriteTo.Console(new JsonFormatter())
+    .WriteTo.OpenTelemetry(opts =>
+        opts.Endpoint = "http://otel-collector:4317"));
+
+// Use correlation ID middleware
+app.Use(async (ctx, next) =>
+{
+    var correlationId = ctx.Request.Headers["X-Correlation-ID"].FirstOrDefault()
+                        ?? Guid.NewGuid().ToString();
+    ctx.Response.Headers["X-Correlation-ID"] = correlationId;
+    using (Serilog.Context.LogContext.PushProperty("CorrelationId", correlationId))
+        await next(ctx);
+});
+
+// 2. OpenTelemetry — metrics + tracing + logs
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddSource("OrderService")
+        .AddOtlpExporter(o => o.Endpoint = new Uri("http://otel-collector:4317")))
+    .WithMetrics(m => m
+        .AddAspNetCoreInstrumentation()
+        .AddRuntimeInstrumentation()
+        .AddOtlpExporter());
+
+// 3. Health checks with detailed status
+builder.Services.AddHealthChecks()
+    .AddNpgSql(connStr)
+    .AddRabbitMQ(rabbitUri)
+    .AddCheck("self", () => HealthCheckResult.Healthy());
+
+app.MapHealthChecks("/health/live",  new() { Predicate = _ => false });  // liveness
+app.MapHealthChecks("/health/ready", new() { Predicate = _ => true  });  // readiness
+
+// 4. Custom metrics
+var meter = new System.Diagnostics.Metrics.Meter("OrderService");
+var ordersCreated = meter.CreateCounter<long>("orders.created");
+ordersCreated.Add(1, new("status", "success"));
+
+// 5. Propagate trace context across HTTP calls (automatic with HttpClient instrumentation)
+// X-B3-TraceId / traceparent headers forwarded automatically
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the difference between monolithic and microservices architecture?
+
+| Aspect | Monolith | Microservices |
+|--------|----------|---------------|
+| **Codebase** | Single deployable unit | Multiple independent services |
+| **Deployment** | Deploy entire app for any change | Deploy only changed service |
+| **Scaling** | Scale the whole app | Scale individual services |
+| **Technology** | Single stack | Polyglot — each service chooses |
+| **Data** | Single shared database | Each service owns its DB |
+| **Failure** | One bug can crash everything | Failures isolated per service |
+| **Complexity** | Simple locally, hard to scale | Complex ops, easy to scale |
+| **Team size** | Small-medium teams | Large orgs, multiple teams |
+| **Testing** | Simpler end-to-end | Complex distributed testing |
+| **Latency** | In-process calls (fast) | Network calls (slower) |
+
+```
+When to choose what:
+
+Monolith …                    Microservices …
+”———————————————              ”———————————————————————————————
+Early-stage startup            Large org with multiple teams
+Small team (<10 devs)          High scale requirements
+Unclear domain boundaries      Well-understood bounded contexts
+Simple operational needs       Independent release cadence needed
+Proof of concept               Different scaling needs per component
+
+Migration path:
+Monolith ’ Strangler Fig Pattern ’ Microservices
+  1. Identify bounded context (e.g., Payment)
+  2. Wrap it behind an interface
+  3. Extract to separate service behind API Gateway
+  4. Route requests to new service
+  5. Remove from monolith
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you handle security in microservices?
+
+```cs
+// 1. JWT authentication — validate in each service
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opts =>
+    {
+        opts.Authority = "https://identity-server"; // OIDC discovery
+        opts.Audience  = "order-service";
+        opts.TokenValidationParameters = new()
+        {
+            ValidateIssuer   = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+        };
+    });
+
+builder.Services.AddAuthorization(opts =>
+    opts.AddPolicy("orders:write", p => p.RequireClaim("scope", "orders:write")));
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapPost("/orders", CreateOrder).RequireAuthorization("orders:write");
+
+// 2. Forward JWT between services (propagate identity)
+builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
+    .AddHttpMessageHandler<JwtForwardingHandler>();
+
+public class JwtForwardingHandler(IHttpContextAccessor accessor) : DelegatingHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request, CancellationToken ct)
+    {
+        var token = accessor.HttpContext?.Request.Headers.Authorization.ToString();
+        if (!string.IsNullOrEmpty(token))
+            request.Headers.Authorization =
+                System.Net.Http.Headers.AuthenticationHeaderValue.Parse(token);
+        return base.SendAsync(request, ct);
+    }
+}
+
+// 3. mTLS — mutual TLS for service-to-service (via service mesh: Istio / Linkerd)
+// Zero-code change; sidecar proxy handles certificate verification
+
+// 4. Secrets management — never store secrets in code
+// Kubernetes secrets
+var connStr = builder.Configuration["ConnectionStrings__Orders"]; // from K8s Secret
+// Azure Key Vault
+builder.Configuration.AddAzureKeyVault(new Uri("https://myvault.vault.azure.net/"),
+    new DefaultAzureCredential());
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is the role of Docker in microservices?
+
+Docker packages each microservice and its dependencies into an **image** — a portable, reproducible unit that runs consistently everywhere.
+
+```dockerfile
+# Each microservice has its own Dockerfile
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+COPY . .
+RUN dotnet publish -c Release -o /app
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /app
+COPY --from=build /app .
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "CatalogService.dll"]
+```
+
+```yaml
+# docker-compose.yml — run all services locally
+version: "3.9"
+services:
+  api-gateway:
+    build: ./ApiGateway
+    ports: ["5000:8080"]
+    depends_on: [order-service, catalog-service]
+
+  order-service:
+    build: ./OrderService
+    environment:
+      - ConnectionStrings__Orders=Host=postgres;Database=orders;Username=app;Password=secret
+    depends_on: [postgres, rabbitmq]
+
+  catalog-service:
+    build: ./CatalogService
+    depends_on: [postgres]
+
+  postgres:
+    image: postgres:16-alpine
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    environment:
+      POSTGRES_PASSWORD: secret
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports: ["15672:15672"]
+
+volumes:
+  pgdata:
+```
+
+```bash
+# Build and run all services
+docker compose up --build
+
+# Build a single image
+docker build -t myregistry.azurecr.io/order-service:1.0.0 ./OrderService
+
+# Push to registry
+docker push myregistry.azurecr.io/order-service:1.0.0
+
+# Run a single service
+docker run -p 8080:8080 myregistry.azurecr.io/order-service:1.0.0
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you implement resilience and fault tolerance in microservices?
+
+```cs
+// Microsoft.Extensions.Http.Resilience (.NET 8+ / Polly v8)
+// dotnet add package Microsoft.Extensions.Http.Resilience
+
+builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
+    .AddStandardResilienceHandler(opts =>
+    {
+        // Retry — 3 times with exponential backoff + jitter
+        opts.Retry.MaxRetryAttempts = 3;
+        opts.Retry.Delay            = TimeSpan.FromMilliseconds(200);
+        opts.Retry.BackoffType      = DelayBackoffType.Exponential;
+        opts.Retry.UseJitter        = true;
+        opts.Retry.ShouldHandle     = args =>
+            ValueTask.FromResult(args.Outcome.Exception is HttpRequestException);
+
+        // Circuit Breaker — open after 50% failure in 10-second window
+        opts.CircuitBreaker.FailureRatio    = 0.5;
+        opts.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(10);
+        opts.CircuitBreaker.MinimumThroughput = 10;
+        opts.CircuitBreaker.BreakDuration    = TimeSpan.FromSeconds(30);
+
+        // Timeout per attempt
+        opts.AttemptTimeout.Timeout = TimeSpan.FromSeconds(5);
+
+        // Total timeout across all retries
+        opts.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(30);
+    });
+
+// Fallback / graceful degradation
+builder.Services.AddResiliencePipeline("catalog-fallback", builder =>
+{
+    builder.AddFallback(new FallbackStrategyOptions<Product?>
+    {
+        FallbackAction = _ => ValueTask.FromResult<Product?>(Product.Default),
+        ShouldHandle   = args => ValueTask.FromResult(
+            args.Outcome.Exception is BrokenCircuitException),
+    });
+});
+
+// Bulkhead — limit concurrent requests to a service
+builder.Services.AddResiliencePipeline("bulkhead", b =>
+    b.AddConcurrencyLimiter(permitLimit: 10, queueLimit: 20));
+
+// Health checks for circuit breaker status
+builder.Services.AddHealthChecks()
+    .AddCheck("catalog-circuit-breaker", () =>
+        circuitBreakerState == CircuitState.Closed
+            ? HealthCheckResult.Healthy()
+            : HealthCheckResult.Degraded("Circuit breaker is open"));
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are some best practices for designing microservices?
+
+| Practice | Description |
+|----------|-------------|
+| **Design around business domains** | Use Domain-Driven Design bounded contexts |
+| **Single responsibility** | Each service does one thing well |
+| **Own your data** | No shared databases between services |
+| **API-first** | Define contracts (OpenAPI/gRPC) before implementation |
+| **Async by default** | Prefer events over synchronous calls |
+| **Design for failure** | Retry, circuit breaker, fallback everywhere |
+| **Health checks** | Liveness + readiness probes |
+| **Structured logging** | Correlation IDs, JSON logs |
+| **Distributed tracing** | OpenTelemetry propagation |
+| **Versioned APIs** | Never break consumers |
+| **Small, frequent releases** | CI/CD per service |
+| **Automate everything** | Docker + Kubernetes + GitOps |
+
+```cs
+// Checklist for a new microservice:
+
+// … 1. Health endpoints
+app.MapHealthChecks("/health/live");
+app.MapHealthChecks("/health/ready");
+
+// … 2. Structured logging with correlation
+builder.Host.UseSerilog((ctx, cfg) => cfg
+    .Enrich.FromLogContext()
+    .WriteTo.Console(new JsonFormatter()));
+
+// … 3. OpenTelemetry tracing
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t.AddAspNetCoreInstrumentation().AddOtlpExporter());
+
+// … 4. Resilient HTTP clients
+builder.Services.AddHttpClient<IDownstreamClient, DownstreamClient>()
+    .AddStandardResilienceHandler();
+
+// … 5. Versioned API
+app.MapGroup("/api/v1").MapOrderEndpoints();
+
+// … 6. Graceful shutdown
+app.Lifetime.ApplicationStopping.Register(() =>
+    logger.LogInformation("Shutting down gracefully..."));
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. Name the key components of Microservices?
+
+```
+Key Components of a Microservices System:
+
+””—————————————————————————————————————————————————————————————————————
+”  CLIENT (Browser / Mobile / 3rd-party)                              ”
+”””——————————————————————”——————————————————————————————————————————————
+                       ”
+              ””——————–”—————————
+              ”   API Gateway    ”  Routing, Auth, Rate Limit, SSL
+              ”  (YARP / Ocelot) ”
+              ”””————————”—————————
+          ””————————————”————————————
+    ””———–”————— ””——–”———— ””——–”——————
+    ”  Order    ” ”Catalog  ” ” Payment   ”    Individual Services
+    ”  Service  ” ” Service ” ” Service   ”
+    ”””—————”————— ”””————”———— ”””————”——————
+          ”            ”           ”
+    ””———–”——   ””———–”——  ””——–”———
+    ” Orders ”   ”Products”  ”Payments”    Per-service Databases
+    ”  DB    ”   ”   DB   ”  ”   DB   ”
+    ”””————————   ”””————————  ”””————————
+          ”            ”           ”
+          ”””————————————”———————————
+                  ””——–”—————
+                  ” Message  ”    Async Communication (RabbitMQ / Kafka)
+                  ”   Bus    ”
+                  ”””——————————
+                       ”
+         ””—————————————”———————————————
+   ””———–”——————              ””—————–”——————
+   ” Notification”             ”  Audit / Log ”    Event Consumers
+   ”  Service   ”             ”   Service    ”
+   ”””————————————              ”””—————————————
+```
+
+| Component | Role |
+|-----------|------|
+| **API Gateway** | Single entry point — routing, auth, rate limiting |
+| **Services** | Independent business capabilities |
+| **Service Registry** | Service discovery (Consul, K8s DNS) |
+| **Message Bus** | Async communication (RabbitMQ, Kafka, Azure Service Bus) |
+| **Configuration Server** | Centralised config (Azure App Config, Consul KV) |
+| **Identity Provider** | Authentication/authorisation (IdentityServer, Azure AD B2C) |
+| **Container Runtime** | Docker for packaging, Kubernetes for orchestration |
+| **Observability** | Logs (Serilog), Metrics (Prometheus), Traces (Jaeger) |
+| **CI/CD Pipeline** | Per-service build and deploy (GitHub Actions, Azure DevOps) |
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are the tools commonly used tools for Microservices?
+
+| Category | Tool | Purpose |
+|----------|------|---------|
+| **Service framework** | ASP.NET Core Minimal API | Build HTTP microservices |
+| **API Gateway** | YARP, Ocelot, Azure APIM | Routing, auth, rate limiting |
+| **gRPC** | Grpc.AspNetCore | High-performance service-to-service |
+| **Messaging** | MassTransit + RabbitMQ | Async pub/sub, saga orchestration |
+| **Messaging (cloud)** | Azure Service Bus, Amazon SQS | Managed message queues |
+| **Streaming** | Apache Kafka, Azure Event Hubs | High-throughput event streaming |
+| **Containers** | Docker, containerd | Package and run services |
+| **Orchestration** | Kubernetes, Azure AKS | Scale, deploy, manage containers |
+| **Service mesh** | Istio, Linkerd | mTLS, traffic management, observability |
+| **Service discovery** | K8s DNS, Consul | Locate services dynamically |
+| **Configuration** | Azure App Config, Consul KV | Centralised config + feature flags |
+| **Identity** | IdentityServer, Azure AD B2C | OAuth2/OIDC for authentication |
+| **Resilience** | Polly / M.E.Http.Resilience | Retry, circuit breaker, timeout |
+| **Tracing** | OpenTelemetry + Jaeger/Zipkin | Distributed request tracing |
+| **Metrics** | Prometheus + Grafana | Dashboards and alerting |
+| **Logging** | Serilog + ELK / Azure Monitor | Structured log aggregation |
+| **CI/CD** | GitHub Actions, Azure DevOps | Automated build and deploy |
+| **Secrets** | Azure Key Vault, HashiCorp Vault | Secrets management |
+| **Health** | ASP.NET Core Health Checks | Liveness/readiness probes |
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are the key principles to follow when designing microservices?
+
+```cs
+// 1. Single Responsibility — one service, one bounded context
+// OrderService handles order lifecycle only; Catalog handles product info
+
+// 2. Database per service — no shared DB
+//  Shared DB creates coupling
+// … Each service owns its schema; communicate via events/API
+
+// 3. Design for failure
+builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
+    .AddStandardResilienceHandler(); // retry + circuit breaker + timeout
+
+// 4. Async-first communication
+// Prefer events over synchronous calls for non-critical paths
+await publishEndpoint.Publish(new OrderShipped(orderId, trackingNumber));
+
+// 5. API versioning — never break consumers
+var v1 = app.MapGroup("/api/v1");
+var v2 = app.MapGroup("/api/v2");
+v1.MapGet("/orders/{id}", GetOrderV1);
+v2.MapGet("/orders/{id}", GetOrderV2); // new shape, v1 still works
+
+// 6. Observability from day one
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t.AddAspNetCoreInstrumentation().AddOtlpExporter())
+    .WithMetrics(m => m.AddAspNetCoreInstrumentation().AddOtlpExporter());
+
+builder.Host.UseSerilog((ctx, cfg) => cfg
+    .Enrich.FromLogContext()
+    .WriteTo.Console(new JsonFormatter()));
+
+// 7. Idempotent consumers — safe to process same message twice
+public class OrderCreatedConsumer : IConsumer<OrderCreated>
+{
+    public async Task Consume(ConsumeContext<OrderCreated> ctx)
+    {
+        // Check if already processed (idempotency key)
+        if (await db.ProcessedEvents.AnyAsync(e => e.Id == ctx.MessageId))
+            return; // duplicate — skip
+
+        // ... process ...
+
+        db.ProcessedEvents.Add(new ProcessedEvent(ctx.MessageId!.Value));
+        await db.SaveChangesAsync();
+    }
+}
+
+// 8. Health checks for Kubernetes
+app.MapHealthChecks("/health/live",  new() { Predicate = _ => false }); // always alive
+app.MapHealthChecks("/health/ready", new() { Predicate = _ => true  }); // checks deps
+
+// 9. Use semantic versioning for Docker images + chart versions
+// v1.2.3 — never use :latest in production
+
+// 10. 12-Factor App principles
+// Config from environment; logs to stdout; stateless processes
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you implement gRPC in .NET Core for service-to-service communication?
+
+**gRPC** is a high-performance RPC framework using Protocol Buffers (protobuf) for serialization. It provides strongly-typed contracts, bi-directional streaming, and is significantly faster than REST for internal service calls.
+
+```bash
+# Create gRPC server
+dotnet new grpc -n OrderGrpcService
+cd OrderGrpcService
+dotnet add package Grpc.AspNetCore
+```
+
+```proto
+// Protos/order.proto — shared contract (copy to both projects or use NuGet)
+syntax = "proto3";
+option csharp_namespace = "OrderGrpcService";
+
+package order;
+
+service OrderService {
+  rpc CreateOrder (CreateOrderRequest) returns (CreateOrderReply);
+  rpc GetOrder    (GetOrderRequest)    returns (OrderReply);
+  rpc StreamOrders(StreamRequest)      returns (stream OrderReply); // server streaming
+}
+
+message CreateOrderRequest {
+  string customer_id = 1;
+  repeated OrderItem items = 2;
+}
+message CreateOrderReply { string order_id = 1; }
+message GetOrderRequest  { string order_id = 1; }
+message OrderReply       { string order_id = 1; string status = 2; double total = 3; }
+message OrderItem        { string product_id = 1; int32 quantity = 2; }
+message StreamRequest    { string customer_id = 1; }
+```
+
+```xml
+<!-- Server .csproj — auto-generates C# from proto -->
+<ItemGroup>
+  <Protobuf Include="Protos\order.proto" GrpcServices="Server" />
+</ItemGroup>
+```
+
+```cs
+// ” gRPC SERVER ”——————————————————————————————————————————————————————
+// Services/OrderGrpcService.cs
+using Grpc.Core;
+using OrderGrpcService;
+
+public class OrderGrpcServiceImpl(IOrderRepository repo) : OrderService.OrderServiceBase
+{
+    public override async Task<CreateOrderReply> CreateOrder(
+        CreateOrderRequest request, ServerCallContext ctx)
+    {
+        var order = await repo.CreateAsync(request.CustomerId,
+            request.Items.Select(i => (i.ProductId, i.Quantity)).ToList(),
+            ctx.CancellationToken);
+
+        return new CreateOrderReply { OrderId = order.Id.ToString() };
+    }
+
+    public override async Task<OrderReply> GetOrder(
+        GetOrderRequest request, ServerCallContext ctx)
+    {
+        var order = await repo.GetAsync(Guid.Parse(request.OrderId), ctx.CancellationToken)
+            ?? throw new RpcException(new Status(StatusCode.NotFound, "Order not found"));
+
+        return new OrderReply
+        {
+            OrderId = order.Id.ToString(),
+            Status  = order.Status.ToString(),
+            Total   = (double)order.Total
+        };
+    }
+
+    // Server-side streaming — push multiple responses
+    public override async Task StreamOrders(
+        StreamRequest request,
+        IServerStreamWriter<OrderReply> stream,
+        ServerCallContext ctx)
+    {
+        await foreach (var order in repo.GetByCustomerAsync(request.CustomerId, ctx.CancellationToken))
+        {
+            await stream.WriteAsync(new OrderReply
+            {
+                OrderId = order.Id.ToString(),
+                Status  = order.Status.ToString(),
+                Total   = (double)order.Total
+            });
+        }
+    }
+}
+
+// Program.cs (server)
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddGrpc(opt =>
+{
+    opt.EnableDetailedErrors = builder.Environment.IsDevelopment();
+    opt.MaxReceiveMessageSize = 4 * 1024 * 1024; // 4 MB
+});
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+var app = builder.Build();
+app.MapGrpcService<OrderGrpcServiceImpl>();
+app.MapGet("/", () => "gRPC server. Use a gRPC client to communicate.");
+app.Run();
+```
+
+```xml
+<!-- Client .csproj -->
+<ItemGroup>
+  <PackageReference Include="Grpc.Net.ClientFactory" Version="2.*" />
+  <PackageReference Include="Google.Protobuf"         Version="3.*" />
+  <PackageReference Include="Grpc.Tools"              Version="2.*" PrivateAssets="All" />
+  <Protobuf Include="Protos\order.proto" GrpcServices="Client" />
+</ItemGroup>
+```
+
+```cs
+// ” gRPC CLIENT ”——————————————————————————————————————————————————————
+// Program.cs (consumer service)
+builder.Services.AddGrpcClient<OrderService.OrderServiceClient>(o =>
+{
+    o.Address = new Uri(builder.Configuration["Services:OrderGrpc"]!);
+})
+.ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+{
+    PooledConnectionIdleTimeout = TimeSpan.FromMinutes(5),
+    KeepAlivePingDelay          = TimeSpan.FromSeconds(60),
+    KeepAlivePingTimeout        = TimeSpan.FromSeconds(30),
+    EnableMultipleHttp2Connections = true
+})
+.AddStandardResilienceHandler(); // retry + circuit breaker
+
+// Usage in a controller / service
+public class CheckoutService(OrderService.OrderServiceClient grpcClient)
+{
+    public async Task<string> PlaceOrderAsync(string customerId, List<(string, int)> items)
+    {
+        var request = new CreateOrderRequest { CustomerId = customerId };
+        request.Items.AddRange(items.Select(i =>
+            new OrderItem { ProductId = i.Item1, Quantity = i.Item2 }));
+
+        var reply = await grpcClient.CreateOrderAsync(request);
+        return reply.OrderId;
+    }
+
+    // Consume server-side stream
+    public async IAsyncEnumerable<OrderReply> StreamCustomerOrdersAsync(string customerId)
+    {
+        using var stream = grpcClient.StreamOrders(new StreamRequest { CustomerId = customerId });
+        await foreach (var order in stream.ResponseStream.ReadAllAsync())
+            yield return order;
+    }
+}
+```
+
+**gRPC vs REST:**
+| | gRPC | REST |
+|--|------|------|
+| **Protocol** | HTTP/2 + protobuf | HTTP/1.1 + JSON |
+| **Performance** | ~7–10— faster | Baseline |
+| **Streaming** | Client/server/bidirectional | Limited (SSE) |
+| **Contract** | Strongly typed `.proto` | OpenAPI/Swagger |
+| **Browser support** | Limited (needs gRPC-Web) | Universal |
+| **Best for** | Internal service mesh | Public APIs |
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. How do you use message brokers with MassTransit and RabbitMQ in .NET?
+
+**MassTransit** is an open-source service bus abstraction for .NET that supports RabbitMQ, Azure Service Bus, Kafka, and more. It provides publish/subscribe, request/reply, and saga patterns.
+
+```bash
+dotnet add package MassTransit.RabbitMQ
+dotnet add package MassTransit.EntityFrameworkCore  # for saga persistence
+```
+
+```cs
+// ” 1. DEFINE MESSAGES (contracts — shared library) ”—————————————————
+namespace Contracts;
+
+// Events (past tense — something happened)
+public record OrderPlaced(Guid OrderId, string CustomerId, decimal Total, DateTimeOffset PlacedAt);
+public record OrderShipped(Guid OrderId, string TrackingNumber, DateTimeOffset ShippedAt);
+public record PaymentProcessed(Guid OrderId, bool Success, string? FailureReason);
+
+// Commands (imperative — do something)
+public record ProcessPayment(Guid OrderId, decimal Amount, string PaymentToken);
+public record SendOrderConfirmation(Guid OrderId, string CustomerEmail);
+
+// ” 2. PRODUCER — PUBLISH EVENT ”—————————————————————————————————————
+public class OrderService(IPublishEndpoint publishEndpoint, AppDbContext db)
+{
+    public async Task<Order> PlaceOrderAsync(PlaceOrderRequest req, CancellationToken ct)
+    {
+        var order = new Order(req.CustomerId, req.Items);
+        db.Orders.Add(order);
+        await db.SaveChangesAsync(ct);
+
+        // Publish event — all subscribers receive it
+        await publishEndpoint.Publish(
+            new OrderPlaced(order.Id, order.CustomerId, order.Total, DateTimeOffset.UtcNow),
+            ct);
+
+        return order;
+    }
+}
+
+// ” 3. CONSUMER — HANDLE EVENT ”——————————————————————————————————————
+public class OrderPlacedConsumer(IEmailService email, ILogger<OrderPlacedConsumer> logger)
+    : IConsumer<OrderPlaced>
+{
+    public async Task Consume(ConsumeContext<OrderPlaced> context)
+    {
+        var evt = context.Message;
+        logger.LogInformation("Processing OrderPlaced {OrderId}", evt.OrderId);
+
+        // Send confirmation email
+        await email.SendOrderConfirmationAsync(evt.CustomerId, evt.OrderId);
+
+        // Optionally respond (for request/reply pattern)
+        // await context.RespondAsync(new OrderConfirmationSent(evt.OrderId));
+    }
+}
+
+// Payment consumer with retry/error handling
+public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
+{
+    public async Task Consume(ConsumeContext<ProcessPayment> context)
+    {
+        var cmd = context.Message;
+        try
+        {
+            var result = await ProcessPaymentInternalAsync(cmd);
+            await context.Publish(new PaymentProcessed(cmd.OrderId, result.Success, null));
+        }
+        catch (PaymentGatewayException ex)
+        {
+            // Throw to trigger MassTransit retry policy
+            throw new Exception($"Payment gateway error: {ex.Message}", ex);
+        }
+    }
+
+    private Task<PaymentResult> ProcessPaymentInternalAsync(ProcessPayment cmd)
+        => Task.FromResult(new PaymentResult(true)); // stub
+}
+
+record PaymentResult(bool Success);
+
+// ” 4. SAGA — COORDINATE LONG-RUNNING WORKFLOW ”—————————————————————
+public class OrderStateMachine : MassTransitStateMachine<OrderSagaState>
+{
+    public State Placed    { get; private set; } = null!;
+    public State Paid      { get; private set; } = null!;
+    public State Shipped   { get; private set; } = null!;
+
+    public Event<OrderPlaced>       OrderPlaced       { get; private set; } = null!;
+    public Event<PaymentProcessed>  PaymentProcessed  { get; private set; } = null!;
+    public Event<OrderShipped>      OrderShipped      { get; private set; } = null!;
+
+    public OrderStateMachine()
+    {
+        InstanceState(x => x.CurrentState);
+
+        Event(() => OrderPlaced,      e => e.CorrelateById(m => m.Message.OrderId));
+        Event(() => PaymentProcessed, e => e.CorrelateById(m => m.Message.OrderId));
+        Event(() => OrderShipped,     e => e.CorrelateById(m => m.Message.OrderId));
+
+        Initially(
+            When(OrderPlaced)
+                .Then(ctx => ctx.Saga.CustomerId = ctx.Message.CustomerId)
+                .Publish(ctx => new ProcessPayment(ctx.Saga.CorrelationId, ctx.Message.Total, "token"))
+                .TransitionTo(Placed));
+
+        During(Placed,
+            When(PaymentProcessed, ctx => ctx.Message.Success)
+                .TransitionTo(Paid),
+            When(PaymentProcessed, ctx => !ctx.Message.Success)
+                .Finalize()); // failed — end saga
+
+        During(Paid,
+            When(OrderShipped)
+                .TransitionTo(Shipped)
+                .Finalize());
+    }
+}
+
+public class OrderSagaState : SagaStateMachineInstance
+{
+    public Guid   CorrelationId { get; set; }
+    public string CurrentState  { get; set; } = null!;
+    public string CustomerId    { get; set; } = null!;
+}
+
+// ” 5. REGISTRATION ”—————————————————————————————————————————————————
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<OrderPlacedConsumer>();
+    x.AddConsumer<ProcessPaymentConsumer>();
+    x.AddSagaStateMachine<OrderStateMachine, OrderSagaState>()
+        .EntityFrameworkRepository(r =>
+        {
+            r.ExistingDbContext<AppDbContext>();
+            r.UsePostgres();
+        });
+
+    x.UsingRabbitMq((ctx, cfg) =>
+    {
+        cfg.Host("rabbitmq://localhost", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        // Retry policy — exponential backoff, 3 attempts
+        cfg.UseMessageRetry(r => r.Exponential(3,
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(10),
+            TimeSpan.FromSeconds(2)));
+
+        // Dead-letter queue after exhausted retries
+        cfg.UseDelayedRedelivery(r => r.Intervals(
+            TimeSpan.FromMinutes(5),
+            TimeSpan.FromMinutes(15),
+            TimeSpan.FromHours(1)));
+
+        cfg.ConfigureEndpoints(ctx); // auto-configure queues from registered consumers
+    });
+});
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are distributed patterns in microservices (Outbox, Circuit Breaker, Idempotency)?
+
+**Distributed patterns** address the fundamental challenges of reliability and consistency when services communicate over a network.
+
+```cs
+// ” 1. OUTBOX PATTERN — guaranteed event delivery ”———————————————————
+// Problem: DB save and message publish can fail independently ’ lost messages
+// Solution: Write event to outbox table in SAME transaction as domain changes
+
+// Outbox message entity
+public class OutboxMessage
+{
+    public Guid     Id           { get; init; } = Guid.NewGuid();
+    public string   Type         { get; init; } = null!; // full type name
+    public string   Payload      { get; init; } = null!; // JSON
+    public DateTime CreatedAt    { get; init; } = DateTime.UtcNow;
+    public DateTime? ProcessedAt { get; set; }
+}
+
+// Service — writes domain change + outbox in same transaction
+public class OrderService(AppDbContext db)
+{
+    public async Task PlaceOrderAsync(PlaceOrderRequest req, CancellationToken ct)
+    {
+        var order = new Order(req.CustomerId, req.Items);
+        var evt   = new OrderPlaced(order.Id, order.CustomerId, order.Total, DateTimeOffset.UtcNow);
+
+        db.Orders.Add(order);
+        db.OutboxMessages.Add(new OutboxMessage
+        {
+            Type    = typeof(OrderPlaced).FullName!,
+            Payload = JsonSerializer.Serialize(evt)
+        });
+
+        await db.SaveChangesAsync(ct); // atomic — either both succeed or both fail
+    }
+}
+
+// Background processor — reads outbox and publishes to broker
+public class OutboxProcessor(AppDbContext db, IPublishEndpoint bus) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken ct)
+    {
+        while (!ct.IsCancellationRequested)
+        {
+            var messages = await db.OutboxMessages
+                .Where(m => m.ProcessedAt == null)
+                .OrderBy(m => m.CreatedAt)
+                .Take(50)
+                .ToListAsync(ct);
+
+            foreach (var msg in messages)
+            {
+                var type    = Type.GetType(msg.Type)!;
+                var payload = JsonSerializer.Deserialize(msg.Payload, type)!;
+                await bus.Publish(payload, type, ct);
+                msg.ProcessedAt = DateTime.UtcNow;
+            }
+
+            await db.SaveChangesAsync(ct);
+            await Task.Delay(TimeSpan.FromSeconds(5), ct);
+        }
+    }
+}
+
+// ” 2. CIRCUIT BREAKER — stop cascading failures ”————————————————————
+// Using Microsoft.Extensions.Http.Resilience (.NET 8+)
+builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
+    .AddResilienceHandler("catalog-pipeline", p =>
+    {
+        // Retry: 3 attempts, exponential backoff
+        p.AddRetry(new HttpRetryStrategyOptions
+        {
+            MaxRetryAttempts = 3,
+            BackoffType      = DelayBackoffType.Exponential,
+            UseJitter        = true,
+            Delay            = TimeSpan.FromMilliseconds(500)
+        });
+
+        // Circuit breaker: open after 50% failure rate over 10-second sampling
+        p.AddCircuitBreaker(new HttpCircuitBreakerStrategyOptions
+        {
+            SamplingDuration          = TimeSpan.FromSeconds(10),
+            FailureRatio              = 0.5,
+            MinimumThroughput         = 5,
+            BreakDuration             = TimeSpan.FromSeconds(30)
+        });
+
+        // Total timeout per full request (including retries)
+        p.AddTimeout(TimeSpan.FromSeconds(10));
+    });
+
+// ” 3. IDEMPOTENCY KEY — safe retries ”———————————————————————————————
+// Ensure duplicate requests produce the same result
+public class IdempotentOrderService(AppDbContext db)
+{
+    public async Task<OrderResult> PlaceOrderAsync(
+        PlaceOrderRequest req,
+        Guid idempotencyKey, // client-generated key
+        CancellationToken ct)
+    {
+        // Check if already processed
+        var existing = await db.IdempotencyRecords
+            .FirstOrDefaultAsync(r => r.Key == idempotencyKey, ct);
+        if (existing != null)
+            return JsonSerializer.Deserialize<OrderResult>(existing.Response)!;
+
+        var order = new Order(req.CustomerId, req.Items);
+        db.Orders.Add(order);
+
+        var result = new OrderResult(order.Id, order.Status.ToString());
+        db.IdempotencyRecords.Add(new IdempotencyRecord
+        {
+            Key      = idempotencyKey,
+            Response = JsonSerializer.Serialize(result),
+            ExpiresAt = DateTime.UtcNow.AddDays(1)
+        });
+
+        await db.SaveChangesAsync(ct);
+        return result;
+    }
+}
+
+// ” 4. CORRELATION ID — trace requests across services ”——————————————
+public class CorrelationIdMiddleware(RequestDelegate next)
+{
+    public async Task InvokeAsync(HttpContext ctx)
+    {
+        const string header = "X-Correlation-Id";
+        if (!ctx.Request.Headers.TryGetValue(header, out var correlationId))
+            correlationId = Guid.NewGuid().ToString();
+
+        ctx.Response.Headers[header] = correlationId;
+
+        using (Serilog.Context.LogContext.PushProperty("CorrelationId", (string)correlationId!))
+            await next(ctx);
+    }
+}
+
+// Registration
+app.UseMiddleware<CorrelationIdMiddleware>();
+
+// Propagate to downstream HTTP calls
+builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
+    .AddHttpMessageHandler<CorrelationIdPropagationHandler>();
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## # 18. ARCHITECTURE AND DESIGN PATTERNS
+
+<br>
+
+## Q. What is Clean Architecture and how do you implement it in .NET?
+
+**Clean Architecture** (Robert C. Martin) organizes code into concentric layers where inner layers define abstractions and outer layers provide implementations. Dependencies always point inward.
+
+```
+””—————————————————————————————————————————————————
+”  Infrastructure  (EF Core, HTTP, Serilog, etc.) ”
+”  ””———————————————————————————————————————————  ”
+”  ”  Application  (use cases, CQRS handlers)  ”  ”
+”  ”  ””—————————————————————————————————————  ”  ”
+”  ”  ”  Domain  (entities, value objects,  ”  ”  ”
+”  ”  ”  domain events, business rules)     ”  ”  ”
+”  ”  ”””—————————————————————————————————————  ”  ”
+”  ”””———————————————————————————————————————————  ”
+”  Presentation  (API Controllers / Minimal API)  ”
+”””—————————————————————————————————————————————————
+         Dependencies flow INWARD only ’
+```
+
+```
+MyApp.sln
+”” src/
+”   ”” MyApp.Domain/           # No external dependencies
+”   ”   ”” Entities/
+”   ”   ”” ValueObjects/
+”   ”   ”” Enums/
+”   ”   ”” Events/
+”   ”   ””” Exceptions/
+”   ”” MyApp.Application/      # Depends only on Domain
+”   ”   ”” Interfaces/         # IOrderRepository, IEmailService
+”   ”   ”” Commands/
+”   ”   ”” Queries/
+”   ”   ”” DTOs/
+”   ”   ””” Behaviors/          # MediatR pipeline behaviors
+”   ”” MyApp.Infrastructure/   # Implements Application interfaces
+”   ”   ”” Persistence/        # EF Core, repositories
+”   ”   ”” Messaging/          # RabbitMQ, SendGrid
+”   ”   ””” Identity/
+”   ””” MyApp.Api/              # ASP.NET Core host
+”       ”” Controllers/
+”       ”” Middleware/
+”       ””” Program.cs
+””” tests/
+    ”” MyApp.Domain.Tests/
+    ”” MyApp.Application.Tests/
+    ””” MyApp.Api.Tests/
+```
+
+```cs
+// ” Domain Layer — pure business logic, no framework dependencies ”———
+namespace MyApp.Domain.Entities;
+
+public sealed class Order : AggregateRoot
+{
+    private readonly List<OrderLine> _lines = [];
+
+    public Guid       Id         { get; private set; }
+    public string     CustomerId { get; private set; } = null!;
+    public OrderStatus Status    { get; private set; }
+    public decimal    Total      => _lines.Sum(l => l.Total);
+    public IReadOnlyList<OrderLine> Lines => _lines.AsReadOnly();
+
+    private Order() { } // EF Core constructor
+
+    public static Order Create(string customerId, IEnumerable<OrderLine> lines)
+    {
+        if (string.IsNullOrWhiteSpace(customerId))
+            throw new DomainException("CustomerId is required.");
+
+        var order = new Order
+        {
+            Id         = Guid.NewGuid(),
+            CustomerId = customerId,
+            Status     = OrderStatus.Pending
+        };
+        order._lines.AddRange(lines);
+        order.AddDomainEvent(new OrderCreatedEvent(order.Id, customerId));
+        return order;
+    }
+
+    public void Ship(string trackingNumber)
+    {
+        if (Status != OrderStatus.Paid)
+            throw new DomainException("Order must be paid before shipping.");
+        Status = OrderStatus.Shipped;
+        AddDomainEvent(new OrderShippedEvent(Id, trackingNumber));
+    }
+}
+
+// ” Application Layer — use case orchestration ”—————————————————————
+namespace MyApp.Application.Interfaces;
+
+public interface IOrderRepository
+{
+    Task<Order?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task AddAsync(Order order, CancellationToken ct = default);
+    Task<IReadOnlyList<Order>> GetByCustomerAsync(string customerId, CancellationToken ct = default);
+}
+
+// ” Infrastructure Layer — concrete implementations ”—————————————————
+namespace MyApp.Infrastructure.Persistence;
+
+public class OrderRepository(AppDbContext db) : IOrderRepository
+{
+    public Task<Order?> GetByIdAsync(Guid id, CancellationToken ct)
+        => db.Orders
+             .Include(o => o.Lines)
+             .FirstOrDefaultAsync(o => o.Id == id, ct);
+
+    public async Task AddAsync(Order order, CancellationToken ct)
+    {
+        db.Orders.Add(order);
+        await db.SaveChangesAsync(ct);
+    }
+
+    public Task<IReadOnlyList<Order>> GetByCustomerAsync(string customerId, CancellationToken ct)
+        => db.Orders
+             .Where(o => o.CustomerId == customerId)
+             .ToListAsync(ct)
+             .ContinueWith(t => (IReadOnlyList<Order>)t.Result, ct);
+}
+
+// ” Presentation Layer — thin controllers, delegate to application ”———
+[ApiController, Route("api/orders")]
+public class OrdersController(ISender mediator) : ControllerBase
+{
+    [HttpPost]
+    public async Task<IActionResult> Create(
+        [FromBody] CreateOrderCommand cmd, CancellationToken ct)
+    {
+        var orderId = await mediator.Send(cmd, ct);
+        return CreatedAtAction(nameof(GetById), new { id = orderId }, new { Id = orderId });
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
+    {
+        var order = await mediator.Send(new GetOrderQuery(id), ct);
+        return order is null ? NotFound() : Ok(order);
+    }
+}
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is CQRS and how do you implement it with MediatR in .NET?
+
+**CQRS (Command Query Responsibility Segregation)** separates read operations (queries) from write operations (commands). MediatR provides an in-process mediator for dispatching commands and queries.
+
+```bash
+dotnet add package MediatR
+dotnet add package FluentValidation.DependencyInjectionExtensions
+```
+
+```cs
+// ” 1. COMMANDS — change state, return minimal result ”———————————————
+// Command DTO
+public sealed record CreateOrderCommand(
+    string CustomerId,
+    IReadOnlyList<OrderLineDto> Lines) : IRequest<Guid>;
+
+public sealed record OrderLineDto(string ProductId, int Quantity, decimal UnitPrice);
+
+// Command Handler
+public sealed class CreateOrderHandler(
+    IOrderRepository repository,
+    IPublishEndpoint  publishEndpoint,
+    ILogger<CreateOrderHandler> logger) : IRequestHandler<CreateOrderCommand, Guid>
+{
+    public async Task<Guid> Handle(CreateOrderCommand cmd, CancellationToken ct)
+    {
+        logger.LogInformation("Creating order for customer {CustomerId}", cmd.CustomerId);
+
+        var lines = cmd.Lines.Select(l =>
+            OrderLine.Create(l.ProductId, l.Quantity, Money.Of(l.UnitPrice, "GBP")));
+
+        var order = Order.Create(cmd.CustomerId, lines);
+        await repository.AddAsync(order, ct);
+
+        return order.Id;
+    }
+}
+
+// ” 2. QUERIES — read state, never mutate ”———————————————————————————
+// Query DTO
+public sealed record GetOrderQuery(Guid OrderId) : IRequest<OrderDetailDto?>;
+
+public sealed record OrderDetailDto(
+    Guid     OrderId,
+    string   CustomerId,
+    string   Status,
+    decimal  Total,
+    IReadOnlyList<OrderLineDetailDto> Lines);
+
+public sealed record OrderLineDetailDto(string ProductId, int Quantity, decimal UnitPrice, decimal Total);
+
+// Query Handler — can use read-optimized data access (dapper, projections)
+public sealed class GetOrderHandler(AppDbContext db) : IRequestHandler<GetOrderQuery, OrderDetailDto?>
+{
+    public async Task<OrderDetailDto?> Handle(GetOrderQuery query, CancellationToken ct)
+    {
+        return await db.Orders
+            .AsNoTracking()
+            .Where(o => o.Id == query.OrderId)
+            .Select(o => new OrderDetailDto(
+                o.Id,
+                o.CustomerId,
+                o.Status.ToString(),
+                o.Lines.Sum(l => l.Quantity * l.UnitPrice),
+                o.Lines.Select(l => new OrderLineDetailDto(
+                    l.ProductId, l.Quantity, l.UnitPrice, l.Quantity * l.UnitPrice))
+                .ToList()))
+            .FirstOrDefaultAsync(ct);
+    }
+}
+
+// ” 3. PIPELINE BEHAVIORS — cross-cutting concerns ”——————————————————
+// Validation behavior — run FluentValidation before every command
+public sealed class ValidationBehavior<TRequest, TResponse>(
+    IEnumerable<IValidator<TRequest>> validators)
+    : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
+{
+    public async Task<TResponse> Handle(
+        TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
+    {
+        if (!validators.Any()) return await next();
+
+        var context = new ValidationContext<TRequest>(request);
+        var failures = validators
+            .Select(v => v.Validate(context))
+            .SelectMany(r => r.Errors)
+            .Where(f => f is not null)
+            .ToList();
+
+        if (failures.Count != 0)
+            throw new ValidationException(failures);
+
+        return await next();
+    }
+}
+
+// Logging behavior — log every request/response
+public sealed class LoggingBehavior<TRequest, TResponse>(
+    ILogger<LoggingBehavior<TRequest, TResponse>> logger)
+    : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
+{
+    public async Task<TResponse> Handle(
+        TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
+    {
+        var name = typeof(TRequest).Name;
+        logger.LogInformation("Handling {Request}", name);
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+
+        var response = await next();
+
+        sw.Stop();
+        logger.LogInformation("Handled {Request} in {Ms}ms", name, sw.ElapsedMilliseconds);
+        return response;
+    }
+}
+
+// FluentValidation for command
+public sealed class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
+{
+    public CreateOrderCommandValidator()
+    {
+        RuleFor(c => c.CustomerId).NotEmpty().MaximumLength(100);
+        RuleFor(c => c.Lines).NotEmpty().WithMessage("Order must have at least one line.");
+        RuleForEach(c => c.Lines).ChildRules(line =>
+        {
+            line.RuleFor(l => l.ProductId).NotEmpty();
+            line.RuleFor(l => l.Quantity).GreaterThan(0);
+            line.RuleFor(l => l.UnitPrice).GreaterThanOrEqualTo(0);
+        });
+    }
+}
+
+// ” 4. REGISTRATION ”—————————————————————————————————————————————————
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssemblyContaining<CreateOrderHandler>();
+    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+});
+builder.Services.AddValidatorsFromAssemblyContaining<CreateOrderCommandValidator>();
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What is Domain-Driven Design (DDD) and what are its core building blocks?
+
+**DDD** (Eric Evans) is a software design approach that focuses on modeling complex business domains. The code structure mirrors the business language (Ubiquitous Language).
+
+```cs
+// ” 1. VALUE OBJECT — defined by its attributes, immutable ”——————————
+public sealed class Money : IEquatable<Money>
+{
+    public decimal Amount   { get; }
+    public string  Currency { get; }
+
+    private Money(decimal amount, string currency)
+    {
+        if (amount < 0)    throw new DomainException("Amount cannot be negative.");
+        if (string.IsNullOrWhiteSpace(currency)) throw new DomainException("Currency required.");
+        Amount   = amount;
+        Currency = currency.ToUpperInvariant();
+    }
+
+    public static Money Of(decimal amount, string currency) => new(amount, currency);
+    public static Money Zero(string currency) => new(0, currency);
+
+    public Money Add(Money other)
+    {
+        if (Currency != other.Currency) throw new DomainException("Currency mismatch.");
+        return new Money(Amount + other.Amount, Currency);
+    }
+
+    public bool Equals(Money? other) => other is not null
+        && Amount == other.Amount && Currency == other.Currency;
+
+    public override bool Equals(object? obj) => Equals(obj as Money);
+    public override int GetHashCode() => HashCode.Combine(Amount, Currency);
+    public override string ToString() => $"{Amount:F2} {Currency}";
+}
+
+// ” 2. ENTITY — defined by identity, mutable state ”——————————————————
+public abstract class Entity
+{
+    public Guid Id { get; protected set; } = Guid.NewGuid();
+
+    private readonly List<IDomainEvent> _domainEvents = [];
+    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+    public void AddDomainEvent(IDomainEvent evt) => _domainEvents.Add(evt);
+    public void ClearDomainEvents() => _domainEvents.Clear();
+}
+
+// ” 3. AGGREGATE ROOT — consistency boundary, only accessible entry ”—
+public sealed class Order : Entity
+{
+    private readonly List<OrderLine> _lines = [];
+
+    public string      CustomerId { get; private set; } = null!;
+    public OrderStatus Status     { get; private set; }
+    public Money       Total      => _lines.Aggregate(
+        Money.Zero("GBP"), (acc, l) => acc.Add(l.Total));
+
+    private Order() { }
+
+    public static Order Create(string customerId)
+    {
+        var order = new Order { CustomerId = customerId, Status = OrderStatus.Pending };
+        order.AddDomainEvent(new OrderCreatedEvent(order.Id, customerId, DateTime.UtcNow));
+        return order;
+    }
+
+    public OrderLine AddLine(string productId, int quantity, Money unitPrice)
+    {
+        if (Status != OrderStatus.Pending)
+            throw new DomainException("Cannot modify order that is not pending.");
+        var line = new OrderLine(Id, productId, quantity, unitPrice);
+        _lines.Add(line);
+        return line;
+    }
+
+    public void Submit()
+    {
+        if (!_lines.Any()) throw new DomainException("Cannot submit empty order.");
+        Status = OrderStatus.Submitted;
+        AddDomainEvent(new OrderSubmittedEvent(Id, Total.Amount, DateTime.UtcNow));
+    }
+}
+
+// ” 4. DOMAIN EVENTS — something significant happened ”——————————————
+public interface IDomainEvent { }
+public sealed record OrderCreatedEvent(Guid OrderId, string CustomerId, DateTime OccurredAt) : IDomainEvent;
+public sealed record OrderSubmittedEvent(Guid OrderId, decimal Total, DateTime OccurredAt) : IDomainEvent;
+
+// Publish domain events after saving (via EF Core interceptor or unit of work)
+public class DomainEventPublisher(IPublishEndpoint bus) : SaveChangesInterceptor
+{
+    public override async ValueTask<int> SavedChangesAsync(
+        SaveChangesCompletedEventData data, int result, CancellationToken ct = default)
+    {
+        var aggregates = data.Context?.ChangeTracker.Entries<Entity>()
+            .Select(e => e.Entity)
+            .Where(e => e.DomainEvents.Any())
+            .ToList() ?? [];
+
+        foreach (var aggregate in aggregates)
+        {
+            foreach (var evt in aggregate.DomainEvents)
+                await bus.Publish(evt, evt.GetType(), ct);
+            aggregate.ClearDomainEvents();
+        }
+
+        return result;
+    }
+}
+
+// ” 5. REPOSITORY — abstracts persistence for aggregates only ”———————
+public interface IOrderRepository
+{
+    Task<Order?> FindAsync(Guid id, CancellationToken ct = default);
+    Task SaveAsync(Order order, CancellationToken ct = default);
+}
+
+// ” 6. DOMAIN SERVICE — logic that doesn\'t belong to a single entity ”
+public class PricingService(IProductRepository products)
+{
+    public async Task<Money> CalculateDiscountedPriceAsync(
+        string productId, int quantity, string customerId, CancellationToken ct)
+    {
+        var product  = await products.FindAsync(productId, ct)
+            ?? throw new DomainException("Product not found.");
+        var basePrice = product.Price.Amount;
+        decimal discount = quantity >= 10 ? 0.1m : quantity >= 5 ? 0.05m : 0m;
+        return Money.Of(basePrice * quantity * (1 - discount), product.Price.Currency);
+    }
+}
+
+// ” 7. BOUNDED CONTEXT MAP ”——————————————————————————————————————————
+/*
+ ””——————————————————         ””——————————————————
+ ”  Order Context   ””ACL”—–”  Catalog Context  ”
+ ”  (Order, Line)   ”         ”  (Product, Stock) ”
+ ”””——————————————————         ”””——————————————————
+        ” Domain Events
+        –
+ ””——————————————————
+ ” Shipping Context ”
+ ”””——————————————————
+
+ ACL = Anti-Corruption Layer (translates between contexts)
+*/
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Q. What are enterprise integration patterns and how do you implement them in .NET?
+
+**Enterprise Integration Patterns (EIP)** (Hohpe & Woolf) provide a vocabulary for designing messaging systems. Key patterns: Message Channel, Message Router, Aggregator, Saga, and Dead Letter Queue.
+
+```cs
+// ” 1. MESSAGE ROUTER — route messages by content ”———————————————————
+public class OrderPriorityRouter(
+    IMessageChannel standardQueue,
+    IMessageChannel priorityQueue) : IConsumer<OrderPlaced>
+{
+    public Task Consume(ConsumeContext<OrderPlaced> ctx)
+    {
+        // Route high-value orders to priority processing
+        var channel = ctx.Message.Total > 1000m ? priorityQueue : standardQueue;
+        return channel.SendAsync(ctx.Message);
+    }
+}
+
+// ” 2. AGGREGATOR — collect related messages, emit combined result ”———
+// Collect all items for an order, then process when complete
+public class OrderAggregatorSaga : MassTransitStateMachine<OrderAggregatorState>
+{
+    public State Aggregating { get; private set; } = null!;
+    public Event<OrderItemReceived> ItemReceived { get; private set; } = null!;
+    public Schedule<OrderAggregatorState, AggregationTimeout> Timeout { get; private set; } = null!;
+
+    public OrderAggregatorSaga()
+    {
+        InstanceState(x => x.CurrentState);
+        Event(() => ItemReceived, e => e.CorrelateById(m => m.Message.OrderId));
+        Schedule(() => Timeout, x => x.TimeoutToken, s =>
+        {
+            s.Delay  = TimeSpan.FromSeconds(30);
+            s.Received = r => r.CorrelateById(m => m.Message.OrderId);
+        });
+
+        Initially(
+            When(ItemReceived)
+                .Then(ctx =>
+                {
+                    ctx.Saga.OrderId      = ctx.Message.OrderId;
+                    ctx.Saga.ExpectedCount = ctx.Message.TotalItems;
+                    ctx.Saga.Items.Add(ctx.Message.ItemId);
+                })
+                .Schedule(Timeout, ctx => new AggregationTimeout(ctx.Saga.CorrelationId))
+                .TransitionTo(Aggregating));
+
+        During(Aggregating,
+            When(ItemReceived)
+                .Then(ctx => ctx.Saga.Items.Add(ctx.Message.ItemId))
+                .IfElse(
+                    ctx => ctx.Saga.Items.Count >= ctx.Saga.ExpectedCount,
+                    complete => complete
+                        .Unschedule(Timeout)
+                        .Publish(ctx => new AllOrderItemsReceived(ctx.Saga.OrderId, ctx.Saga.Items))
+                        .Finalize(),
+                    waiting => waiting.TransitionTo(Aggregating)),
+            When(Timeout!.Received)
+                .Publish(ctx => new OrderAggregationTimedOut(ctx.Saga.OrderId, ctx.Saga.Items))
+                .Finalize());
+    }
+}
+
+// ” 3. DEAD LETTER QUEUE — handle unprocessable messages ”————————————
+public class FaultConsumer<T> : IConsumer<Fault<T>> where T : class
+{
+    private readonly IDeadLetterStore _store;
+    private readonly ILogger<FaultConsumer<T>> _logger;
+
+    public FaultConsumer(IDeadLetterStore store, ILogger<FaultConsumer<T>> logger)
+        => (_store, _logger) = (store, logger);
+
+    public async Task Consume(ConsumeContext<Fault<T>> context)
+    {
+        var fault = context.Message;
+        _logger.LogError("Message {MessageId} of type {Type} failed after {Retries} retries. Exceptions: {Errors}",
+            fault.FaultedMessageId,
+            typeof(T).Name,
+            fault.RetryCount,
+            string.Join("; ", fault.Exceptions.Select(e => e.Message)));
+
+        await _store.StoreAsync(new DeadLetterMessage
+        {
+            MessageId  = fault.FaultedMessageId?.ToString(),
+            MessageType = typeof(T).Name,
+            Payload    = System.Text.Json.JsonSerializer.Serialize(fault.Message),
+            Errors     = fault.Exceptions.Select(e => e.Message).ToArray(),
+            FailedAt   = DateTime.UtcNow
+        });
+    }
+}
+
+// Register fault consumers
+x.AddConsumer(typeof(FaultConsumer<OrderPlaced>));
+x.AddConsumer(typeof(FaultConsumer<ProcessPayment>));
+
+// ” 4. REQUEST-REPLY — synchronous over async messaging ”—————————————
+// Requester
+public class InventoryCheckService(IRequestClient<CheckInventory> client)
+{
+    public async Task<bool> IsAvailableAsync(string productId, int quantity, CancellationToken ct)
+    {
+        var response = await client.GetResponse<InventoryCheckResult>(
+            new CheckInventory(productId, quantity), ct,
+            timeout: RequestTimeout.After(s: 5));
+
+        return response.Message.Available;
+    }
+}
+
+// Responder
+public class InventoryConsumer(IInventoryRepository repo) : IConsumer<CheckInventory>
+{
+    public async Task Consume(ConsumeContext<CheckInventory> ctx)
+    {
+        var stock = await repo.GetStockAsync(ctx.Message.ProductId);
+        await ctx.RespondAsync(
+            new InventoryCheckResult(ctx.Message.ProductId, stock >= ctx.Message.Quantity));
+    }
+}
+
+record CheckInventory(string ProductId, int Quantity);
+record InventoryCheckResult(string ProductId, bool Available);
+```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## # 19. DEPLOYMENT
 
 <br>
 
@@ -32476,7 +33260,7 @@ public class StartupInfo(IConfiguration config)
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## # 17. .NET Core
+## # 20. .NET Core
 
 <br>
 
@@ -34910,7 +35694,7 @@ await builder.Build().RunAsync();
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## # 18. MISCELLANEOUS
+## # 21. MISCELLANEOUS
 
 <br>
 
@@ -36836,790 +37620,6 @@ object CreateInternalInstance() => new object();
 | Unknown JSON structure (prefer `JsonNode`/`JsonElement`) |  Prefer typed approach |
 | Reflection replacement in hot paths |  No — use compiled delegates |
 | Plugin systems |  Prefer interfaces |
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## # 19. ADVANCED C# FEATURES
-
-<br>
-
-## Q. How does unsafe code and pointers work in C#?
-
-**Unsafe code** enables direct memory manipulation using pointers — useful for performance-critical interop, image processing, and working with unmanaged APIs.
-
-```cs
-// ” 1. Enable unsafe code in .csproj ”———————————————————————————————
-// <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-// ” 2. Pointer basics ”———————————————————————————————————————————————
-unsafe
-{
-    int value = 42;
-    int* ptr  = &value;           // take address
-    Console.WriteLine(*ptr);      // dereference: 42
-    *ptr = 100;
-    Console.WriteLine(value);     // 100 — modified via pointer
-
-    // Pointer arithmetic
-    int[] arr = { 10, 20, 30, 40, 50 };
-    fixed (int* p = arr)          // pin array so GC doesn\'t move it
-    {
-        for (int i = 0; i < arr.Length; i++)
-            Console.Write(*(p + i) + " "); // 10 20 30 40 50
-    }
-}
-
-// ” 3. stackalloc — allocate on stack (no GC) ”———————————————————————
-unsafe
-{
-    // Stack-allocated buffer — no heap allocation, no GC pressure
-    int* numbers = stackalloc int[8];
-    for (int i = 0; i < 8; i++) numbers[i] = i * i;
-    for (int i = 0; i < 8; i++) Console.Write(numbers[i] + " "); // 0 1 4 9 16 25 36 49
-}
-
-// Preferred: stackalloc with Span<T> (no unsafe keyword needed)
-Span<int> safeStack = stackalloc int[8];
-for (int i = 0; i < 8; i++) safeStack[i] = i * i;
-
-// ” 4. Structs with fixed-size arrays ”———————————————————————————————
-public unsafe struct NetworkHeader
-{
-    public fixed byte IpAddress[4];     // inline array — no pointer chasing
-    public ushort Port;
-    public uint Sequence;
-}
-
-unsafe
-{
-    NetworkHeader header = new();
-    header.IpAddress[0] = 192;
-    header.IpAddress[1] = 168;
-    header.IpAddress[2] = 1;
-    header.IpAddress[3] = 1;
-    header.Port = 8080;
-    Console.WriteLine($"IP: {header.IpAddress[0]}.{header.IpAddress[1]}.{header.IpAddress[2]}.{header.IpAddress[3]}:{header.Port}");
-}
-
-// ” 5. Interop with native libraries ”———————————————————————————————
-[System.Runtime.InteropServices.DllImport("msvcrt.dll", CallingConvention = System.Runtime.InteropServices.CallingConvention.Cdecl)]
-private static unsafe extern void* memcpy(void* dest, void* src, nint count);
-
-// Modern interop: LibraryImport + Span<T> (avoids unsafe, .NET 7+)
-[System.Runtime.InteropServices.LibraryImport("msvcrt.dll")]
-private static partial void memset_s(nint dest, nint destSize, int value, nint count);
-
-// ” 6. Performance: unsafe struct copy ”——————————————————————————————
-public static unsafe void FastCopy(byte[] src, byte[] dst, int length)
-{
-    fixed (byte* pSrc = src, pDst = dst)
-    {
-        Buffer.MemoryCopy(pSrc, pDst, dst.Length, length); // hardware-accelerated
-    }
-}
-
-// Modern alternative: Span<T> (preferred)
-public static void SafeCopy(ReadOnlySpan<byte> src, Span<byte> dst)
-    => src[..dst.Length].CopyTo(dst); // no unsafe, no pointers
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are advanced C# patterns — pattern matching, records, and primary constructors?
-
-Modern C# (10–14) provides expressive patterns and type features that reduce boilerplate and improve code clarity.
-
-```cs
-// ” 1. Extended pattern matching (C# 8–12) ”——————————————————————————
-public record Shape;
-public record Circle(double Radius) : Shape;
-public record Rectangle(double Width, double Height) : Shape;
-public record Triangle(double Base, double Height) : Shape;
-
-static string Describe(Shape shape) => shape switch
-{
-    Circle { Radius: 0 }                => "Degenerate circle",
-    Circle { Radius: > 100 }            => "Huge circle",
-    Circle c                            => $"Circle r={c.Radius:F1}",
-    Rectangle { Width: var w, Height: var h } when w == h
-                                        => $"Square {w}x{h}",
-    Rectangle(var w, var h)             => $"Rect {w}x{h}",
-    Triangle(var b, var h)              => $"Triangle b={b} h={h}",
-    null                                => "null",
-    _                                   => "unknown"
-};
-
-// List patterns (C# 11+)
-static string DescribeList(int[] arr) => arr switch
-{
-    []          => "empty",
-    [var x]     => $"one element: {x}",
-    [var x, var y] => $"two elements: {x}, {y}",
-    [1, 2, ..]  => "starts with 1, 2",
-    [.., 99]    => "ends with 99",
-    _           => $"{arr.Length} elements"
-};
-
-Console.WriteLine(DescribeList([]));         // empty
-Console.WriteLine(DescribeList([42]));       // one element: 42
-Console.WriteLine(DescribeList([1, 2, 5])); // starts with 1, 2
-
-// ” 2. Records — immutable data with value semantics ”————————————————
-public record OrderLine(string ProductId, int Quantity, decimal UnitPrice)
-{
-    public decimal Total => Quantity * UnitPrice;
-
-    // Custom deconstruct
-    public void Deconstruct(out string sku, out decimal total)
-        => (sku, total) = (ProductId, Total);
-}
-
-var line = new OrderLine("SKU-001", 3, 9.99m);
-Console.WriteLine(line);       // OrderLine { ProductId = SKU-001, Quantity = 3, UnitPrice = 9.99 }
-
-var modified = line with { Quantity = 5 }; // non-destructive update
-Console.WriteLine(modified.Total); // 49.95
-
-var (sku, total) = line;       // custom deconstruct
-Console.WriteLine($"{sku}: £{total:F2}");
-
-// Record struct (C# 10+) — value type record
-public record struct Point(double X, double Y)
-{
-    public double Distance => Math.Sqrt(X * X + Y * Y);
-}
-
-// ” 3. Primary constructors (C# 12) ”—————————————————————————————————
-// For classes (not just records)
-public class OrderService(
-    IOrderRepository repository,
-    IPublishEndpoint  publishEndpoint,
-    ILogger<OrderService> logger)
-{
-    public async Task<Order> PlaceOrderAsync(PlaceOrderRequest req, CancellationToken ct)
-    {
-        // Parameters are captured as fields automatically
-        logger.LogInformation("Placing order for {Customer}", req.CustomerId);
-        var order = new Order(req.CustomerId, req.Items);
-        await repository.AddAsync(order, ct);
-        await publishEndpoint.Publish(new OrderPlaced(order.Id), ct);
-        return order;
-    }
-}
-
-// ” 4. Required members (C# 11) ”—————————————————————————————————————
-public class ProductDto
-{
-    public required string Name  { get; init; }
-    public required decimal Price { get; init; }
-    public string? Description  { get; init; }
-}
-
-// Compile error if required members not set:
-// var p = new ProductDto(); 
-var p = new ProductDto { Name = "Laptop", Price = 999m }; // …
-
-// ” 5. Generic math (C# 11+) ”———————————————————————————————————————
-using System.Numerics;
-
-static T Average<T>(IEnumerable<T> values) where T : INumber<T>
-{
-    T sum   = values.Aggregate(T.Zero, (acc, n) => acc + n);
-    T count = T.CreateChecked(values.Count());
-    return sum / count;
-}
-
-Console.WriteLine(Average([1, 2, 3, 4, 5]));           // 3
-Console.WriteLine(Average([1.5, 2.5, 3.5]));            // 2.5
-Console.WriteLine(Average(new decimal[] { 10m, 20m })); // 15
-
-// ” 6. Interceptors (C# 12, preview) ”———————————————————————————————
-// Allow source generators to intercept specific call sites
-// Used by EF Core compiled models, System.Text.Json, ASP.NET Core Minimal APIs
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## # 20. ARCHITECTURE AND DESIGN PATTERNS
-
-<br>
-
-## Q. What is Clean Architecture and how do you implement it in .NET?
-
-**Clean Architecture** (Robert C. Martin) organizes code into concentric layers where inner layers define abstractions and outer layers provide implementations. Dependencies always point inward.
-
-```
-””—————————————————————————————————————————————————
-”  Infrastructure  (EF Core, HTTP, Serilog, etc.) ”
-”  ””———————————————————————————————————————————  ”
-”  ”  Application  (use cases, CQRS handlers)  ”  ”
-”  ”  ””—————————————————————————————————————  ”  ”
-”  ”  ”  Domain  (entities, value objects,  ”  ”  ”
-”  ”  ”  domain events, business rules)     ”  ”  ”
-”  ”  ”””—————————————————————————————————————  ”  ”
-”  ”””———————————————————————————————————————————  ”
-”  Presentation  (API Controllers / Minimal API)  ”
-”””—————————————————————————————————————————————————
-         Dependencies flow INWARD only ’
-```
-
-```
-MyApp.sln
-”” src/
-”   ”” MyApp.Domain/           # No external dependencies
-”   ”   ”” Entities/
-”   ”   ”” ValueObjects/
-”   ”   ”” Enums/
-”   ”   ”” Events/
-”   ”   ””” Exceptions/
-”   ”” MyApp.Application/      # Depends only on Domain
-”   ”   ”” Interfaces/         # IOrderRepository, IEmailService
-”   ”   ”” Commands/
-”   ”   ”” Queries/
-”   ”   ”” DTOs/
-”   ”   ””” Behaviors/          # MediatR pipeline behaviors
-”   ”” MyApp.Infrastructure/   # Implements Application interfaces
-”   ”   ”” Persistence/        # EF Core, repositories
-”   ”   ”” Messaging/          # RabbitMQ, SendGrid
-”   ”   ””” Identity/
-”   ””” MyApp.Api/              # ASP.NET Core host
-”       ”” Controllers/
-”       ”” Middleware/
-”       ””” Program.cs
-””” tests/
-    ”” MyApp.Domain.Tests/
-    ”” MyApp.Application.Tests/
-    ””” MyApp.Api.Tests/
-```
-
-```cs
-// ” Domain Layer — pure business logic, no framework dependencies ”———
-namespace MyApp.Domain.Entities;
-
-public sealed class Order : AggregateRoot
-{
-    private readonly List<OrderLine> _lines = [];
-
-    public Guid       Id         { get; private set; }
-    public string     CustomerId { get; private set; } = null!;
-    public OrderStatus Status    { get; private set; }
-    public decimal    Total      => _lines.Sum(l => l.Total);
-    public IReadOnlyList<OrderLine> Lines => _lines.AsReadOnly();
-
-    private Order() { } // EF Core constructor
-
-    public static Order Create(string customerId, IEnumerable<OrderLine> lines)
-    {
-        if (string.IsNullOrWhiteSpace(customerId))
-            throw new DomainException("CustomerId is required.");
-
-        var order = new Order
-        {
-            Id         = Guid.NewGuid(),
-            CustomerId = customerId,
-            Status     = OrderStatus.Pending
-        };
-        order._lines.AddRange(lines);
-        order.AddDomainEvent(new OrderCreatedEvent(order.Id, customerId));
-        return order;
-    }
-
-    public void Ship(string trackingNumber)
-    {
-        if (Status != OrderStatus.Paid)
-            throw new DomainException("Order must be paid before shipping.");
-        Status = OrderStatus.Shipped;
-        AddDomainEvent(new OrderShippedEvent(Id, trackingNumber));
-    }
-}
-
-// ” Application Layer — use case orchestration ”—————————————————————
-namespace MyApp.Application.Interfaces;
-
-public interface IOrderRepository
-{
-    Task<Order?> GetByIdAsync(Guid id, CancellationToken ct = default);
-    Task AddAsync(Order order, CancellationToken ct = default);
-    Task<IReadOnlyList<Order>> GetByCustomerAsync(string customerId, CancellationToken ct = default);
-}
-
-// ” Infrastructure Layer — concrete implementations ”—————————————————
-namespace MyApp.Infrastructure.Persistence;
-
-public class OrderRepository(AppDbContext db) : IOrderRepository
-{
-    public Task<Order?> GetByIdAsync(Guid id, CancellationToken ct)
-        => db.Orders
-             .Include(o => o.Lines)
-             .FirstOrDefaultAsync(o => o.Id == id, ct);
-
-    public async Task AddAsync(Order order, CancellationToken ct)
-    {
-        db.Orders.Add(order);
-        await db.SaveChangesAsync(ct);
-    }
-
-    public Task<IReadOnlyList<Order>> GetByCustomerAsync(string customerId, CancellationToken ct)
-        => db.Orders
-             .Where(o => o.CustomerId == customerId)
-             .ToListAsync(ct)
-             .ContinueWith(t => (IReadOnlyList<Order>)t.Result, ct);
-}
-
-// ” Presentation Layer — thin controllers, delegate to application ”———
-[ApiController, Route("api/orders")]
-public class OrdersController(ISender mediator) : ControllerBase
-{
-    [HttpPost]
-    public async Task<IActionResult> Create(
-        [FromBody] CreateOrderCommand cmd, CancellationToken ct)
-    {
-        var orderId = await mediator.Send(cmd, ct);
-        return CreatedAtAction(nameof(GetById), new { id = orderId }, new { Id = orderId });
-    }
-
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
-    {
-        var order = await mediator.Send(new GetOrderQuery(id), ct);
-        return order is null ? NotFound() : Ok(order);
-    }
-}
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is CQRS and how do you implement it with MediatR in .NET?
-
-**CQRS (Command Query Responsibility Segregation)** separates read operations (queries) from write operations (commands). MediatR provides an in-process mediator for dispatching commands and queries.
-
-```bash
-dotnet add package MediatR
-dotnet add package FluentValidation.DependencyInjectionExtensions
-```
-
-```cs
-// ” 1. COMMANDS — change state, return minimal result ”———————————————
-// Command DTO
-public sealed record CreateOrderCommand(
-    string CustomerId,
-    IReadOnlyList<OrderLineDto> Lines) : IRequest<Guid>;
-
-public sealed record OrderLineDto(string ProductId, int Quantity, decimal UnitPrice);
-
-// Command Handler
-public sealed class CreateOrderHandler(
-    IOrderRepository repository,
-    IPublishEndpoint  publishEndpoint,
-    ILogger<CreateOrderHandler> logger) : IRequestHandler<CreateOrderCommand, Guid>
-{
-    public async Task<Guid> Handle(CreateOrderCommand cmd, CancellationToken ct)
-    {
-        logger.LogInformation("Creating order for customer {CustomerId}", cmd.CustomerId);
-
-        var lines = cmd.Lines.Select(l =>
-            OrderLine.Create(l.ProductId, l.Quantity, Money.Of(l.UnitPrice, "GBP")));
-
-        var order = Order.Create(cmd.CustomerId, lines);
-        await repository.AddAsync(order, ct);
-
-        return order.Id;
-    }
-}
-
-// ” 2. QUERIES — read state, never mutate ”———————————————————————————
-// Query DTO
-public sealed record GetOrderQuery(Guid OrderId) : IRequest<OrderDetailDto?>;
-
-public sealed record OrderDetailDto(
-    Guid     OrderId,
-    string   CustomerId,
-    string   Status,
-    decimal  Total,
-    IReadOnlyList<OrderLineDetailDto> Lines);
-
-public sealed record OrderLineDetailDto(string ProductId, int Quantity, decimal UnitPrice, decimal Total);
-
-// Query Handler — can use read-optimized data access (dapper, projections)
-public sealed class GetOrderHandler(AppDbContext db) : IRequestHandler<GetOrderQuery, OrderDetailDto?>
-{
-    public async Task<OrderDetailDto?> Handle(GetOrderQuery query, CancellationToken ct)
-    {
-        return await db.Orders
-            .AsNoTracking()
-            .Where(o => o.Id == query.OrderId)
-            .Select(o => new OrderDetailDto(
-                o.Id,
-                o.CustomerId,
-                o.Status.ToString(),
-                o.Lines.Sum(l => l.Quantity * l.UnitPrice),
-                o.Lines.Select(l => new OrderLineDetailDto(
-                    l.ProductId, l.Quantity, l.UnitPrice, l.Quantity * l.UnitPrice))
-                .ToList()))
-            .FirstOrDefaultAsync(ct);
-    }
-}
-
-// ” 3. PIPELINE BEHAVIORS — cross-cutting concerns ”——————————————————
-// Validation behavior — run FluentValidation before every command
-public sealed class ValidationBehavior<TRequest, TResponse>(
-    IEnumerable<IValidator<TRequest>> validators)
-    : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : notnull
-{
-    public async Task<TResponse> Handle(
-        TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
-    {
-        if (!validators.Any()) return await next();
-
-        var context = new ValidationContext<TRequest>(request);
-        var failures = validators
-            .Select(v => v.Validate(context))
-            .SelectMany(r => r.Errors)
-            .Where(f => f is not null)
-            .ToList();
-
-        if (failures.Count != 0)
-            throw new ValidationException(failures);
-
-        return await next();
-    }
-}
-
-// Logging behavior — log every request/response
-public sealed class LoggingBehavior<TRequest, TResponse>(
-    ILogger<LoggingBehavior<TRequest, TResponse>> logger)
-    : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : notnull
-{
-    public async Task<TResponse> Handle(
-        TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
-    {
-        var name = typeof(TRequest).Name;
-        logger.LogInformation("Handling {Request}", name);
-        var sw = System.Diagnostics.Stopwatch.StartNew();
-
-        var response = await next();
-
-        sw.Stop();
-        logger.LogInformation("Handled {Request} in {Ms}ms", name, sw.ElapsedMilliseconds);
-        return response;
-    }
-}
-
-// FluentValidation for command
-public sealed class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
-{
-    public CreateOrderCommandValidator()
-    {
-        RuleFor(c => c.CustomerId).NotEmpty().MaximumLength(100);
-        RuleFor(c => c.Lines).NotEmpty().WithMessage("Order must have at least one line.");
-        RuleForEach(c => c.Lines).ChildRules(line =>
-        {
-            line.RuleFor(l => l.ProductId).NotEmpty();
-            line.RuleFor(l => l.Quantity).GreaterThan(0);
-            line.RuleFor(l => l.UnitPrice).GreaterThanOrEqualTo(0);
-        });
-    }
-}
-
-// ” 4. REGISTRATION ”—————————————————————————————————————————————————
-builder.Services.AddMediatR(cfg =>
-{
-    cfg.RegisterServicesFromAssemblyContaining<CreateOrderHandler>();
-    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-});
-builder.Services.AddValidatorsFromAssemblyContaining<CreateOrderCommandValidator>();
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is Domain-Driven Design (DDD) and what are its core building blocks?
-
-**DDD** (Eric Evans) is a software design approach that focuses on modeling complex business domains. The code structure mirrors the business language (Ubiquitous Language).
-
-```cs
-// ” 1. VALUE OBJECT — defined by its attributes, immutable ”——————————
-public sealed class Money : IEquatable<Money>
-{
-    public decimal Amount   { get; }
-    public string  Currency { get; }
-
-    private Money(decimal amount, string currency)
-    {
-        if (amount < 0)    throw new DomainException("Amount cannot be negative.");
-        if (string.IsNullOrWhiteSpace(currency)) throw new DomainException("Currency required.");
-        Amount   = amount;
-        Currency = currency.ToUpperInvariant();
-    }
-
-    public static Money Of(decimal amount, string currency) => new(amount, currency);
-    public static Money Zero(string currency) => new(0, currency);
-
-    public Money Add(Money other)
-    {
-        if (Currency != other.Currency) throw new DomainException("Currency mismatch.");
-        return new Money(Amount + other.Amount, Currency);
-    }
-
-    public bool Equals(Money? other) => other is not null
-        && Amount == other.Amount && Currency == other.Currency;
-
-    public override bool Equals(object? obj) => Equals(obj as Money);
-    public override int GetHashCode() => HashCode.Combine(Amount, Currency);
-    public override string ToString() => $"{Amount:F2} {Currency}";
-}
-
-// ” 2. ENTITY — defined by identity, mutable state ”——————————————————
-public abstract class Entity
-{
-    public Guid Id { get; protected set; } = Guid.NewGuid();
-
-    private readonly List<IDomainEvent> _domainEvents = [];
-    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
-    public void AddDomainEvent(IDomainEvent evt) => _domainEvents.Add(evt);
-    public void ClearDomainEvents() => _domainEvents.Clear();
-}
-
-// ” 3. AGGREGATE ROOT — consistency boundary, only accessible entry ”—
-public sealed class Order : Entity
-{
-    private readonly List<OrderLine> _lines = [];
-
-    public string      CustomerId { get; private set; } = null!;
-    public OrderStatus Status     { get; private set; }
-    public Money       Total      => _lines.Aggregate(
-        Money.Zero("GBP"), (acc, l) => acc.Add(l.Total));
-
-    private Order() { }
-
-    public static Order Create(string customerId)
-    {
-        var order = new Order { CustomerId = customerId, Status = OrderStatus.Pending };
-        order.AddDomainEvent(new OrderCreatedEvent(order.Id, customerId, DateTime.UtcNow));
-        return order;
-    }
-
-    public OrderLine AddLine(string productId, int quantity, Money unitPrice)
-    {
-        if (Status != OrderStatus.Pending)
-            throw new DomainException("Cannot modify order that is not pending.");
-        var line = new OrderLine(Id, productId, quantity, unitPrice);
-        _lines.Add(line);
-        return line;
-    }
-
-    public void Submit()
-    {
-        if (!_lines.Any()) throw new DomainException("Cannot submit empty order.");
-        Status = OrderStatus.Submitted;
-        AddDomainEvent(new OrderSubmittedEvent(Id, Total.Amount, DateTime.UtcNow));
-    }
-}
-
-// ” 4. DOMAIN EVENTS — something significant happened ”——————————————
-public interface IDomainEvent { }
-public sealed record OrderCreatedEvent(Guid OrderId, string CustomerId, DateTime OccurredAt) : IDomainEvent;
-public sealed record OrderSubmittedEvent(Guid OrderId, decimal Total, DateTime OccurredAt) : IDomainEvent;
-
-// Publish domain events after saving (via EF Core interceptor or unit of work)
-public class DomainEventPublisher(IPublishEndpoint bus) : SaveChangesInterceptor
-{
-    public override async ValueTask<int> SavedChangesAsync(
-        SaveChangesCompletedEventData data, int result, CancellationToken ct = default)
-    {
-        var aggregates = data.Context?.ChangeTracker.Entries<Entity>()
-            .Select(e => e.Entity)
-            .Where(e => e.DomainEvents.Any())
-            .ToList() ?? [];
-
-        foreach (var aggregate in aggregates)
-        {
-            foreach (var evt in aggregate.DomainEvents)
-                await bus.Publish(evt, evt.GetType(), ct);
-            aggregate.ClearDomainEvents();
-        }
-
-        return result;
-    }
-}
-
-// ” 5. REPOSITORY — abstracts persistence for aggregates only ”———————
-public interface IOrderRepository
-{
-    Task<Order?> FindAsync(Guid id, CancellationToken ct = default);
-    Task SaveAsync(Order order, CancellationToken ct = default);
-}
-
-// ” 6. DOMAIN SERVICE — logic that doesn\'t belong to a single entity ”
-public class PricingService(IProductRepository products)
-{
-    public async Task<Money> CalculateDiscountedPriceAsync(
-        string productId, int quantity, string customerId, CancellationToken ct)
-    {
-        var product  = await products.FindAsync(productId, ct)
-            ?? throw new DomainException("Product not found.");
-        var basePrice = product.Price.Amount;
-        decimal discount = quantity >= 10 ? 0.1m : quantity >= 5 ? 0.05m : 0m;
-        return Money.Of(basePrice * quantity * (1 - discount), product.Price.Currency);
-    }
-}
-
-// ” 7. BOUNDED CONTEXT MAP ”——————————————————————————————————————————
-/*
- ””——————————————————         ””——————————————————
- ”  Order Context   ””ACL”—–”  Catalog Context  ”
- ”  (Order, Line)   ”         ”  (Product, Stock) ”
- ”””——————————————————         ”””——————————————————
-        ” Domain Events
-        –
- ””——————————————————
- ” Shipping Context ”
- ”””——————————————————
-
- ACL = Anti-Corruption Layer (translates between contexts)
-*/
-```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What are enterprise integration patterns and how do you implement them in .NET?
-
-**Enterprise Integration Patterns (EIP)** (Hohpe & Woolf) provide a vocabulary for designing messaging systems. Key patterns: Message Channel, Message Router, Aggregator, Saga, and Dead Letter Queue.
-
-```cs
-// ” 1. MESSAGE ROUTER — route messages by content ”———————————————————
-public class OrderPriorityRouter(
-    IMessageChannel standardQueue,
-    IMessageChannel priorityQueue) : IConsumer<OrderPlaced>
-{
-    public Task Consume(ConsumeContext<OrderPlaced> ctx)
-    {
-        // Route high-value orders to priority processing
-        var channel = ctx.Message.Total > 1000m ? priorityQueue : standardQueue;
-        return channel.SendAsync(ctx.Message);
-    }
-}
-
-// ” 2. AGGREGATOR — collect related messages, emit combined result ”———
-// Collect all items for an order, then process when complete
-public class OrderAggregatorSaga : MassTransitStateMachine<OrderAggregatorState>
-{
-    public State Aggregating { get; private set; } = null!;
-    public Event<OrderItemReceived> ItemReceived { get; private set; } = null!;
-    public Schedule<OrderAggregatorState, AggregationTimeout> Timeout { get; private set; } = null!;
-
-    public OrderAggregatorSaga()
-    {
-        InstanceState(x => x.CurrentState);
-        Event(() => ItemReceived, e => e.CorrelateById(m => m.Message.OrderId));
-        Schedule(() => Timeout, x => x.TimeoutToken, s =>
-        {
-            s.Delay  = TimeSpan.FromSeconds(30);
-            s.Received = r => r.CorrelateById(m => m.Message.OrderId);
-        });
-
-        Initially(
-            When(ItemReceived)
-                .Then(ctx =>
-                {
-                    ctx.Saga.OrderId      = ctx.Message.OrderId;
-                    ctx.Saga.ExpectedCount = ctx.Message.TotalItems;
-                    ctx.Saga.Items.Add(ctx.Message.ItemId);
-                })
-                .Schedule(Timeout, ctx => new AggregationTimeout(ctx.Saga.CorrelationId))
-                .TransitionTo(Aggregating));
-
-        During(Aggregating,
-            When(ItemReceived)
-                .Then(ctx => ctx.Saga.Items.Add(ctx.Message.ItemId))
-                .IfElse(
-                    ctx => ctx.Saga.Items.Count >= ctx.Saga.ExpectedCount,
-                    complete => complete
-                        .Unschedule(Timeout)
-                        .Publish(ctx => new AllOrderItemsReceived(ctx.Saga.OrderId, ctx.Saga.Items))
-                        .Finalize(),
-                    waiting => waiting.TransitionTo(Aggregating)),
-            When(Timeout!.Received)
-                .Publish(ctx => new OrderAggregationTimedOut(ctx.Saga.OrderId, ctx.Saga.Items))
-                .Finalize());
-    }
-}
-
-// ” 3. DEAD LETTER QUEUE — handle unprocessable messages ”————————————
-public class FaultConsumer<T> : IConsumer<Fault<T>> where T : class
-{
-    private readonly IDeadLetterStore _store;
-    private readonly ILogger<FaultConsumer<T>> _logger;
-
-    public FaultConsumer(IDeadLetterStore store, ILogger<FaultConsumer<T>> logger)
-        => (_store, _logger) = (store, logger);
-
-    public async Task Consume(ConsumeContext<Fault<T>> context)
-    {
-        var fault = context.Message;
-        _logger.LogError("Message {MessageId} of type {Type} failed after {Retries} retries. Exceptions: {Errors}",
-            fault.FaultedMessageId,
-            typeof(T).Name,
-            fault.RetryCount,
-            string.Join("; ", fault.Exceptions.Select(e => e.Message)));
-
-        await _store.StoreAsync(new DeadLetterMessage
-        {
-            MessageId  = fault.FaultedMessageId?.ToString(),
-            MessageType = typeof(T).Name,
-            Payload    = System.Text.Json.JsonSerializer.Serialize(fault.Message),
-            Errors     = fault.Exceptions.Select(e => e.Message).ToArray(),
-            FailedAt   = DateTime.UtcNow
-        });
-    }
-}
-
-// Register fault consumers
-x.AddConsumer(typeof(FaultConsumer<OrderPlaced>));
-x.AddConsumer(typeof(FaultConsumer<ProcessPayment>));
-
-// ” 4. REQUEST-REPLY — synchronous over async messaging ”—————————————
-// Requester
-public class InventoryCheckService(IRequestClient<CheckInventory> client)
-{
-    public async Task<bool> IsAvailableAsync(string productId, int quantity, CancellationToken ct)
-    {
-        var response = await client.GetResponse<InventoryCheckResult>(
-            new CheckInventory(productId, quantity), ct,
-            timeout: RequestTimeout.After(s: 5));
-
-        return response.Message.Available;
-    }
-}
-
-// Responder
-public class InventoryConsumer(IInventoryRepository repo) : IConsumer<CheckInventory>
-{
-    public async Task Consume(ConsumeContext<CheckInventory> ctx)
-    {
-        var stock = await repo.GetStockAsync(ctx.Message.ProductId);
-        await ctx.RespondAsync(
-            new InventoryCheckResult(ctx.Message.ProductId, stock >= ctx.Message.Quantity));
-    }
-}
-
-record CheckInventory(string ProductId, int Quantity);
-record InventoryCheckResult(string ProductId, bool Available);
-```
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
