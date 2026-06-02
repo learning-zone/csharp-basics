@@ -2402,7 +2402,7 @@ Console.WriteLine(msg);
 **5. Raw interpolated string (C# 11+):**
 
 ```cs
-string json = $$"""{ "name": "{{name}}",  "age": {{age}} }""";
+string json = $$"""{ "name": {{name}},  "age": {{age}} }""";
 
 Console.WriteLine(json);
 ```
