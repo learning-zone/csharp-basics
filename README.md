@@ -145,22 +145,6 @@ Span<int> span = [10, 20, 30];
 
 C# offers a variety of data types categorized as value types, reference types, and pointer types. Value types store data directly, while reference types store memory addresses to the actual data. 
 
-```mermaid
-graph TD
-    A["C# Data Type"] --> B["Value Type"]
-    A --> C["Reference Type"]
-
-    B --> D["Simple Types"]
-    B --> E["Enum Types"]
-    B --> F["Struct Type"]
-    B --> G["Nullable Type"]
-
-    C --> H["Class Types"]
-    C --> I["Interface Types"]
-    C --> J["Array Types"]
-    C --> K["Delegate Types"]
-```
-
 **1. Value Types:**
 
 These store data directly and include:
@@ -464,20 +448,6 @@ public class Calculator
 
 The **Common Language Runtime (CLR)** — known as **CoreCLR** in modern .NET (formerly .NET Core) — is the core execution engine for .NET applications. It manages execution, memory, security, and cross-language interoperability. As of **.NET 10**, CoreCLR is cross-platform (Windows, Linux, macOS, Android, iOS, WebAssembly).
 
-```mermaid
-graph TD
-    A["C# / F# / VB.NET Source Code"] --> B["Roslyn Compiler"]
-    B --> C["IL Code + Metadata\n(Assembly .dll / .exe)"]
-    C --> D["CoreCLR Runtime"]
-    D --> E["JIT Compiler\n(Tiered + Dynamic PGO)"]
-    D --> F["Garbage Collector\n(Generational GC)"]
-    D --> G["Type System / CTS"]
-    D --> H["Exception Handling"]
-    D --> I["Security & Verification"]
-    E --> J["Native Machine Code\n(cached)"]
-    J --> K["CPU Execution"]
-```
-
 **Key Functions:**
 
 * **Execution and Management:** Manages the full lifecycle of .NET applications, including startup, execution, and shutdown.
@@ -494,7 +464,7 @@ graph TD
 
 * **Metadata:** Type information embedded in assemblies enables reflection, serialization, and source generators.
 
-**Example — inspecting runtime info (.NET 10):**
+**Example — inspecting runtime info (.NET 10)**
 
 ```cs
 using System.Runtime.InteropServices;
@@ -1167,21 +1137,6 @@ The JIT (Just-In-Time) compiler is a core component of the .NET runtime (CLR/Cor
 4. **Caching:** The native code is cached in memory so subsequent calls execute directly without re-compilation.
 5. **Execution:** The CPU runs the native code.
 
-```mermaid
-flowchart TD
-    A["Source Code\n(.cs files)"] -->|"Roslyn Compiler\n(dotnet build)"| B["IL Code + Metadata\n(Assembly .dll / .exe)"]
-    B -->|"CoreCLR loads assembly"| C{"First call\nto method?"}
-    C -->|Yes| D["JIT Compiler\nIL → Native Machine Code"]
-    D --> E["Cache native code\nin memory"]
-    E --> F["CPU Executes\nNative Code"]
-    C -->|No - already cached| F
-
-    style A fill:#4a90d9,color:#fff
-    style B fill:#7b68ee,color:#fff
-    style D fill:#e8732a,color:#fff
-    style F fill:#27ae60,color:#fff
-```
-
 **.NET JIT improvements (.NET 8/9/10):**
 
 * **Tiered Compilation (default on):** Methods start with quick-tier-0 code, then are recompiled with full optimizations (tier-1) if called frequently.
@@ -1707,18 +1662,6 @@ IEnumerable<int> GetNumbers()
 
 In C# programs, variables are primarily categorized into **value types** and **reference types**. Value types directly store the variable\'s value in memory, while reference types store a memory address (reference) to the value\'s location. 
 
-```mermaid
-graph TD
-    A["C# Variable Types"] --> B["Value Types"]
-    A --> C["Reference Types"]
-    B --> D["Stack Memory"]
-    C --> E["Heap Memory"]
-    D --> F["int, bool, float\nenum, struct\nDateTime, Guid"]
-    E --> G["string, object\narray, class\ndelegate, interface"]
-    B --> H["Copy Semantics\nChanges do NOT affect original"]
-    C --> I["Reference Semantics\nChanges affect all references"]
-```
-
 **Value Types:**
 
 These store the actual data directly in the memory location of the variable (Stack). Examples include `int`, `bool`, `float`, `enum`, and `struct` types. When a value type variable is copied, a new copy of the data is created, so changes to one variable don\'t affect others.
@@ -1989,26 +1932,6 @@ The compiler (like Roslyn for C#) initially converts the high-level source code 
 5. **Execution:**
    - The CPU executes the native code. JIT-compiled code is cached for subsequent calls.
 
-**Summary Diagram:**
-
-```mermaid
-flowchart TD
-    A["Source Code\n(C# 14 / .cs files)"] -->|"Roslyn Compiler\ndotnet build"| B["IL Code + Metadata\n(Assembly .dll / .exe)"]
-    B --> C["CoreCLR loads assembly"]
-    C --> D{Compilation mode?}
-    D -->|Default JIT| E["JIT Compiler\nmethod-by-method\non first call"]
-    D -->|"Native AOT\n(PublishAot=true)"| F["Whole-app compiled\nto native binary\nat build time"]
-    E --> G["Tiered Compilation\n+ Dynamic PGO\n(hot path recompiled)"]
-    G --> H["Native Machine Code\n(cached in memory)"]
-    F --> H
-    H --> I["CPU Execution"]
-
-    style A fill:#4a90d9,color:#fff
-    style B fill:#7b68ee,color:#fff
-    style E fill:#e8732a,color:#fff
-    style F fill:#27ae60,color:#fff
-    style I fill:#2c3e50,color:#fff
-```
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
@@ -3755,21 +3678,6 @@ Use `int.TryParse()` for user input or when the string may not be a valid intege
 
 In C#, **boxing** and **unboxing** are processes that allow value types (like `int`, `float`, `bool`, `double`, `struct`, etc.) to be treated as reference types (like object).
 
-```mermaid
-graph LR
-    subgraph Stack
-        A["int num = 42"]
-    end
-    subgraph Heap
-        B["object obj\n——————————\n  42      \n——————————"]
-    end
-    subgraph Stack2["Stack"]
-        C["int n = 42"]
-    end
-    A -->|"Boxing\nobject obj = num"| B
-    B -->|"Unboxing\nint n = (int)obj"| C
-```
-
 **1. Boxing:**  
 
 - Boxing is the process of converting a **value type** to a **reference type** (specially, to object or to any interface type implemented by the value type). 
@@ -4779,27 +4687,6 @@ Console.WriteLine(grade); // Output: B
 
 Object-oriented programming (OOP) in C# is a programming paradigm based on the concept of "objects", which are instances of classes. OOP enables developers to structure software in a modular way by organizing code into reusable components.
 
-```mermaid
-mindmap
-  root((OOP))
-    Encapsulation
-      Bundles data and methods
-      Restricts direct access
-      Access modifiers
-    Inheritance
-      Reuse base class members
-      IS-A relationship
-      Supports polymorphism
-    Polymorphism
-      Method overriding
-      Method overloading
-      Runtime dispatch
-    Abstraction
-      Hides implementation details
-      Abstract classes
-      Interfaces
-```
-
 **Key principles:**
 
 * **Encapsulation**: Bundles data and methods that operate on the data into a single unit called a class, and restricts direct access to some of the object\'s components.
@@ -5418,35 +5305,6 @@ foreach (var animal in animals)
 
 Both define contracts for derived types, but they differ in usage, capabilities, and design intent.
 
-```mermaid
-classDiagram
-    class AbstractClass {
-        <<abstract>>
-        +fields: allowed
-        +constructors: allowed
-        +concreteMethod()
-        +abstractMethod()*
-        -privateMembers: allowed
-    }
-    class Interface {
-        <<interface>>
-        +fields: NOT allowed
-        +constructors: NOT allowed
-        +abstractMethod()*
-        +defaultMethod() C#8+
-        +staticMethod() C#8+
-    }
-    class ConcreteClass {
-        +abstractMethod()
-    }
-    class AnotherClass {
-        +abstractMethod()
-    }
-    AbstractClass <|-- ConcreteClass : extends (single only)
-    Interface <|.. ConcreteClass : implements (multiple allowed)
-    Interface <|.. AnotherClass : implements
-```
-
 | Feature                          | Abstract Class                     | Interface (C# 8+)                      |
 |----------------------------------|-------------------------------------|----------------------------------------|
 | Instantiation                    | Cannot be instantiated              | Cannot be instantiated                 |
@@ -5994,16 +5852,6 @@ Push to pradeep@example.com: Your order has shipped!
 ## Q. What are the SOLID principles in C#?
 
 **SOLID** is an acronym for five object-oriented design principles that lead to more maintainable, scalable, and testable software.
-
-```mermaid
-mindmap
-  root((SOLID))
-    S["S — Single Responsibility\nOne class, one reason to change"]
-    O["O — Open / Closed\nOpen for extension,\nclosed for modification"]
-    L["L — Liskov Substitution\nDerived types must be\nsubstitutable for base types"]
-    I["I — Interface Segregation\nMany specific interfaces\nbetter than one general"]
-    D["D — Dependency Inversion\nDepend on abstractions,\nnot concrete implementations"]
-```
 
 **1. S — Single Responsibility Principle (SRP)**
 
@@ -6835,30 +6683,6 @@ foreach (var (country, city) in capitals)
 ## Q. Explain the three services model commonly known as a three-tier application?
 
 A **three-tier architecture** separates an application into three logical layers, each with a distinct responsibility:
-
-```mermaid
-graph TD
-    U[" User / Browser / Client App"]
-    U --> P
-
-    subgraph Tier1["Presentation Layer (UI)"]
-        P["Views, Controllers, API Endpoints\nInput validation, User interaction"]
-    end
-
-    P --> B
-
-    subgraph Tier2["Business Logic Layer (BLL)"]
-        B["Services, Business Rules\nWorkflows, Calculations, Validation"]
-    end
-
-    B --> D
-
-    subgraph Tier3["Data Access Layer (DAL)"]
-        D["Repositories, ORM\nDatabase queries, External APIs"]
-    end
-
-    D --> DB[("— Database\nSQL Server / PostgreSQL / etc.")]
-```
 
 | Tier                  | Also called       | Responsibility                              |
 |-----------------------|-------------------|---------------------------------------------|
@@ -8613,22 +8437,6 @@ foreach (var s in Squares(5))
 - `async` marks a method as asynchronous; it must return `void`, `Task`, `Task<T>`, `ValueTask`, or `ValueTask<T>`.
 - `await` suspends the current method until the awaited operation completes, freeing the thread for other work.
 
-```mermaid
-sequenceDiagram
-    participant Caller
-    participant AsyncMethod
-    participant ThreadPool
-    participant IO as "I/O / Network"
-
-    Caller->>AsyncMethod: await FetchDataAsync()
-    AsyncMethod->>IO: Start async I/O operation
-    AsyncMethod-->>Caller: Return control (thread freed)
-    Note over Caller,ThreadPool: Thread is free to do other work
-    IO-->>ThreadPool: I/O completes
-    ThreadPool->>AsyncMethod: Resume after await
-    AsyncMethod-->>Caller: Return result
-```
-
 **Basic example:**
 
 ```cs
@@ -9619,21 +9427,6 @@ Console.WriteLine($"{p.Name}: {p.Price:C}"); // Laptop: 999.00
 ## Q. In parent child which constructor fires first?
 
 The **base (parent) class constructor always fires first**, before the derived (child) class constructor. This guarantees that the base part of the object is fully initialised before derived initialisation runs.
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant Child
-    participant Parent
-    participant GrandParent
-
-    Client->>Child: new Child()
-    Child->>Parent: implicit base()
-    Parent->>GrandParent: implicit base()
-    GrandParent-->>Parent: "1. GrandParent constructor"
-    Parent-->>Child: "2. Parent constructor"
-    Child-->>Client: "3. Child constructor"
-```
 
 ```cs
 public class GrandParent
@@ -11280,31 +11073,6 @@ Console.WriteLine(c1 == c2);  // false
 ## Q. What is inheritance in C# and how does it work?
 
 **Inheritance** allows a class (derived/child class) to acquire the members (fields, properties, methods) of another class (base/parent class) using the `:` syntax. It promotes code reuse and enables polymorphism.
-
-```mermaid
-classDiagram
-    class Person {
-        +string Name
-        +int Age
-        +virtual Describe() string
-    }
-    class Employee {
-        +string Department
-        +override Describe() string
-    }
-    class Manager {
-        +int DirectReports
-        +override Describe() string
-    }
-    class IDescribable {
-        <<interface>>
-        +Describe() string
-    }
-
-    Person <|-- Employee : inherits
-    Employee <|-- Manager : inherits
-    IDescribable <|.. Person : implements
-```
 
 **Key rules:**
 - C# supports **single class inheritance** (one direct base class) but **multiple interface implementation**.
@@ -15440,6 +15208,8 @@ while (pq.TryDequeue(out string? task, out int priority))
 | `System.Text.Json` | `JsonSerializer`, `Utf8JsonReader`, `Utf8JsonWriter` |
 | `System.Xml` | `XmlReader`, `XmlWriter`, `XDocument` |
 
+**Example:**
+
 ```cs
 // Quick overview of the main file API
 using System.IO;
@@ -15511,6 +15281,8 @@ while (true)
 
 ## Q. How do you write to a file in C#?
 
+**Example:**
+
 ```cs
 // 1. File.WriteAllText — overwrites (or creates) the file
 await File.WriteAllTextAsync("output.txt", "Hello, .NET 10!");
@@ -15560,6 +15332,8 @@ File.Move(temp, target, overwrite: true); // atomic on same volume
 | **Use case** | Small config/text files | CSV, log files, line-by-line processing |
 | **Async** | `ReadAllTextAsync` | `ReadAllLinesAsync` |
 
+**Example:**
+
 ```cs
 // File content: "Hello\nWorld\nFoo"
 
@@ -15591,6 +15365,8 @@ Console.WriteLine(lineCount); // 3
 </div>
 
 ## Q. How do you append text to an existing file in C#?
+
+**Example:**
 
 ```cs
 // 1. File.AppendAllText — simplest
@@ -15635,6 +15411,8 @@ await logger.LogAsync("Server started");
 </div>
 
 ## Q. How do you check if a file exists in C#?
+
+**Example:**
 
 ```cs
 // 1. File.Exists — synchronous check (thread-safe to call)
@@ -15689,6 +15467,8 @@ Console.WriteLine($"{filePath} exists: {exists}");
 
 `StreamReader` and `StreamWriter` are text-oriented wrappers around a `Stream` that handle **character encoding** automatically. They read/write decoded text rather than raw bytes.
 
+**Example:**
+
 ```cs
 // StreamReader — read text from any Stream
 // 1. From file path (convenience constructor)
@@ -15741,6 +15521,8 @@ Console.WriteLine(await msReader.ReadToEndAsync()); // in-memory text
 </div>
 
 ## Q. How do you handle exceptions when working with files in C#?
+
+**Example:**
 
 ```cs
 // Common file I/O exceptions:
@@ -15812,6 +15594,8 @@ public void DeleteIfExists(string path)
 
 ## Q. How do you delete a file in C#?
 
+**Example:**
+
 ```cs
 // 1. File.Delete — throws if path is a directory or access denied; silent if not found
 File.Delete("temp.txt");
@@ -15866,9 +15650,11 @@ Directory.EnumerateFiles("logs", "*.tmp")
 | **Persistence** | Data persists after app exits | Lost when stream is disposed/app exits |
 | **Size limit** | Disk capacity | Available RAM |
 | **Performance** | Slower (disk I/O) | Very fast (RAM) |
-| **Async** | … `useAsync: true` | … (but completes synchronously) |
+| **Async** | … `useAsync: true` | (but completes synchronously) |
 | **Use case** | Read/write actual files | Temporary buffers, unit testing, serialisation |
 | **Seek** | … (seekable) | … (seekable) |
+
+**Example:**
 
 ```cs
 // FileStream — backed by disk
@@ -15906,6 +15692,8 @@ byte[] allBytes = ms.ToArray(); // independent copy
 </div>
 
 ## Q. How do you copy a file in C#?
+
+**Example:**
 
 ```cs
 // 1. File.Copy — simplest
@@ -15955,6 +15743,8 @@ static void CopyDirectory(string src, string dst)
 
 ## Q. How do you move a file in C#?
 
+**Example:**
+
 ```cs
 // 1. File.Move — rename or move; throws if destination exists (use overwrite param)
 File.Move("old.txt", "new.txt");                     // error if new.txt exists
@@ -15999,6 +15789,8 @@ foreach (string file in Directory.EnumerateFiles("reports", "*.txt"))
 ## Q. What is the `FileInfo` class and how is it used?
 
 `FileInfo` provides **instance-based** file operations and rich metadata about a single file. Unlike the static `File` class, it performs only one security check at construction time — useful when you need to perform multiple operations on the same file.
+
+**Example:**
 
 ```cs
 var fi = new FileInfo("report.csv");
@@ -16051,6 +15843,8 @@ foreach (FileInfo logFile in di.GetFiles("*.log"))
 </div>
 
 ## Q. How do you read and write binary files in C#?
+
+**Example:**
 
 ```cs
 //  Writing binary data ————————————————————————————————————————————
@@ -16110,6 +15904,8 @@ Header header = System.Runtime.InteropServices.MemoryMarshal
 
 ## Q. How do you work with directories in C#?
 
+**Example:**
+
 ```cs
 // 1. Create directory (and parents)
 Directory.CreateDirectory("logs/2026/april"); // creates entire path, no error if exists
@@ -16167,6 +15963,8 @@ string ext     = Path.GetExtension(combined);                // .csv
 </div>
 
 ## Q. How do you get the size of a file in C#?
+
+**Example:**
 
 ```cs
 // 1. FileInfo.Length — most common
@@ -16262,6 +16060,8 @@ method.Invoke(instance, null);
 ## Q. What is a `MemoryStream` in C#?
 
 `MemoryStream` is a `Stream` implementation that stores data in **in-memory byte arrays** — no file system or network I/O. It is seekable, readable, and writable.
+
+**Example:**
 
 ```cs
 // 1. Basic write and read
@@ -18110,25 +17910,6 @@ Console.WriteLine(trimmed);
 - Separates error-handling code from normal logic
 - Provides structured information (stack trace, message, inner exception) for debugging
 - Enables resource cleanup via `finally` / `using`
-
-```mermaid
-flowchart TD
-    A["Execute code in\ntry block"] --> B{Exception\nthrown?}
-    B -->|No| C["Continue normal\nexecution"]
-    B -->|Yes| D{Matching\ncatch block?}
-    D -->|Yes| E["Execute matching\ncatch block"]
-    D -->|No| F["Propagate up\ncall stack"]
-    E --> G["Execute\nfinally block"]
-    C --> G
-    F --> G
-    G --> H{Was exception\nhandled?}
-    H -->|Yes| I["Continue after\ntry-catch"]
-    H -->|No| J["Unhandled Exception\nApp terminates / crash"]
-
-    style E fill:#27ae60,color:#fff
-    style J fill:#e74c3c,color:#fff
-    style G fill:#f39c12,color:#fff
-```
 
 ```cs
 // Without exception handling — crash on bad input
@@ -25788,24 +25569,6 @@ The **Garbage Collector (GC)** is an automatic memory manager in the .NET runtim
 2. The GC periodically checks which objects are **reachable** (via roots: stack variables, static fields, GC handles)
 3. **Unreachable** objects are swept — their memory is reclaimed
 4. **Surviving** objects are **compacted** (defragmentation) and promoted to higher generations
-
-```mermaid
-flowchart TD
-    A["Object Created\n(new keyword)"] --> B["Allocated in\nGeneration 0 (Gen 0)"]
-    B --> C{"GC Collection\ntriggered?"}
-    C -->|"Still reachable\n(has root)"| D["Survive ’ Promoted\nto Generation 1"]
-    C -->|"Unreachable\n(no root)"| E["Memory Reclaimed\n(swept)"]
-    D --> F{"Next GC\ncollection?"}
-    F -->|"Still reachable"| G["Promote to\nGeneration 2\n(long-lived)"]
-    F -->|"Unreachable"| E
-    G --> H{"Large Object?\n≥ 85KB"}
-    H -->|Yes| I["Large Object Heap\n(LOH) — Gen 2"]
-    H -->|No| G
-
-    style E fill:#e74c3c,color:#fff
-    style G fill:#27ae60,color:#fff
-    style I fill:#8e44ad,color:#fff
-```
 
 ```cs
 // Objects on managed heap — GC manages lifetime automatically
