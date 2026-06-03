@@ -3761,7 +3761,7 @@ graph LR
         A["int num = 42"]
     end
     subgraph Heap
-        B["object obj\n””——————————\n”  42      ”\n”””——————————"]
+        B["object obj\n——————————\n  42      \n——————————"]
     end
     subgraph Stack2["Stack"]
         C["int n = 42"]
@@ -8139,7 +8139,7 @@ public class Engine { public void Start() => Console.WriteLine("Engine started")
 
 | Relationship  | Lifecycle dependency     | Example              |
 |---------------|--------------------------|----------------------|
-| Association   | Independent              | Teacher ” Student    |
+| Association   | Independent              | Teacher  Student    |
 | Aggregation   | Part survives whole      | Department ’ Employee|
 | Composition   | Part dies with whole     | Car ’ Engine         |
 
@@ -11135,16 +11135,16 @@ A **field** is a variable declared directly inside a class or struct that holds 
 ```cs
 public class BankAccount
 {
-    // ” Fields ”——————————————————————————————————————————————————
+    //  Fields ——————————————————————————————————————————————————
     private decimal _balance;                      // instance field
     private static int _totalAccounts;             // static field
     private readonly string _accountNumber;        // readonly field
     private const decimal MinimumBalance = 0m;     // const field
 
-    // ” Auto-implemented property (compiler generates backing field)
+    //  Auto-implemented property (compiler generates backing field)
     public string Owner { get; set; }
 
-    // ” Property with custom getter/setter using the private field
+    //  Property with custom getter/setter using the private field
     public decimal Balance
     {
         get => _balance;
@@ -11156,7 +11156,7 @@ public class BankAccount
         }
     }
 
-    // ” Init-only property (C# 9) — settable only during object initialisation
+    //  Init-only property (C# 9) — settable only during object initialisation
     public DateTime OpenedOn { get; init; } = DateTime.UtcNow;
 
     public BankAccount(string owner, string accountNumber, decimal initialDeposit)
@@ -11209,7 +11209,7 @@ A **record** (C# 9+) is a reference type that is designed for **immutable data m
 | `readonly record struct` | `readonly record struct Point(int X, int Y)` | Immutable value type |
 
 ```cs
-// ” 1. Positional record with primary constructor ”————————————————
+//  1. Positional record with primary constructor ————————————————
 record Person(string FirstName, string LastName, int Age);
 
 var p1 = new Person("Alice", "Smith", 30);
@@ -11219,15 +11219,15 @@ Console.WriteLine(p1 == p2);          // true  — value equality
 Console.WriteLine(p1.Equals(p2));     // true
 Console.WriteLine(p1);                // Person { FirstName = Alice, LastName = Smith, Age = 30 }
 
-// ” 2. Non-destructive mutation with `with` expression ”———————————
+//  2. Non-destructive mutation with `with` expression ———————————
 var p3 = p1 with { Age = 31 };        // creates a new record; p1 is unchanged
 Console.WriteLine(p3);               // Person { FirstName = Alice, LastName = Smith, Age = 31 }
 
-// ” 3. Deconstruction ”———————————————————————————————————————————
+//  3. Deconstruction ———————————————————————————————————————————
 var (first, last, age) = p1;
 Console.WriteLine($"{first} {last}, {age}");  // Alice Smith, 30
 
-// ” 4. Inheritance ”——————————————————————————————————————————————
+//  4. Inheritance ——————————————————————————————————————————————
 record Employee(string FirstName, string LastName, int Age, string Department)
     : Person(FirstName, LastName, Age);
 
@@ -11235,7 +11235,7 @@ var emp = new Employee("Bob", "Jones", 25, "Engineering");
 Console.WriteLine(emp);
 // Employee { FirstName = Bob, LastName = Jones, Age = 25, Department = Engineering }
 
-// ” 5. Custom members ”———————————————————————————————————————————
+//  5. Custom members ———————————————————————————————————————————
 record Product(string Name, decimal Price)
 {
     // Computed property
@@ -11249,7 +11249,7 @@ record Product(string Name, decimal Price)
 var prod = new Product("Widget", 9.99m);
 Console.WriteLine(prod.Label);  // Widget ($9.99)
 
-// ” 6. record struct (C# 10) ”————————————————————————————————————
+//  6. record struct (C# 10) ————————————————————————————————————
 record struct Coordinate(double Lat, double Lon);
 
 var c1 = new Coordinate(51.5, -0.1);
@@ -12708,11 +12708,11 @@ public class Rectangle : IArea, IPerimeter
     public double Width { get; init; }
     public double Height { get; init; }
 
-    // ” Explicit implementation — only callable via the interface ”
+    //  Explicit implementation — only callable via the interface 
     double IArea.Calculate()      => Width * Height;
     double IPerimeter.Calculate() => 2 * (Width + Height);
 
-    // ” Optional convenience properties ”—————————————————————————
+    //  Optional convenience properties —————————————————————————
     public double Area      => ((IArea)this).Calculate();
     public double Perimeter => ((IPerimeter)this).Calculate();
 }
@@ -12750,7 +12750,7 @@ Console.WriteLine(ip.Calculate());   // 16
 **Default interface members** (C# 8+) allow interfaces to provide a **default implementation** for a method. Implementing classes can optionally override them. This enables interface versioning without breaking existing implementations.
 
 ```cs
-// ” 1. Basic default implementation ”—————————————————————————————
+//  1. Basic default implementation —————————————————————————————
 interface ILogger
 {
     void Log(string message);
@@ -12781,7 +12781,7 @@ console.LogError("Disk full");       // [ERROR] Disk full
 ILogger file = new FileLogger();
 file.LogError("DB timeout");         // CRITICAL >> DB timeout (overridden)
 
-// ” 2. Interface evolution — adding a method without breaking callers
+//  2. Interface evolution — adding a method without breaking callers
 interface ICache
 {
     object? Get(string key);
@@ -12795,7 +12795,7 @@ interface ICache
     }
 }
 
-// ” 3. Static abstract members (C# 11) — for generic math
+//  3. Static abstract members (C# 11) — for generic math
 interface IAddable<T> where T : IAddable<T>
 {
     static abstract T operator +(T left, T right);
@@ -13870,13 +13870,13 @@ public record struct Point(int X, int Y); // struct = value type
 
 ```
 STACK (per thread)            HEAP (shared)
-””—————————————————           ””————————————————————————
-” x = 42          ”           ” List<int> object        ”
-” y = 3.14        ”           ”  [_items array, Count]  ”
-” list ”————————————————————–”                         ”
-” point = (1,2)   ”           ” object {}               ”
-” obj ”——————————————————————–                         ”
-”””—————————————————           ”””————————————————————————
+—————————————————           ————————————————————————
+ x = 42                      List<int> object        
+ y = 3.14                     [_items array, Count]  
+ list ————————————————————–                         
+ point = (1,2)               object {}               
+ obj ——————————————————————–                         
+—————————————————           ————————————————————————
 ```
 
 <div align="right">
@@ -14222,16 +14222,16 @@ dotnet-gcdump collect -p <pid>
 
 ```
  Stack (per thread)                  Heap (shared, GC managed)
- ””—————————————————————————         ””—————————————————————————
- ” Main() frame            ”         ” ””————————————————————— ”
- ”   args reference ”—————————————– ” ” string[] args       ” ”
- ”   person ref ”—————————————————– ” ”””————————————————————— ”
- ””—————————————————————————         ” ””————————————————————— ”
- ” CreatePerson() frame    ”         ” ” Person object       ” ”
- ”   name = "Pradeep"      ”         ” ”  Name: "Pradeep"    ” ”
- ”   age  = 30             ”         ” ”  Age:  30           ” ”
- ”   p ref ”——————————————————————– ” ”””————————————————————— ”
- ”””—————————————————————————         ”””—————————————————————————
+ —————————————————————————         —————————————————————————
+  Main() frame                      ————————————————————— 
+    args reference —————————————–   string[] args        
+    person ref —————————————————–  ————————————————————— 
+ —————————————————————————          ————————————————————— 
+  CreatePerson() frame               Person object        
+    name = "Pradeep"                  Name: "Pradeep"     
+    age  = 30                         Age:  30            
+    p ref ——————————————————————–  ————————————————————— 
+ —————————————————————————         —————————————————————————
 ```
 
 ```cs
@@ -14286,15 +14286,15 @@ Console.WriteLine($"Total heap committed: {info.TotalCommittedBytes / 1_048_576}
 **Conceptually:**
 ```
 Physical RAM
-  ”” OS kernel code + data
-  ”” Thread 1 stack (virtual address range, ~1 MB reserved)
-  ”” Thread 2 stack (separate range)
-  ”” Managed heap segments (GC-managed, can grow)
-  ”     ”” Gen 0 segment
-  ”     ”” Gen 1 segment
-  ”     ”” Gen 2 segment
-  ”     ””” LOH segment
-  ””” Native heaps (unmanaged, DLL code, etc.)
+   OS kernel code + data
+   Thread 1 stack (virtual address range, ~1 MB reserved)
+   Thread 2 stack (separate range)
+   Managed heap segments (GC-managed, can grow)
+        Gen 0 segment
+        Gen 1 segment
+        Gen 2 segment
+        LOH segment
+   Native heaps (unmanaged, DLL code, etc.)
 ```
 
 <div align="right">
@@ -14321,13 +14321,13 @@ public class Circle { public double R; }   // reference type
 
 void Example()
 {
-    // ” STACK ”————————————————————————————————————————
+    //  STACK ————————————————————————————————————————
     int age     = 30;          // int ’ stack
     bool active = true;        // bool ’ stack
     Point pt    = new(3, 4);   // struct ’ stack (inline)
     Circle c    = new() { R = 5 }; // c (reference) ’ stack; object ’ heap
 
-    // ” HEAP ”—————————————————————————————————————————
+    //  HEAP —————————————————————————————————————————
     // new Circle() object is on heap, 'c' on stack points to it
     var list = new List<int>(); // List object on heap; 'list' ref on stack
     list.Add(42);               // int 42 stored inside the List\'s backing array (heap)
@@ -14361,21 +14361,21 @@ The stack grows **downward** in memory on x86/x64 architectures. When a new meth
 
 ```
 High addresses
-  ””—————————————————————————  Stack base (thread start)
-  ” Main() frame            ”
-  ”   [return address]      ”
-  ”   [saved registers]     ”
-  ”   args = ...            ” RSP points here when in Main()
-  ””—————————————————————————
-  ” Method1() frame         ”  RSP decremented when Method1() called
-  ”   [return address]      ”
-  ”   local int a = 10      ”
-  ”   local double b = 3.14 ”
-  ””—————————————————————————
-  ” Method2() frame         ”  RSP decremented again
-  ”   [return address]      ”
-  ”   local int x = 5       ”  RSP points here (top of stack)
-  ”””—————————————————————————
+  —————————————————————————  Stack base (thread start)
+   Main() frame            
+     [return address]      
+     [saved registers]     
+     args = ...             RSP points here when in Main()
+  —————————————————————————
+   Method1() frame           RSP decremented when Method1() called
+     [return address]      
+     local int a = 10      
+     local double b = 3.14 
+  —————————————————————————
+   Method2() frame           RSP decremented again
+     [return address]      
+     local int x = 5         RSP points here (top of stack)
+  —————————————————————————
 Low addresses (stack grows downward “)
 ```
 
@@ -15195,44 +15195,44 @@ var count = items.Count(x => x > 0); // single pass, no intermediate list
 `List<T>` is the most commonly used generic collection in .NET. It is a resizable array that provides O(1) indexed access, O(1) amortised appends, and O(n) inserts/removes.
 
 ```cs
-// ” 1. Create and initialise ”————————————————————————————————————
+//  1. Create and initialise ————————————————————————————————————
 var fruits = new List<string> { "Apple", "Banana", "Cherry" };
 
-// ” 2. Add / Insert ”—————————————————————————————————————————————
+//  2. Add / Insert —————————————————————————————————————————————
 fruits.Add("Date");                   // append
 fruits.Insert(1, "Avocado");          // insert at index 1
 fruits.AddRange(["Elderberry", "Fig"]); // add multiple
 
-// ” 3. Access ”———————————————————————————————————————————————————
+//  3. Access ———————————————————————————————————————————————————
 Console.WriteLine(fruits[0]);        // Apple
 Console.WriteLine(fruits.Count);     // 6
 
-// ” 4. Search ”———————————————————————————————————————————————————
+//  4. Search ———————————————————————————————————————————————————
 Console.WriteLine(fruits.Contains("Banana"));       // True
 Console.WriteLine(fruits.IndexOf("Cherry"));        // 3 (after insert)
 Console.WriteLine(fruits.Find(f => f.StartsWith("A"))); // Apple
 
-// ” 5. Remove ”———————————————————————————————————————————————————
+//  5. Remove ———————————————————————————————————————————————————
 fruits.Remove("Banana");              // by value
 fruits.RemoveAt(0);                   // by index
 fruits.RemoveAll(f => f.Length > 5);  // by predicate
 
-// ” 6. Sort and reverse ”—————————————————————————————————————————
+//  6. Sort and reverse —————————————————————————————————————————
 fruits.Sort();
 fruits.Reverse();
 
-// ” 7. Convert ”——————————————————————————————————————————————————
+//  7. Convert ——————————————————————————————————————————————————
 string[] array = fruits.ToArray();
 List<string> copy  = fruits.ToList();           // shallow copy
 
-// ” 8. Iterate ”——————————————————————————————————————————————————
+//  8. Iterate ——————————————————————————————————————————————————
 foreach (var f in fruits)
     Console.WriteLine(f);
 
-// ” 9. LINQ integration ”—————————————————————————————————————————
+//  9. LINQ integration —————————————————————————————————————————
 var longNames = fruits.Where(f => f.Length > 4).OrderBy(f => f).ToList();
 
-// ” 10. Capacity vs Count ”———————————————————————————————————————
+//  10. Capacity vs Count ———————————————————————————————————————
 var numbers = new List<int>(capacity: 100);  // reserve space upfront
 Console.WriteLine(numbers.Capacity);  // 100
 Console.WriteLine(numbers.Count);     // 0  — no elements yet
@@ -15259,7 +15259,7 @@ Console.WriteLine(numbers.Count);     // 0  — no elements yet
 `Dictionary<TKey, TValue>` stores key–value pairs in a hash table, providing O(1) average-case lookups, inserts, and deletes.
 
 ```cs
-// ” 1. Create ”———————————————————————————————————————————————————
+//  1. Create ———————————————————————————————————————————————————
 var scores = new Dictionary<string, int>
 {
     ["Alice"] = 95,
@@ -15267,14 +15267,14 @@ var scores = new Dictionary<string, int>
     ["Carol"] = 78,
 };
 
-// ” 2. Add / Update ”—————————————————————————————————————————————
+//  2. Add / Update —————————————————————————————————————————————
 scores.Add("Dave", 91);              // throws if key exists
 scores["Eve"] = 88;                  // add or overwrite
 scores.TryAdd("Alice", 0);           // no-op if key exists — returns false
 
 scores["Bob"] = 85;                  // update existing value
 
-// ” 3. Read ”—————————————————————————————————————————————————————
+//  3. Read —————————————————————————————————————————————————————
 Console.WriteLine(scores["Alice"]);  // 95 — throws KeyNotFoundException if missing
 
 if (scores.TryGetValue("Frank", out int frankScore))
@@ -15285,33 +15285,33 @@ else
 // Safe default without exception
 int val = scores.GetValueOrDefault("Ghost", 0);
 
-// ” 4. Delete ”———————————————————————————————————————————————————
+//  4. Delete ———————————————————————————————————————————————————
 scores.Remove("Carol");              // returns true if removed
 scores.Remove("Carol");              // returns false — already gone, no exception
 
-// ” 5. Check existence ”——————————————————————————————————————————
+//  5. Check existence ——————————————————————————————————————————
 Console.WriteLine(scores.ContainsKey("Alice"));   // True
 Console.WriteLine(scores.ContainsValue(91));      // True
 
-// ” 6. Iterate ”——————————————————————————————————————————————————
+//  6. Iterate ——————————————————————————————————————————————————
 foreach (var (name, score) in scores)             // KeyValuePair deconstruction
     Console.WriteLine($"{name}: {score}");
 
 foreach (string key in scores.Keys)   Console.WriteLine(key);
 foreach (int    v   in scores.Values) Console.WriteLine(v);
 
-// ” 7. Merge / upsert pattern ”———————————————————————————————————
+//  7. Merge / upsert pattern ———————————————————————————————————
 var extras = new Dictionary<string, int> { ["Alice"] = 5, ["Zoe"] = 70 };
 foreach (var (k, v) in extras)
     scores[k] = scores.GetValueOrDefault(k) + v;  // adds or accumulates
 
-// ” 8. Group by with Dictionary ”—————————————————————————————————
+//  8. Group by with Dictionary —————————————————————————————————
 string[] words = ["apple", "ant", "banana", "berry", "cherry"];
 var byFirstLetter = words.GroupBy(w => w[0])
                          .ToDictionary(g => g.Key, g => g.ToList());
 Console.WriteLine(string.Join(", ", byFirstLetter['a']));  // apple, ant
 
-// ” 9. Concurrent access ”————————————————————————————————————————
+//  9. Concurrent access ————————————————————————————————————————
 // For thread-safe scenarios use ConcurrentDictionary<K,V>
 var concurrentScores = new System.Collections.Concurrent.ConcurrentDictionary<string, int>();
 concurrentScores.AddOrUpdate("Alice", 95, (_, old) => old + 5);
@@ -16053,7 +16053,7 @@ foreach (FileInfo logFile in di.GetFiles("*.log"))
 ## Q. How do you read and write binary files in C#?
 
 ```cs
-// ” Writing binary data ”————————————————————————————————————————————
+//  Writing binary data ————————————————————————————————————————————
 
 // 1. File.WriteAllBytes
 byte[] raw = [0x89, 0x50, 0x4E, 0x47]; // PNG magic bytes
@@ -16075,7 +16075,7 @@ Span<byte> span = stackalloc byte[8];
 System.Buffers.Binary.BinaryPrimitives.WriteInt64LittleEndian(span, 123456789L);
 await write.WriteAsync(span.ToArray());
 
-// ” Reading binary data ”————————————————————————————————————————————
+//  Reading binary data ————————————————————————————————————————————
 
 // 1. File.ReadAllBytes
 byte[] bytes = await File.ReadAllBytesAsync("data.bin");
@@ -17061,7 +17061,7 @@ public class MyDto
 **Serialization** is the process of converting an object\'s state into a format (bytes, JSON, XML, binary) that can be stored or transmitted. **Deserialization** is the reverse — reconstructing the object from that format.
 
 ```cs
-// ” JSON Serialization (recommended in .NET 10) ”——————————————————
+//  JSON Serialization (recommended in .NET 10) ——————————————————
 using System.Text.Json;
 
 record Person(int Id, string Name, DateTime BirthDate, List<string> Hobbies);
@@ -17095,7 +17095,7 @@ await JsonSerializer.SerializeAsync(file, person);
 await using var readFile = File.OpenRead("person.json");
 Person fromFile = (await JsonSerializer.DeserializeAsync<Person>(readFile))!;
 
-// ” XML Serialization ”—————————————————————————————————————————————
+//  XML Serialization —————————————————————————————————————————————
 [Serializable]
 public class ProductXml { public int Id; public string Name = ""; }
 
@@ -17104,7 +17104,7 @@ await using var sw = new StringWriter();
 xmlSer.Serialize(sw, new ProductXml { Id = 1, Name = "Laptop" });
 Console.WriteLine(sw.ToString());
 
-// ” Custom binary (no third-party, no security risk) ”——————————————
+//  Custom binary (no third-party, no security risk) ——————————————
 await using var ms = new MemoryStream();
 using var bw = new BinaryWriter(ms);
 bw.Write(person.Id);
@@ -17143,12 +17143,12 @@ The static `System.IO.Path` class provides platform-independent methods for mani
 ```cs
 using System.IO;
 
-// ” 1. Combine path segments (handles separators automatically) ”—
+//  1. Combine path segments (handles separators automatically) —
 string full = Path.Combine("C:\\Users", "Alice", "Documents", "report.pdf");
 Console.WriteLine(full);
 // Windows: C:\Users\Alice\Documents\report.pdf
 
-// ” 2. Get parts of a path ”——————————————————————————————————————
+//  2. Get parts of a path ——————————————————————————————————————
 string path = @"C:\Projects\MyApp\src\Program.cs";
 
 Console.WriteLine(Path.GetFileName(path));           // Program.cs
@@ -17157,35 +17157,35 @@ Console.WriteLine(Path.GetExtension(path));          // .cs
 Console.WriteLine(Path.GetDirectoryName(path));      // C:\Projects\MyApp\src
 Console.WriteLine(Path.GetPathRoot(path));           // C:\
 
-// ” 3. Change or check extension ”————————————————————————————————
+//  3. Change or check extension ————————————————————————————————
 string newPath = Path.ChangeExtension(path, ".bak");
 Console.WriteLine(newPath);   // C:\Projects\MyApp\src\Program.bak
 
 Console.WriteLine(Path.HasExtension("readme.txt"));  // True
 Console.WriteLine(Path.HasExtension("Makefile"));    // False
 
-// ” 4. Rooted / absolute paths ”——————————————————————————————————
+//  4. Rooted / absolute paths ——————————————————————————————————
 Console.WriteLine(Path.IsPathRooted(@"C:\temp"));    // True
 Console.WriteLine(Path.IsPathRooted(@"relative\path")); // False
 
 string absolute = Path.GetFullPath(@".\logs\app.log");
 Console.WriteLine(absolute);  // expands relative to current directory
 
-// ” 5. Temporary files and random names ”—————————————————————————
+//  5. Temporary files and random names —————————————————————————
 string tempFile = Path.GetTempFileName();   // creates empty file in %TEMP%
 string tempDir  = Path.GetTempPath();       // e.g. C:\Users\Alice\AppData\Local\Temp\
 string random   = Path.GetRandomFileName(); // e.g. 3j4knw32.tmp (no file created)
 
-// ” 6. Path separator constants ”—————————————————————————————————
+//  6. Path separator constants —————————————————————————————————
 Console.WriteLine(Path.DirectorySeparatorChar); // \ on Windows, / on Linux
 Console.WriteLine(Path.PathSeparator);          // ; on Windows, : on Linux
 Console.WriteLine(Path.AltDirectorySeparatorChar); // /
 
-// ” 7. Relative paths (net5.0+) ”—————————————————————————————————
+//  7. Relative paths (net5.0+) —————————————————————————————————
 string relative = Path.GetRelativePath(@"C:\Projects\MyApp", @"C:\Projects\MyApp\src\Program.cs");
 Console.WriteLine(relative);  // src\Program.cs
 
-// ” 8. Safe file naming ”—————————————————————————————————————————
+//  8. Safe file naming —————————————————————————————————————————
 char[] invalid = Path.GetInvalidFileNameChars();
 string safeName = string.Concat("my:file*name".Select(c => invalid.Contains(c) ? '_' : c));
 Console.WriteLine(safeName);  // my_file_name
@@ -17198,7 +17198,7 @@ File.Delete(tempFile);
 
 | Method | Returns |
 |--------|---------|
-| `Combine(€)` | Joined path string |
+| `Combine()` | Joined path string |
 | `GetFileName(path)` | `"Program.cs"` |
 | `GetFileNameWithoutExtension(path)` | `"Program"` |
 | `GetExtension(path)` | `".cs"` |
@@ -17293,19 +17293,19 @@ Async file I/O prevents blocking the calling thread during disk operations, whic
 using System.IO;
 using System.Text;
 
-// ” 1. Read all text asynchronously ”————————————————————————————
+//  1. Read all text asynchronously ————————————————————————————
 string path = @"C:\Temp\data.txt";
 string content = await File.ReadAllTextAsync(path);
 Console.WriteLine(content);
 
-// ” 2. Write all text asynchronously ”———————————————————————————
+//  2. Write all text asynchronously ———————————————————————————
 await File.WriteAllTextAsync(path, "Async content written.");
 
-// ” 3. Read / write lines asynchronously ”————————————————————————
+//  3. Read / write lines asynchronously ————————————————————————
 await File.WriteAllLinesAsync(path, ["Line A", "Line B", "Line C"]);
 string[] lines = await File.ReadAllLinesAsync(path);
 
-// ” 4. StreamReader / StreamWriter (streaming large files) ”——————
+//  4. StreamReader / StreamWriter (streaming large files) ——————
 // Read large file line by line without loading all into memory
 await using var reader = new StreamReader(path, Encoding.UTF8);
 string? line;
@@ -17319,7 +17319,7 @@ for (int i = 1; i <= 5; i++)
     await writer.WriteLineAsync($"Row {i}");
 // FlushAsync called automatically on DisposeAsync
 
-// ” 5. FileStream with explicit async I/O ”———————————————————————
+//  5. FileStream with explicit async I/O ———————————————————————
 await using var fs = new FileStream(
     path,
     FileMode.Create,
@@ -17331,7 +17331,7 @@ await using var fs = new FileStream(
 byte[] data = Encoding.UTF8.GetBytes("Binary async write");
 await fs.WriteAsync(data);
 
-// ” 6. CancellationToken support ”————————————————————————————————
+//  6. CancellationToken support ————————————————————————————————
 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 try
 {
@@ -17343,7 +17343,7 @@ catch (OperationCanceledException)
     Console.WriteLine("File read cancelled.");
 }
 
-// ” 7. Process multiple files concurrently ”——————————————————————
+//  7. Process multiple files concurrently ——————————————————————
 string[] files = Directory.GetFiles(@"C:\Temp\Logs", "*.log");
 
 IEnumerable<Task<string>> readTasks = files.Select(f => File.ReadAllTextAsync(f));
@@ -17358,8 +17358,8 @@ Console.WriteLine($"Read {contents.Length} log files.");
 | Thread blocking | Blocks caller | Frees caller thread |
 | Throughput | Lower (1 thread per op) | Higher (thread pool) |
 | Code complexity | Simple | Requires `async`/`await` |
-| Use in ASP.NET Core |  Avoid | … Always prefer |
-| Use in Console/scripts | … Acceptable | Optional |
+| Use in ASP.NET Core |  Avoid | Always prefer |
+| Use in Console/scripts | Acceptable | Optional |
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
@@ -17932,7 +17932,7 @@ bool zip = Regex.IsMatch("12345-6789", @"^\d{5}(-\d{4})?$");  // True
 // Password: at least 8 chars, one upper, one lower, one digit
 bool strongPwd = Regex.IsMatch("MyPass1!", @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$"); // True
 
-// ” Split on multiple delimiters ”———————————————————————————————
+//  Split on multiple delimiters ———————————————————————————————
 string csv = "one, two;three|four";
 string[] parts = Regex.Split(csv, @"[,;|]\s*");
 Console.WriteLine(string.Join(" | ", parts));  // one | two | three | four
@@ -17960,7 +17960,7 @@ Console.WriteLine(string.Join(" | ", parts));  // one | two | three | four
 ```cs
 using System.Text.RegularExpressions;
 
-// ” 1. Named groups ”—————————————————————————————————————————————
+//  1. Named groups —————————————————————————————————————————————
 // Parse a date in the format  YYYY-MM-DD
 var datePattern = new Regex(@"(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})");
 
@@ -17974,7 +17974,7 @@ if (m.Success)
     // 19/04/2026
 }
 
-// ” 2. Multiple matches with named groups ”———————————————————————
+//  2. Multiple matches with named groups ———————————————————————
 string log = "ERROR 2026-01-10 | INFO 2026-01-11 | WARN 2026-01-12";
 var logPattern = new Regex(@"(?<level>\w+) (?<date>\d{4}-\d{2}-\d{2})");
 
@@ -17984,14 +17984,14 @@ foreach (Match entry in logPattern.Matches(log))
 // INFO  on 2026-01-11
 // WARN  on 2026-01-12
 
-// ” 3. Backreference with named group ”———————————————————————————
+//  3. Backreference with named group ———————————————————————————
 // Match doubled words: "the the", "is is"
 var doubled = new Regex(@"\b(?<word>\w+)\s+\k<word>\b", RegexOptions.IgnoreCase);
 Console.WriteLine(doubled.IsMatch("The the quick fox"));  // True
 string cleaned = doubled.Replace("This is is a test test.", "${word}");
 Console.WriteLine(cleaned);  // This is a test.
 
-// ” 4. Replace using named group references ”—————————————————————
+//  4. Replace using named group references —————————————————————
 string dates = "Born: 1990-06-15, Hired: 2015-03-22";
 // Reformat YYYY-MM-DD ’ DD/MM/YYYY
 string reformatted = Regex.Replace(dates,
@@ -17999,7 +17999,7 @@ string reformatted = Regex.Replace(dates,
     "${d}/${m}/${y}");
 Console.WriteLine(reformatted);  // Born: 15/06/1990, Hired: 22/03/2015
 
-// ” 5. Regex.Split ”——————————————————————————————————————————————
+//  5. Regex.Split ——————————————————————————————————————————————
 // Basic split on whitespace
 string sentence = "Split   this\tsentence\nnow";
 string[] words = Regex.Split(sentence, @"\s+");
@@ -18060,19 +18060,19 @@ foreach (Match m in prices) Console.Write($"{m.Value} "); // 9.99 24.50
 var nonDollar = Regex.Matches("tax:$10 qty:5 price:$99", @"(?<!\$)\b\d+\b");
 foreach (Match m in nonDollar) Console.Write($"{m.Value} "); // 5
 
-// ” Password strength — lookaheads for multiple requirements ”———
+//  Password strength — lookaheads for multiple requirements ———
 // At least 8 chars, one uppercase, one lowercase, one digit, one special char
 string passwordPattern = @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$";
 Console.WriteLine(Regex.IsMatch("MyP@ss1!", passwordPattern));    // True
 Console.WriteLine(Regex.IsMatch("weakpass", passwordPattern));    // False
 
-// ” Insert separator before each uppercase in camelCase ”————————
+//  Insert separator before each uppercase in camelCase ————————
 // Lookbehind to find position after lowercase, lookahead for uppercase
 string camel = "getFirstNameById";
 string snake = Regex.Replace(camel, @"(?<=[a-z])(?=[A-Z])", "_").ToLower();
 Console.WriteLine(snake);  // get_first_name_by_id
 
-// ” Remove trailing whitespace per line (multiline mode) ”———————
+//  Remove trailing whitespace per line (multiline mode) ———————
 string multiline = "Hello   \nWorld  \nDone";
 string trimmed = Regex.Replace(multiline, @"[ \t]+(?=\r?\n|$)", "",
     RegexOptions.Multiline);
@@ -18219,20 +18219,20 @@ catch (TaskCanceledException)
 
 ```
 System.Exception
-”” System.SystemException          (CLR/runtime exceptions)
-”   ”” NullReferenceException
-”   ”” IndexOutOfRangeException
-”   ”” InvalidOperationException
-”   ”” ArgumentException
-”   ”   ”” ArgumentNullException
-”   ”   ””” ArgumentOutOfRangeException
-”   ”” IOException
-”   ”   ””” FileNotFoundException
-”   ”” OverflowException
-”   ”” FormatException
-”   ”” StackOverflowException
-”   ””” OutOfMemoryException
-””” System.ApplicationException     (user/app exceptions — rarely used directly)
+ System.SystemException          (CLR/runtime exceptions)
+    NullReferenceException
+    IndexOutOfRangeException
+    InvalidOperationException
+    ArgumentException
+       ArgumentNullException
+       ArgumentOutOfRangeException
+    IOException
+       FileNotFoundException
+    OverflowException
+    FormatException
+    StackOverflowException
+    OutOfMemoryException
+ System.ApplicationException     (user/app exceptions — rarely used directly)
 ```
 
 **Key properties:**
@@ -19285,7 +19285,7 @@ record Order { public static Order Default { get; } = new(); }
 **Exception filters** (C# 6+) allow you to conditionally catch an exception only when a boolean expression evaluates to `true`. The `when` keyword attaches a filter to a `catch` block. If the filter is `false`, the exception is not caught and continues to propagate — **without unwinding the stack**, which preserves the original call stack for debugging.
 
 ```cs
-// ” 1. Basic exception filter ”———————————————————————————————————
+//  1. Basic exception filter ———————————————————————————————————
 try
 {
     int result = int.Parse(Console.ReadLine() ?? "");
@@ -19300,7 +19300,7 @@ catch (DivideByZeroException) when (DateTime.Now.DayOfWeek != DayOfWeek.Sunday)
     Console.WriteLine("Division by zero on a weekday.");
 }
 
-// ” 2. Filter on HttpStatusCode ”—————————————————————————————————
+//  2. Filter on HttpStatusCode —————————————————————————————————
 static async Task FetchDataAsync(string url)
 {
     try
@@ -19321,7 +19321,7 @@ static async Task FetchDataAsync(string url)
     }
 }
 
-// ” 3. Logging filter (side-effect without catching) ”————————————
+//  3. Logging filter (side-effect without catching) ————————————
 static bool Log(Exception ex)
 {
     Console.Error.WriteLine($"[LOG] {ex.GetType().Name}: {ex.Message}");
@@ -19338,7 +19338,7 @@ catch (Exception ex) when (Log(ex))   // Log is called, returns false ’ not ca
 }
 // The exception propagates with the original stack intact
 
-// ” 4. Multiple filters on the same exception type ”———————————————
+//  4. Multiple filters on the same exception type ———————————————
 static void ProcessOrder(int orderId)
 {
     try
@@ -19377,32 +19377,32 @@ static void ProcessOrder(int orderId)
 .NET defines a rich hierarchy of exception types under `System.Exception`. Understanding when each is thrown helps write targeted `catch` blocks.
 
 ```cs
-// ” Exception hierarchy (simplified) ”———————————————————————————
+//  Exception hierarchy (simplified) ———————————————————————————
 // System.Exception
-// ”” System.SystemException          (runtime errors)
-// ”   ”” ArgumentException
-// ”   ”   ”” ArgumentNullException
-// ”   ”   ””” ArgumentOutOfRangeException
-// ”   ”” InvalidOperationException
-// ”   ”” NullReferenceException
-// ”   ”” IndexOutOfRangeException
-// ”   ”” InvalidCastException
-// ”   ”” OverflowException
-// ”   ”” DivideByZeroException
-// ”   ”” StackOverflowException      (non-catchable)
-// ”   ”” OutOfMemoryException
-// ”   ”” NotImplementedException
-// ”   ”” NotSupportedException
-// ”   ”” TimeoutException
-// ”   ”” OperationCanceledException
-// ”   ”   ””” TaskCanceledException
-// ”   ””” IOException
-// ”       ”” FileNotFoundException
-// ”       ”” DirectoryNotFoundException
-// ”       ””” EndOfStreamException
-// ””” System.ApplicationException    (app-level — rarely used directly)
+//  System.SystemException          (runtime errors)
+//     ArgumentException
+//        ArgumentNullException
+//        ArgumentOutOfRangeException
+//     InvalidOperationException
+//     NullReferenceException
+//     IndexOutOfRangeException
+//     InvalidCastException
+//     OverflowException
+//     DivideByZeroException
+//     StackOverflowException      (non-catchable)
+//     OutOfMemoryException
+//     NotImplementedException
+//     NotSupportedException
+//     TimeoutException
+//     OperationCanceledException
+//        TaskCanceledException
+//     IOException
+//         FileNotFoundException
+//         DirectoryNotFoundException
+//         EndOfStreamException
+//  System.ApplicationException    (app-level — rarely used directly)
 
-// ” Demonstration of common exceptions ”——————————————————————————
+//  Demonstration of common exceptions ——————————————————————————
 // 1. ArgumentNullException
 static void Greet(string name)
 {
@@ -19492,9 +19492,9 @@ catch (OperationCanceledException)
 ```cs
 using System.IO;
 
-// ” 1. Catch only what you can handle ”———————————————————————————
+//  1. Catch only what you can handle ———————————————————————————
 //  Swallowing all exceptions hides bugs
-try { /* € */ }
+try { /*  */ }
 catch (Exception) { }    // silent swallow — avoid
 
 // … Catch the most specific type you can actually handle
@@ -19508,12 +19508,12 @@ catch (FileNotFoundException)
     Console.WriteLine("Config not found — using defaults.");
 }
 
-// ” 2. Use `finally` or `using` for resource cleanup ”————————————
+//  2. Use `finally` or `using` for resource cleanup ————————————
 // … using — preferred for IDisposable resources
-await using var conn = new System.Data.SqlClient.SqlConnection("€");
+await using var conn = new System.Data.SqlClient.SqlConnection("");
 await conn.OpenAsync();
 
-// ” 3. Re-throw with `throw;` not `throw ex;` ”———————————————————
+//  3. Re-throw with `throw;` not `throw ex;` ———————————————————
 static void LoadData()
 {
     try { File.ReadAllText("data.csv"); }
@@ -19526,14 +19526,14 @@ static void LoadData()
     }
 }
 
-// ” 4. Wrap low-level exceptions in meaningful ones ”—————————————
+//  4. Wrap low-level exceptions in meaningful ones —————————————
 public class UserRepository
 {
     public User FindById(int id)
     {
         try
         {
-            // DB call €
+            // DB call 
             throw new System.Data.SqlClient.SqlException(); // simulated
         }
         catch (System.Data.SqlClient.SqlException ex)
@@ -19550,14 +19550,14 @@ public class RepositoryException : Exception
 }
 public record User(int Id, string Name);
 
-// ” 5. Use exception filters for conditional handling ”———————————
+//  5. Use exception filters for conditional handling ———————————
 try { /* network call */ }
 catch (TimeoutException ex) when (ex.Message.Contains("read"))
 {
     Console.WriteLine("Read timeout — retry.");
 }
 
-// ” 6. Validate early — avoid exceptions as control flow ”————————
+//  6. Validate early — avoid exceptions as control flow ————————
 //  Using exceptions as flow control
 static int ParseAgeException(string s)
 {
@@ -19569,10 +19569,10 @@ static int ParseAgeException(string s)
 static int ParseAgeSafe(string s)
     => int.TryParse(s, out int age) ? age : -1;
 
-// ” 7. Log exceptions with context ”——————————————————————————————
+//  7. Log exceptions with context ——————————————————————————————
 static void ProcessOrder(int orderId)
 {
-    try { /* € */ }
+    try { /*  */ }
     catch (Exception ex)
     {
         // Log full exception (type, message, stack trace, inner)
@@ -19581,10 +19581,10 @@ static void ProcessOrder(int orderId)
     }
 }
 
-// ” 8. Never catch StackOverflowException / ExecutionEngineException
+//  8. Never catch StackOverflowException / ExecutionEngineException
 // These are non-recoverable — the process must terminate.
 
-// ” 9. Handle async exceptions properly ”—————————————————————————
+//  9. Handle async exceptions properly —————————————————————————
 static async Task<string> DownloadAsync(string url)
 {
     using var client = new System.Net.Http.HttpClient();
@@ -19599,7 +19599,7 @@ static async Task<string> DownloadAsync(string url)
     }
 }
 
-// ” 10. Global unhandled exception handlers ”—————————————————————
+//  10. Global unhandled exception handlers —————————————————————
 // In Program.cs / top-level setup:
 AppDomain.CurrentDomain.UnhandledException += (_, e) =>
     Console.Error.WriteLine($"Unhandled: {e.ExceptionObject}");
@@ -20000,8 +20000,8 @@ Console.WriteLine(string.Join(", ", evens)); // 4, 16, 36
 
 | Delegate | Signature | Returns | Use when |
 |----------|-----------|---------|----------|
-| `Action` | `Action<T1, T2, €>` | `void` | Side-effect operations (print, log, update) |
-| `Func` | `Func<T1, T2, €, TResult>` | `TResult` | Transformations, computations |
+| `Action` | `Action<T1, T2, >` | `void` | Side-effect operations (print, log, update) |
+| `Func` | `Func<T1, T2, , TResult>` | `TResult` | Transformations, computations |
 | `Predicate<T>` | `Predicate<T>` | `bool` | Tests a condition — equivalent to `Func<T, bool>` |
 
 ```cs
@@ -20241,7 +20241,7 @@ class OrderEventArgs(int orderId, string message) : EventArgs
 The **standard .NET event pattern** uses `EventHandler<TEventArgs>` where `TEventArgs` derives from `EventArgs`. This convention ensures compatibility with the .NET event system, tooling, and frameworks.
 
 ```cs
-// ” 1. Custom EventArgs ”—————————————————————————————————————————
+//  1. Custom EventArgs —————————————————————————————————————————
 public class StockPriceChangedEventArgs : EventArgs
 {
     public string Symbol    { get; }
@@ -20257,7 +20257,7 @@ public class StockPriceChangedEventArgs : EventArgs
     }
 }
 
-// ” 2. Publisher — declares and raises the event ”————————————————
+//  2. Publisher — declares and raises the event ————————————————
 public class StockTicker
 {
     private readonly Dictionary<string, decimal> _prices = [];
@@ -20279,7 +20279,7 @@ public class StockTicker
     }
 }
 
-// ” 3. Subscriber — attaches and detaches handlers ”——————————————
+//  3. Subscriber — attaches and detaches handlers ——————————————
 public class AlertSystem
 {
     private readonly StockTicker _ticker;
@@ -20299,7 +20299,7 @@ public class AlertSystem
     public void Detach() => _ticker.PriceChanged -= OnPriceChanged;  // unsubscribe
 }
 
-// ” 4. Usage ”———————————————————————————————————————————————————
+//  4. Usage ———————————————————————————————————————————————————
 var ticker = new StockTicker();
 var alerts = new AlertSystem(ticker);
 
@@ -20310,7 +20310,7 @@ alerts.Detach();                        // unsubscribe — prevent memory leaks
 
 ticker.UpdatePrice("AAPL", 200.00m);   // no alert — subscriber detached
 
-// ” 5. Thread-safe event invocation (local copy pattern) ”————————
+//  5. Thread-safe event invocation (local copy pattern) ————————
 public class SafePublisher
 {
     public event EventHandler<EventArgs>? DataReady;
@@ -20324,7 +20324,7 @@ public class SafePublisher
     }
 }
 
-// ” 6. EventHandler without custom args (simple notification) ”———
+//  6. EventHandler without custom args (simple notification) ———
 public class Timer
 {
     public event EventHandler? Tick;            // uses plain EventHandler
@@ -20340,7 +20340,7 @@ public class Timer
 | Derive `EventArgs` subclass for custom data | Type-safe event data |
 | Use `EventHandler<TEventArgs>?` (nullable) | No NullReferenceException when no subscribers |
 | Raise via `protected virtual void OnXxx()` | Allows override in derived classes |
-| Use `?.Invoke(this, e)` not `if (E != null) E(€)` | Thread-safer single evaluation |
+| Use `?.Invoke(this, e)` not `if (E != null) E()` | Thread-safer single evaluation |
 | Always unsubscribe when done | Prevents memory leaks (publisher holds reference to subscriber) |
 
 <div align="right">
@@ -21053,7 +21053,7 @@ Console.WriteLine(string.Join(", ", people.Select(p => p.Name)));  // Alice, Bob
 ```cs
 using System.Linq.Expressions;
 
-// ” 1. Func — compiled IL, not inspectable ”——————————————————————
+//  1. Func — compiled IL, not inspectable ——————————————————————
 Func<int, bool> funcDelegate = x => x > 10;
 
 // Executes directly
@@ -21062,7 +21062,7 @@ Console.WriteLine(funcDelegate(5));    // False
 
 // Cannot inspect the body — it\'s already compiled binary code
 
-// ” 2. Expression<Func<T,TResult>> — a data structure (AST) ”—————
+//  2. Expression<Func<T,TResult>> — a data structure (AST) —————
 Expression<Func<int, bool>> expr = x => x > 10;
 
 // Inspect the expression tree
@@ -21075,7 +21075,7 @@ Console.WriteLine(((BinaryExpression)expr.Body).Right);  // 10
 Func<int, bool> compiled = expr.Compile();
 Console.WriteLine(compiled(15));   // True
 
-// ” 3. Why ORMs use Expression<Func<>> ”———————————————————————————
+//  3. Why ORMs use Expression<Func<>> ———————————————————————————
 // IQueryable<T>.Where() accepts Expression<Func<T, bool>>
 // The ORM inspects the tree and translates it to SQL
 
@@ -21085,9 +21085,9 @@ var inMemory = numbers.Where(funcDelegate);   // Func — runs as .NET code
 
 // IQueryable (EF Core, LINQ to SQL) — uses Expression, translates to SQL
 // IQueryable<Product> products = dbContext.Products;
-// var fromDb = products.Where(expr);  // Expression ’ "SELECT € WHERE Price > 10"
+// var fromDb = products.Where(expr);  // Expression ’ "SELECT  WHERE Price > 10"
 
-// ” 4. Build an Expression tree manually ”————————————————————————
+//  4. Build an Expression tree manually ————————————————————————
 // Equivalent to: x => x * x + 2 * x + 1
 ParameterExpression param = Expression.Parameter(typeof(int), "x");
 Expression xSquared   = Expression.Multiply(param, param);        // x * x
@@ -21099,7 +21099,7 @@ var quadratic = Expression.Lambda<Func<int, int>>(full, param).Compile();
 Console.WriteLine(quadratic(3));   // 3*3 + 2*3 + 1 = 16
 Console.WriteLine(quadratic(5));   // 5*5 + 2*5 + 1 = 36
 
-// ” 5. Modify / rewrite an expression ”——————————————————————————
+//  5. Modify / rewrite an expression ——————————————————————————
 // Common use case: expression visitor to rewrite predicates
 class ReplaceParameterVisitor : ExpressionVisitor
 {
@@ -21270,14 +21270,14 @@ LINQ queries can be written in two equivalent syntaxes: **query syntax** (SQL-li
 ```cs
 int[] numbers = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5];
 
-// ” Query syntax ”————————————————————————————————————
+//  Query syntax ————————————————————————————————————
 var queryResult =
     from n in numbers
     where n > 3
     orderby n descending
     select n * 2;
 
-// ” Equivalent method syntax ”————————————————————————
+//  Equivalent method syntax ————————————————————————
 var methodResult = numbers
     .Where(n => n > 3)
     .OrderByDescending(n => n)
@@ -21637,7 +21637,7 @@ record Order(int Id, int CustomerId, string Product, decimal Amount);
 |-|--------------------|---------------------|
 | **When runs** | When iterated (`foreach`, `ToList`, etc.) | Immediately when called |
 | **Re-runs** | Every time you iterate | Result captured once |
-| **Operators** | `Where`, `Select`, `OrderBy`, `GroupBy`, `Skip`, `Take`€ | `ToList`, `ToArray`, `Count`, `First`, `Sum`, `Any`, `ToDictionary`€ |
+| **Operators** | `Where`, `Select`, `OrderBy`, `GroupBy`, `Skip`, `Take` | `ToList`, `ToArray`, `Count`, `First`, `Sum`, `Any`, `ToDictionary` |
 
 ```cs
 var data = new List<int> { 1, 2, 3, 4, 5 };
@@ -22188,21 +22188,21 @@ var products = new List<Product>
     new("Pen",        2m, "Stationery"),
 };
 
-// ” Query syntax (SQL-like) ”——————————————————————————————————————————
+//  Query syntax (SQL-like) ——————————————————————————————————————————
 var queryExpr =
     from p in products
     where p.Price > 50
     orderby p.Category, p.Price descending
     select new { p.Name, p.Price };
 
-// ” Equivalent method chain ”——————————————————————————————————————————
+//  Equivalent method chain ——————————————————————————————————————————
 var methodChain = products
     .Where(p => p.Price > 50)
     .OrderBy(p => p.Category)
     .ThenByDescending(p => p.Price)
     .Select(p => new { p.Name, p.Price });
 
-// ” Join — query syntax is more readable ”————————————————————————————
+//  Join — query syntax is more readable ————————————————————————————
 var customers = new List<(int Id, string Name)> { (1, "Alice"), (2, "Bob") };
 var orders    = new List<(int CId, string Item)> { (1, "Laptop"), (1, "Mouse"), (2, "Phone") };
 
@@ -22217,14 +22217,14 @@ var joinMethod = customers.Join(
     orders, c => c.Id, o => o.CId,
     (c, o) => new { c.Name, o.Item });
 
-// ” Operators ONLY available in method syntax ”———————————————————————
+//  Operators ONLY available in method syntax ———————————————————————
 // (no query syntax equivalent)
 var count = products.Count(p => p.Price > 100);
 var first = products.FirstOrDefault(p => p.Price > 100);
 var dist  = products.DistinctBy(p => p.Category);
 var chunk = products.Chunk(2);
 
-// ” let in query syntax = intermediate Select in method syntax ”——————
+//  let in query syntax = intermediate Select in method syntax ——————
 var qLet =
     from p in products
     let discounted = p.Price * 0.9m
@@ -22776,7 +22776,7 @@ record Product(string Name, decimal Price);
 `SelectMany` projects each element to an `IEnumerable<T>` and then **flattens** all those sequences into a single flat sequence. It is the LINQ equivalent of a `flatMap` in other languages.
 
 ```cs
-// ” 1. Basic flatten ”————————————————————————————————————————————
+//  1. Basic flatten ————————————————————————————————————————————
 var departments = new[]
 {
     new { Name = "Engineering", Employees = new[] { "Alice", "Bob", "Carol" } },
@@ -22791,7 +22791,7 @@ IEnumerable<string> allEmployeesNested =
 Console.WriteLine(string.Join(", ", allEmployeesNested));
 // Alice, Bob, Carol, Dave, Eve, Frank
 
-// ” 2. With result selector — access both parent and child ”———————
+//  2. With result selector — access both parent and child ———————
 var withDept = departments.SelectMany(
     d => d.Employees,
     (dept, emp) => $"{emp} ({dept.Name})");
@@ -22799,7 +22799,7 @@ var withDept = departments.SelectMany(
 Console.WriteLine(string.Join(", ", withDept));
 // Alice (Engineering), Bob (Engineering), Carol (Engineering), Dave (Design), ...
 
-// ” 3. Flatten a list of lists ”——————————————————————————————————
+//  3. Flatten a list of lists ——————————————————————————————————
 var matrix = new List<List<int>>
 {
     [1, 2, 3],
@@ -22810,7 +22810,7 @@ var matrix = new List<List<int>>
 List<int> flat = matrix.SelectMany(row => row).ToList();
 Console.WriteLine(string.Join(", ", flat));  // 1, 2, 3, 4, 5, 6, 7, 8, 9
 
-// ” 4. Flatten with filtering ”———————————————————————————————————
+//  4. Flatten with filtering ———————————————————————————————————
 var orders = new[]
 {
     new { Id = 1, Items = new[] { "Widget", "Gadget", "Widget" } },
@@ -22830,7 +22830,7 @@ var distinctItems = orders
     .OrderBy(i => i);
 Console.WriteLine(string.Join(", ", distinctItems));  // Doohickey, Gadget, Gizmo, Widget
 
-// ” 5. Query syntax equivalent ”——————————————————————————————————
+//  5. Query syntax equivalent ——————————————————————————————————
 var queryResult =
     from d in departments
     from emp in d.Employees         // second `from` = SelectMany
@@ -22842,12 +22842,12 @@ foreach (var r in queryResult)
 // Alice — Engineering
 // Eve — Design
 
-// ” 6. String as char sequence (practical) ”——————————————————————
+//  6. String as char sequence (practical) ——————————————————————
 string[] words = ["hello", "world"];
 char[] allChars = words.SelectMany(w => w).Distinct().OrderBy(c => c).ToArray();
 Console.WriteLine(new string(allChars));  // dehlorw
 
-// ” 7. Cross join (Cartesian product) ”——————————————————————————
+//  7. Cross join (Cartesian product) ——————————————————————————
 var colors  = new[] { "Red", "Blue" };
 var sizes   = new[] { "S", "M", "L" };
 
@@ -22874,26 +22874,26 @@ Console.WriteLine(string.Join(", ", variants));
 
 ## Q. What are LINQ set operators (`Union`, `Intersect`, `Except`, `Distinct`) and how are they used?
 
-LINQ set operators work on sequences the same way mathematical sets work — they compare elements for equality and produce results without duplicates (unless using the `€By` or `WithComparer` overloads).
+LINQ set operators work on sequences the same way mathematical sets work — they compare elements for equality and produce results without duplicates (unless using the `By` or `WithComparer` overloads).
 
 ```cs
 int[] a = [1, 2, 3, 4, 5];
 int[] b = [3, 4, 5, 6, 7];
 
-// ” Distinct — remove duplicates ”————————————————————————————————
+//  Distinct — remove duplicates ————————————————————————————————
 int[] withDups = [1, 2, 2, 3, 3, 3, 4];
 int[] unique = withDups.Distinct().ToArray();
 Console.WriteLine(string.Join(", ", unique));   // 1, 2, 3, 4
 
-// ” Union — all elements from both, no duplicates ”———————————————
+//  Union — all elements from both, no duplicates ———————————————
 int[] union = a.Union(b).ToArray();
 Console.WriteLine(string.Join(", ", union));    // 1, 2, 3, 4, 5, 6, 7
 
-// ” Intersect — only elements in BOTH ”———————————————————————————
+//  Intersect — only elements in BOTH ———————————————————————————
 int[] intersect = a.Intersect(b).ToArray();
 Console.WriteLine(string.Join(", ", intersect)); // 3, 4, 5
 
-// ” Except — elements in a but NOT in b (set difference) ”————————
+//  Except — elements in a but NOT in b (set difference) ————————
 int[] except = a.Except(b).ToArray();
 Console.WriteLine(string.Join(", ", except));    // 1, 2
 
@@ -22901,7 +22901,7 @@ Console.WriteLine(string.Join(", ", except));    // 1, 2
 int[] exceptReverse = b.Except(a).ToArray();
 Console.WriteLine(string.Join(", ", exceptReverse)); // 6, 7
 
-// ” DistinctBy / UnionBy / IntersectBy / ExceptBy (.NET 6+) ”————
+//  DistinctBy / UnionBy / IntersectBy / ExceptBy (.NET 6+) ————
 record Person(string Name, int DeptId);
 
 var team1 = new[]
@@ -22930,7 +22930,7 @@ Console.WriteLine(string.Join(", ", onlyTeam1.Select(p => p.Name))); // Bob, Car
 var onePerDept = team1.DistinctBy(p => p.DeptId);
 Console.WriteLine(string.Join(", ", onePerDept.Select(p => p.Name))); // Alice, Bob
 
-// ” Custom equality comparer ”————————————————————————————————————
+//  Custom equality comparer ————————————————————————————————————
 class CaseInsensitiveComparer : IEqualityComparer<string>
 {
     public bool Equals(string? x, string? y)
@@ -23029,7 +23029,7 @@ Console.WriteLine(evens.SingleOrDefault(n => n == 5, -1)); // -1
 Console.WriteLine(evens.ElementAt(2));               // 6
 Console.WriteLine(evens.ElementAtOrDefault(99));     // 0 (out of range)
 
-// ” Boolean aggregates ”——————————————————————————————————————————
+//  Boolean aggregates ——————————————————————————————————————————
 Console.WriteLine(numbers.Any());                    // True (not empty)
 Console.WriteLine(empty.Any());                      // False
 Console.WriteLine(numbers.Any(n => n > 9));          // True
@@ -23039,18 +23039,18 @@ Console.WriteLine(numbers.All(n => n > 5));          // False
 
 Console.WriteLine(numbers.Contains(7));              // True
 
-// ” Count / LongCount ”———————————————————————————————————————————
+//  Count / LongCount ———————————————————————————————————————————
 Console.WriteLine(numbers.Count());                  // 10
 Console.WriteLine(numbers.Count(n => n % 3 == 0));  // 3  (3, 6, 9)
 Console.WriteLine(numbers.LongCount());              // 10L
 
-// ” Min, Max, Sum, Average ”——————————————————————————————————————
+//  Min, Max, Sum, Average ——————————————————————————————————————
 Console.WriteLine(numbers.Min());    // 1
 Console.WriteLine(numbers.Max());    // 10
 Console.WriteLine(numbers.Sum());    // 55
 Console.WriteLine(numbers.Average()); // 5.5
 
-// ” MinBy / MaxBy (.NET 6+) ”—————————————————————————————————————
+//  MinBy / MaxBy (.NET 6+) —————————————————————————————————————
 record Product2(string Name, decimal Price);
 var products = new[] { new Product2("A", 5m), new Product2("B", 2m), new Product2("C", 8m) };
 Console.WriteLine(products.MinBy(p => p.Price)?.Name);  // B
@@ -25516,7 +25516,7 @@ var longRunning = Task.Factory.StartNew(() =>
 When a `Task` is awaited, by default .NET tries to **resume on the original synchronisation context** (e.g., the UI thread, or an ASP.NET Classic request context). `ConfigureAwait(false)` instructs the runtime to resume on **any available thread-pool thread** instead, which avoids unnecessary context switches and potential deadlocks.
 
 ```cs
-// ” 1. Default behaviour (ConfigureAwait(true) / omitted) ”———————
+//  1. Default behaviour (ConfigureAwait(true) / omitted) ———————
 // Resumes on the captured synchronisation context (e.g. UI thread)
 async Task LoadAndDisplayAsync()
 {
@@ -25524,7 +25524,7 @@ async Task LoadAndDisplayAsync()
     label.Text = data;                   // … safe — UI update on UI thread
 }
 
-// ” 2. Library code — always use ConfigureAwait(false) ”——————————
+//  2. Library code — always use ConfigureAwait(false) ——————————
 // Library methods should NOT capture the caller\'s context
 public static async Task<string> FetchDataAsync(string url)
 {
@@ -25534,7 +25534,7 @@ public static async Task<string> FetchDataAsync(string url)
     return json;   // no context-sensitive work here
 }
 
-// ” 3. Deadlock scenario (ASP.NET Classic / WPF without ConfigureAwait) ”
+//  3. Deadlock scenario (ASP.NET Classic / WPF without ConfigureAwait) 
 // BAD: .Result on async method in single-threaded context causes deadlock
 // string result = FetchDataAsync("https://example.com").Result; //  DEADLOCK
 
@@ -25545,7 +25545,7 @@ public static async Task<string> SafeFetchAsync(string url)
     return await client.GetStringAsync(url).ConfigureAwait(false);
 }
 
-// ” 4. ASP.NET Core — no SynchronisationContext, so ConfigureAwait(false)
+//  4. ASP.NET Core — no SynchronisationContext, so ConfigureAwait(false)
 //    is not required for correctness, but still a good habit in library code
 public async Task<IActionResult> GetAsync()
 {
@@ -25554,7 +25554,7 @@ public async Task<IActionResult> GetAsync()
     return Ok(data);
 }
 
-// ” 5. ConfigureAwait in a loop ”—————————————————————————————————
+//  5. ConfigureAwait in a loop —————————————————————————————————
 public static async Task ProcessItemsAsync(IEnumerable<int> ids)
 {
     foreach (int id in ids)
@@ -25588,7 +25588,7 @@ static Task<string> LoadItemAsync(int id) => Task.FromResult($"Item-{id}");
 ```cs
 using System.Runtime.CompilerServices;
 
-// ” 1. Producing an async stream ”————————————————————————————————
+//  1. Producing an async stream ————————————————————————————————
 // Use `yield return` inside an `async` method returning IAsyncEnumerable<T>
 static async IAsyncEnumerable<int> GenerateNumbersAsync(
     int count,
@@ -25602,11 +25602,11 @@ static async IAsyncEnumerable<int> GenerateNumbersAsync(
     }
 }
 
-// ” 2. Consuming with `await foreach` ”———————————————————————————
+//  2. Consuming with `await foreach` ———————————————————————————
 await foreach (int number in GenerateNumbersAsync(5))
     Console.WriteLine(number);   // prints 1..5 as they arrive
 
-// ” 3. CancellationToken support ”————————————————————————————————
+//  3. CancellationToken support ————————————————————————————————
 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
 try
 {
@@ -25618,11 +25618,11 @@ catch (OperationCanceledException)
     Console.WriteLine("Stream cancelled.");
 }
 
-// ” 4. ConfigureAwait on IAsyncEnumerable ”———————————————————————
+//  4. ConfigureAwait on IAsyncEnumerable ———————————————————————
 await foreach (int n in GenerateNumbersAsync(5).ConfigureAwait(false))
     Console.WriteLine(n);
 
-// ” 5. Real-world: streaming database rows ”——————————————————————
+//  5. Real-world: streaming database rows ——————————————————————
 // (EF Core 3+ supports IAsyncEnumerable via AsAsyncEnumerable())
 // async IAsyncEnumerable<Order> StreamOrdersAsync(AppDbContext db)
 // {
@@ -25630,7 +25630,7 @@ await foreach (int n in GenerateNumbersAsync(5).ConfigureAwait(false))
 //         yield return order;
 // }
 
-// ” 6. Stream large file lines without loading all into memory ”——
+//  6. Stream large file lines without loading all into memory ——
 static async IAsyncEnumerable<string> ReadLinesAsync(
     string path,
     [EnumeratorCancellation] CancellationToken ct = default)
@@ -25642,11 +25642,11 @@ static async IAsyncEnumerable<string> ReadLinesAsync(
         yield return line;
 }
 
-// ” 7. LINQ-style on async streams (System.Linq.Async NuGet) ”————
+//  7. LINQ-style on async streams (System.Linq.Async NuGet) ————
 // var evens = GenerateNumbersAsync(10).Where(n => n % 2 == 0);
 // await foreach (var n in evens) Console.WriteLine(n);
 
-// ” 8. Collect to list when needed ”——————————————————————————————
+//  8. Collect to list when needed ——————————————————————————————
 var items = new List<int>();
 await foreach (int n in GenerateNumbersAsync(5))
     items.Add(n);
@@ -25702,7 +25702,7 @@ async void LoadAsync() { await Task.Delay(500); Console.WriteLine("Done"); }
 // CORRECT ALTERNATIVES
 // ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 
-// ” 1. Return Task — preferred for all non-event-handler async methods
+//  1. Return Task — preferred for all non-event-handler async methods
 async Task LoadDataAsync()
 {
     await Task.Delay(100);
@@ -25710,7 +25710,7 @@ async Task LoadDataAsync()
 }
 await LoadDataAsync();   // … awaitable, exception propagates normally
 
-// ” 2. async void is ONLY acceptable for event handlers
+//  2. async void is ONLY acceptable for event handlers
 // (because event delegates have a void return signature)
 public class MyForm
 {
@@ -25735,7 +25735,7 @@ public class MyForm
     }
 }
 
-// ” 3. Fire-and-forget with proper error handling ”———————————————
+//  3. Fire-and-forget with proper error handling ———————————————
 static Task StartBackgroundWork()
 {
     return Task.Run(async () =>
@@ -25754,7 +25754,7 @@ static Task StartBackgroundWork()
 
 _ = StartBackgroundWork();   // discard Task intentionally — fire-and-forget pattern
 
-// ” 4. Top-level async in older frameworks ”——————————————————————
+//  4. Top-level async in older frameworks ——————————————————————
 // BEFORE C# 7.1: Main couldn\'t be async ’ temptation to use async void
 // async void Main() { }  // 
 
@@ -26352,8 +26352,8 @@ DataService.Instance.Query();
 // Lazy (non-generic) — does NOT exist as a public API
 // 'Lazy' by itself is not a type — always use Lazy<T>
 // The question likely refers to:
-// € Lazy<T>  — built-in BCL class
-// € Custom lazy patterns (lazy fields, lazy properties)
+//  Lazy<T>  — built-in BCL class
+//  Custom lazy patterns (lazy fields, lazy properties)
 
 // Lazy property pattern (no Lazy<T> class)
 private ExpensiveObject? _resource;
@@ -27099,14 +27099,14 @@ public class NativeResourceHolder : IDisposable
         _nativeHandle = AllocateNativeResource();   // hypothetical P/Invoke
     }
 
-    // ” Public entry point ”———————————————————————————————————
+    //  Public entry point ———————————————————————————————————
     public void Dispose()
     {
         Dispose(disposing: true);
         GC.SuppressFinalize(this);   // no need for finalizer — Dispose already ran
     }
 
-    // ” Core logic — called by both Dispose() and finalizer ”——
+    //  Core logic — called by both Dispose() and finalizer ——
     protected virtual void Dispose(bool disposing)
     {
         if (_disposed) return;
@@ -27128,7 +27128,7 @@ public class NativeResourceHolder : IDisposable
         _disposed = true;
     }
 
-    // ” Finalizer — safety net if caller forgot Dispose() ”————
+    //  Finalizer — safety net if caller forgot Dispose() ————
     ~NativeResourceHolder() => Dispose(disposing: false);
 
     private static IntPtr AllocateNativeResource() => new IntPtr(1);   // placeholder
@@ -27202,18 +27202,18 @@ await using var conn = new AsyncDbConnection();
 The .NET GC splits the managed heap into the **Small Object Heap (SOH)** for objects < 85,000 bytes and the **Large Object Heap (LOH)** for objects ≥ 85,000 bytes. The LOH is treated differently and can cause **memory pressure** and **fragmentation**.
 
 ```cs
-// ” 1. What goes to the LOH ”—————————————————————————————————————
+//  1. What goes to the LOH —————————————————————————————————————
 // Any single managed object >= 85,000 bytes (default threshold)
 // Most common: large arrays (byte[], int[], string with >40K chars)
 
 byte[] small = new byte[84_999];  // SOH — Gen 0
 byte[] large = new byte[85_000];  // LOH — collected only during Gen 2 GC
 
-// ” 2. LOH is collected only with Gen 2 (Full GC) ”———————————————
+//  2. LOH is collected only with Gen 2 (Full GC) ———————————————
 // SOH: Gen 0 ’ Gen 1 ’ Gen 2 (short-lived objects collected quickly)
 // LOH: always collected together with Gen 2 ’ more expensive, less frequent
 
-// ” 3. LOH fragmentation ”————————————————————————————————————————
+//  3. LOH fragmentation ————————————————————————————————————————
 // LOH is NOT compacted by default (unlike SOH)
 // Allocate and free many large arrays ’ holes appear ’ OutOfMemoryException
 // even when total free memory is enough (fragmentation)
@@ -27230,11 +27230,11 @@ void DemonstrateFragmentation()
     GC.Collect();   // compacts SOH but NOT LOH by default — fragmented holes remain
 }
 
-// ” 4. Force LOH compaction (one-time, expensive) ”———————————————
+//  4. Force LOH compaction (one-time, expensive) ———————————————
 GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
 GC.Collect();   // compacts LOH this one time, then resets to NoCompaction
 
-// ” 5. Best practice: ArrayPool<T> to avoid LOH allocations ”—————
+//  5. Best practice: ArrayPool<T> to avoid LOH allocations —————
 using System.Buffers;
 
 void ProcessData(int size)
@@ -27258,7 +27258,7 @@ void ProcessData(int size)
 
 ProcessData(200_000);   // large but no LOH allocation
 
-// ” 6. Span<T> and Memory<T> — zero-copy, stack-friendly slices ”—
+//  6. Span<T> and Memory<T> — zero-copy, stack-friendly slices —
 byte[] fullBuffer = new byte[1_000_000];
 
 // Span<T> — stack-allocated slice reference (cannot be stored in heap fields)
@@ -27275,7 +27275,7 @@ static async Task ProcessMemoryAsync(Memory<byte> mem)
     Console.WriteLine($"Processing {mem.Length} bytes asynchronously");
 }
 
-// ” 7. Monitor LOH size ”—————————————————————————————————————————
+//  7. Monitor LOH size —————————————————————————————————————————
 long lohSize = GC.GetGCMemoryInfo().GenerationInfo[3].SizeAfterBytes;
 Console.WriteLine($"LOH size after GC: {lohSize / 1024:N0} KB");
 ```
@@ -27304,26 +27304,26 @@ Console.WriteLine($"LOH size after GC: {lohSize / 1024:N0} KB");
 // Span<T> — stack-only, synchronous, ultra-fast
 // ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 
-// ” 1. Slice an array without copying ”———————————————————————————
+//  1. Slice an array without copying ———————————————————————————
 int[] numbers = [10, 20, 30, 40, 50, 60, 70];
 Span<int> middle = numbers.AsSpan(2, 3);   // [30, 40, 50] — no copy
 middle[1] = 99;                             // mutates the original array
 Console.WriteLine(numbers[3]);              // 99
 
-// ” 2. Parse substrings without allocating a new string ”—————————
+//  2. Parse substrings without allocating a new string —————————
 ReadOnlySpan<char> date = "2026-06-01".AsSpan();
 int year  = int.Parse(date[..4]);     // "2026"
 int month = int.Parse(date[5..7]);    // "06"
 int day   = int.Parse(date[8..]);     // "01"
 Console.WriteLine(new DateTime(year, month, day)); // 01/06/2026
 
-// ” 3. Stack-allocated Span (stackalloc) ”————————————————————————
+//  3. Stack-allocated Span (stackalloc) ————————————————————————
 // No heap allocation at all
 Span<byte> stackBuffer = stackalloc byte[256];
 stackBuffer.Fill(0);
 Console.WriteLine(stackBuffer.Length);   // 256
 
-// ” 4. String split without allocating substrings ”———————————————
+//  4. String split without allocating substrings ———————————————
 static int CountCommas(ReadOnlySpan<char> text)
 {
     int count = 0;
@@ -27333,7 +27333,7 @@ static int CountCommas(ReadOnlySpan<char> text)
 }
 Console.WriteLine(CountCommas("a,b,c,d".AsSpan()));   // 3
 
-// ” 5. Span across native memory (unsafe) ”———————————————————————
+//  5. Span across native memory (unsafe) ———————————————————————
 // unsafe {
 //     byte* ptr = stackalloc byte[100];
 //     Span<byte> native = new Span<byte>(ptr, 100);
@@ -27343,7 +27343,7 @@ Console.WriteLine(CountCommas("a,b,c,d".AsSpan()));   // 3
 // Memory<T> — heap-compatible, works with async
 // ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 
-// ” 6. Memory<T> in async methods ”———————————————————————————————
+//  6. Memory<T> in async methods ———————————————————————————————
 byte[] buffer = new byte[4096];
 Memory<byte> mem = buffer.AsMemory(0, 1024);
 
@@ -27353,17 +27353,17 @@ async Task ReadToMemoryAsync(Stream stream, Memory<byte> destination)
     Console.WriteLine($"Read {bytesRead} bytes");
 }
 
-// ” 7. ReadOnlyMemory<T> for strings and read-only data ”—————————
+//  7. ReadOnlyMemory<T> for strings and read-only data —————————
 ReadOnlyMemory<char> roMem = "Hello, World!".AsMemory(7, 5);  // "World"
 Console.WriteLine(new string(roMem.Span));  // World
 
-// ” 8. MemoryPool<T> for reusable large buffers ”—————————————————
+//  8. MemoryPool<T> for reusable large buffers —————————————————
 using IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent(minBufferSize: 4096);
 Memory<byte> pooledMem = owner.Memory;
 // use pooledMem...
 // IMemoryOwner.Dispose() returns memory to pool automatically
 
-// ” 9. Performance comparison ”———————————————————————————————————
+//  9. Performance comparison ———————————————————————————————————
 // Traditional (allocates):       string sub = str.Substring(start, length);
 // Span-based (zero alloc):       ReadOnlySpan<char> sub = str.AsSpan(start, length);
 
@@ -27399,10 +27399,10 @@ static bool StartsWithHttp(string url)
 **Unsafe code** enables direct memory manipulation using pointers — useful for performance-critical interop, image processing, and working with unmanaged APIs.
 
 ```cs
-// ” 1. Enable unsafe code in .csproj ”———————————————————————————————
+//  1. Enable unsafe code in .csproj ———————————————————————————————
 // <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-// ” 2. Pointer basics ”———————————————————————————————————————————————
+//  2. Pointer basics ———————————————————————————————————————————————
 unsafe
 {
     int value = 42;
@@ -27420,7 +27420,7 @@ unsafe
     }
 }
 
-// ” 3. stackalloc — allocate on stack (no GC) ”———————————————————————
+//  3. stackalloc — allocate on stack (no GC) ———————————————————————
 unsafe
 {
     // Stack-allocated buffer — no heap allocation, no GC pressure
@@ -27433,7 +27433,7 @@ unsafe
 Span<int> safeStack = stackalloc int[8];
 for (int i = 0; i < 8; i++) safeStack[i] = i * i;
 
-// ” 4. Structs with fixed-size arrays ”———————————————————————————————
+//  4. Structs with fixed-size arrays ———————————————————————————————
 public unsafe struct NetworkHeader
 {
     public fixed byte IpAddress[4];     // inline array — no pointer chasing
@@ -27452,7 +27452,7 @@ unsafe
     Console.WriteLine($"IP: {header.IpAddress[0]}.{header.IpAddress[1]}.{header.IpAddress[2]}.{header.IpAddress[3]}:{header.Port}");
 }
 
-// ” 5. Interop with native libraries ”———————————————————————————————
+//  5. Interop with native libraries ———————————————————————————————
 [System.Runtime.InteropServices.DllImport("msvcrt.dll", CallingConvention = System.Runtime.InteropServices.CallingConvention.Cdecl)]
 private static unsafe extern void* memcpy(void* dest, void* src, nint count);
 
@@ -27460,7 +27460,7 @@ private static unsafe extern void* memcpy(void* dest, void* src, nint count);
 [System.Runtime.InteropServices.LibraryImport("msvcrt.dll")]
 private static partial void memset_s(nint dest, nint destSize, int value, nint count);
 
-// ” 6. Performance: unsafe struct copy ”——————————————————————————————
+//  6. Performance: unsafe struct copy ——————————————————————————————
 public static unsafe void FastCopy(byte[] src, byte[] dst, int length)
 {
     fixed (byte* pSrc = src, pDst = dst)
@@ -27483,7 +27483,7 @@ public static void SafeCopy(ReadOnlySpan<byte> src, Span<byte> dst)
 Modern C# (10–14) provides expressive patterns and type features that reduce boilerplate and improve code clarity.
 
 ```cs
-// ” 1. Extended pattern matching (C# 8–12) ”——————————————————————————
+//  1. Extended pattern matching (C# 8–12) ——————————————————————————
 public record Shape;
 public record Circle(double Radius) : Shape;
 public record Rectangle(double Width, double Height) : Shape;
@@ -27517,7 +27517,7 @@ Console.WriteLine(DescribeList([]));         // empty
 Console.WriteLine(DescribeList([42]));       // one element: 42
 Console.WriteLine(DescribeList([1, 2, 5])); // starts with 1, 2
 
-// ” 2. Records — immutable data with value semantics ”————————————————
+//  2. Records — immutable data with value semantics ————————————————
 public record OrderLine(string ProductId, int Quantity, decimal UnitPrice)
 {
     public decimal Total => Quantity * UnitPrice;
@@ -27542,7 +27542,7 @@ public record struct Point(double X, double Y)
     public double Distance => Math.Sqrt(X * X + Y * Y);
 }
 
-// ” 3. Primary constructors (C# 12) ”—————————————————————————————————
+//  3. Primary constructors (C# 12) —————————————————————————————————
 // For classes (not just records)
 public class OrderService(
     IOrderRepository repository,
@@ -27560,7 +27560,7 @@ public class OrderService(
     }
 }
 
-// ” 4. Required members (C# 11) ”—————————————————————————————————————
+//  4. Required members (C# 11) —————————————————————————————————————
 public class ProductDto
 {
     public required string Name  { get; init; }
@@ -27572,7 +27572,7 @@ public class ProductDto
 // var p = new ProductDto(); 
 var p = new ProductDto { Name = "Laptop", Price = 999m }; // …
 
-// ” 5. Generic math (C# 11+) ”———————————————————————————————————————
+//  5. Generic math (C# 11+) ———————————————————————————————————————
 using System.Numerics;
 
 static T Average<T>(IEnumerable<T> values) where T : INumber<T>
@@ -27586,7 +27586,7 @@ Console.WriteLine(Average([1, 2, 3, 4, 5]));           // 3
 Console.WriteLine(Average([1.5, 2.5, 3.5]));            // 2.5
 Console.WriteLine(Average(new decimal[] { 10m, 20m })); // 15
 
-// ” 6. Interceptors (C# 12, preview) ”———————————————————————————————
+//  6. Interceptors (C# 12, preview) ———————————————————————————————
 // Allow source generators to intercept specific call sites
 // Used by EF Core compiled models, System.Text.Json, ASP.NET Core Minimal APIs
 ```
@@ -29114,7 +29114,7 @@ await db.Products
 ## Q. What are the secure coding practices (XSS, CSRF, SQL Injection) available in .NET?
 
 ```cs
-// ” 1. XSS (Cross-Site Scripting) ”——————————————————————————————————
+//  1. XSS (Cross-Site Scripting) ——————————————————————————————————
 // ASP.NET Core Razor auto-encodes output by default
 @Model.UserInput  // HTML-encoded automatically — safe
 
@@ -29131,7 +29131,7 @@ app.Use(async (ctx, next) =>
     await next(ctx);
 });
 
-// ” 2. CSRF (Cross-Site Request Forgery) ”———————————————————————————
+//  2. CSRF (Cross-Site Request Forgery) ———————————————————————————
 // MVC — Antiforgery token (automatic with [ValidateAntiForgeryToken])
 builder.Services.AddAntiforgery(opt =>
 {
@@ -29151,7 +29151,7 @@ app.MapPost("/products", (IAntiforgery af, HttpContext ctx) =>
     // ...
 }).RequireAuthorization();
 
-// ” 3. SQL Injection ”————————————————————————————————————————————————
+//  3. SQL Injection ————————————————————————————————————————————————
 //  Vulnerable — string interpolation into SQL
 var name = userInput;
 var sql = $"SELECT * FROM Products WHERE Name = '{name}'";  // NEVER DO THIS
@@ -29170,7 +29170,7 @@ var results = await db.Products
 await using var cmd = new SqlCommand("SELECT * FROM Products WHERE Name = @name", conn);
 cmd.Parameters.AddWithValue("@name", name);
 
-// ” 4. Additional practices ”—————————————————————————————————————————
+//  4. Additional practices —————————————————————————————————————————
 // Enforce HTTPS
 app.UseHttpsRedirection();
 app.UseHsts(); // HTTP Strict Transport Security
@@ -29212,7 +29212,7 @@ app.MapPost("/products", ([FromBody] CreateProductRequest req) =>
 using System;
 using System.Buffers;
 
-// ” Span<T> — stack-only, synchronous code ”——————————————————————————
+//  Span<T> — stack-only, synchronous code ——————————————————————————
 // Points to: stack memory (stackalloc), array slices, or unmanaged memory
 // Cannot be stored in class fields or used across await boundaries
 
@@ -29249,7 +29249,7 @@ int[] arr = [1, 2, 3, 4, 5];
 Console.WriteLine(SumSpan(arr));           // works with array
 Console.WriteLine(SumSpan(arr.AsSpan(1, 3))); // slice without allocation
 
-// ” Memory<T> — can cross await, can be stored in fields ”————————————
+//  Memory<T> — can cross await, can be stored in fields ————————————
 // Use Memory<T> when you need to store the view or use it with async code
 public class DataProcessor
 {
@@ -29267,7 +29267,7 @@ public class DataProcessor
     }
 }
 
-// ” MemoryPool<T> and ArrayPool<T> — reuse buffers ”——————————————————
+//  MemoryPool<T> and ArrayPool<T> — reuse buffers ——————————————————
 // ArrayPool<T>.Shared — pool of reusable byte arrays
 async Task ProcessRequestAsync(Stream requestStream)
 {
@@ -29285,7 +29285,7 @@ async Task ProcessRequestAsync(Stream requestStream)
     }
 }
 
-// ” ReadOnlySequence<T> — for fragmented memory (e.g., Pipelines) ”———
+//  ReadOnlySequence<T> — for fragmented memory (e.g., Pipelines) ———
 // System.IO.Pipelines — zero-copy network I/O
 async Task ReadPipeAsync(PipeReader reader)
 {
@@ -29340,7 +29340,7 @@ using Microsoft.Extensions.ObjectPool;
 using System.Buffers;
 using System.Text;
 
-// ” ArrayPool<T> — reuse arrays, avoid GC pressure ”——————————————————
+//  ArrayPool<T> — reuse arrays, avoid GC pressure ——————————————————
 public class CsvParser
 {
     public List<string[]> Parse(string csvContent)
@@ -29362,7 +29362,7 @@ public class CsvParser
     }
 }
 
-// ” ObjectPool<T> for StringBuilder ”——————————————————————————————————
+//  ObjectPool<T> for StringBuilder ——————————————————————————————————
 // Register pool in DI
 builder.Services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
 builder.Services.AddSingleton(sp =>
@@ -29392,7 +29392,7 @@ public class HtmlRenderer(ObjectPool<StringBuilder> sbPool)
         => System.Net.WebUtility.HtmlEncode(s);
 }
 
-// ” Custom ObjectPool policy ”—————————————————————————————————————————
+//  Custom ObjectPool policy —————————————————————————————————————————
 public class HttpClientPolicy : IPooledObjectPolicy<HttpClient>
 {
     public HttpClient Create() => new HttpClient
@@ -29414,7 +29414,7 @@ builder.Services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
 builder.Services.AddSingleton<ObjectPool<HttpClient>>(sp =>
     sp.GetRequiredService<ObjectPoolProvider>().Create(new HttpClientPolicy()));
 
-// ” MemoryPool<T> for streaming scenarios ”———————————————————————————
+//  MemoryPool<T> for streaming scenarios ———————————————————————————
 async Task ProcessStreamAsync(Stream stream, CancellationToken ct)
 {
     using IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent(8192);
@@ -29429,7 +29429,7 @@ async Task ProcessStreamAsync(Stream stream, CancellationToken ct)
 
 void ProcessChunk(ReadOnlySpan<byte> data) { /* process */ }
 
-// ” Benchmark: pool vs new allocation ”———————————————————————————————
+//  Benchmark: pool vs new allocation ———————————————————————————————
 // Without pooling: new StringBuilder() per request
 // With pooling:    ~6— faster, near-zero GC for StringBuilder operations
 ```
@@ -29454,7 +29454,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using System.Text;
 
-// ” 1. Basic benchmark ”——————————————————————————————————————————————
+//  1. Basic benchmark ——————————————————————————————————————————————
 [MemoryDiagnoser]          // track GC allocations
 [SimpleJob(launchCount: 1, warmupCount: 3, iterationCount: 10)]
 [RankColumn]               // show relative rank
@@ -29506,7 +29506,7 @@ public class StringBenchmarks
     }
 }
 
-// ” 2. Parametrized benchmark ”———————————————————————————————————————
+//  2. Parametrized benchmark ———————————————————————————————————————
 [MemoryDiagnoser]
 public class CollectionBenchmarks
 {
@@ -29542,7 +29542,7 @@ public class CollectionBenchmarks
     public int ParallelSum() => _data.AsParallel().Sum();
 }
 
-// ” 3. Advanced config with categories and filters ”——————————————————
+//  3. Advanced config with categories and filters ——————————————————
 [Config(typeof(AntiVirusFriendlyConfig))]
 [CategoriesColumn]
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
@@ -29568,7 +29568,7 @@ class AntiVirusFriendlyConfig : ManualConfig
     }
 }
 
-// ” 4. Run benchmarks ”———————————————————————————————————————————————
+//  4. Run benchmarks ———————————————————————————————————————————————
 // Program.cs — must run in Release mode: dotnet run -c Release
 class Program
 {
@@ -29604,13 +29604,13 @@ Sample output:
 .NET provides built-in CLI tools (`dotnet-trace`, `dotnet-counters`, `dotnet-dump`) and integrates with Visual Studio and PerfView.
 
 ```bash
-# ” Install .NET diagnostic tools ”——————————————————————————————————
+#  Install .NET diagnostic tools ——————————————————————————————————
 dotnet tool install --global dotnet-trace
 dotnet tool install --global dotnet-counters
 dotnet tool install --global dotnet-dump
 dotnet tool install --global dotnet-gcdump
 
-# ” dotnet-counters — real-time metrics monitoring ”——————————————————
+#  dotnet-counters — real-time metrics monitoring ——————————————————
 # List available counters
 dotnet-counters list
 
@@ -29627,7 +29627,7 @@ dotnet-counters monitor --process-id 12345 \
 # requests-per-second       ’ ASP.NET Core throughput
 # requests-current          ’ in-flight requests
 
-# ” dotnet-trace — CPU sampling and event tracing ”———————————————————
+#  dotnet-trace — CPU sampling and event tracing ———————————————————
 # Collect CPU profile (30 seconds)
 dotnet-trace collect --process-id 12345 \
   --profile cpu-sampling \
@@ -29642,7 +29642,7 @@ dotnet-trace collect --process-id 12345 \
 # Convert to speedscope format (view at speedscope.app)
 dotnet-trace convert trace.nettrace --format Speedscope
 
-# ” dotnet-dump — memory analysis ”———————————————————————————————————
+#  dotnet-dump — memory analysis ———————————————————————————————————
 # Capture memory dump
 dotnet-dump collect --process-id 12345 --output dump.dmp
 
@@ -29656,13 +29656,13 @@ dotnet-dump analyze dump.dmp
 # finalizequeue           ’ objects with finalizers
 # sos threads             ’ all managed threads and stack traces
 
-# ” dotnet-gcdump — GC heap snapshot ”———————————————————————————————
+#  dotnet-gcdump — GC heap snapshot ———————————————————————————————
 dotnet-gcdump collect --process-id 12345 --output heap.gcdump
 # Open in Visual Studio or dotnet-gcdump report heap.gcdump
 ```
 
 ```cs
-// ” In-code diagnostics ”——————————————————————————————————————————————
+//  In-code diagnostics ——————————————————————————————————————————————
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
@@ -29767,10 +29767,10 @@ public class RequestEventCounters : EventSource
 
 ```
 Monolith                         Microservices
-””—————————————————————————      ””———————————  ””———————————  ””———————————
-”  UI + Business + Data   ”      ”  Order    ”  ”  Catalog  ”  ”  Payment  ”
-”  (all in one process)   ”  ’   ”  Service  ”  ”  Service  ”  ”  Service  ”
-”””—————————————————————————      ”””———————————  ”””———————————  ”””———————————
+—————————————————————————      ———————————  ———————————  ———————————
+  UI + Business + Data           Order        Catalog      Payment  
+  (all in one process)     ’     Service      Service      Service  
+—————————————————————————      ———————————  ———————————  ———————————
                                                                    
                                  Each has its own DB, deploy, scale, team
 ```
@@ -29864,15 +29864,15 @@ app.MapHealthChecks("/health/ready", new() { Predicate = r => r.Tags.Contains("r
 ```
 Example: E-Commerce Platform
 
-””—————————————   ””——————————————   ””—————————————   ””—————————————
-”  API Gateway ””–” Order Service””–”Catalog Svc  ”   ”Payment Svc  ”
-” (YARP/Ocelot)”   ”  (C# + PG)  ”   ”(C# + PG)    ”   ”(C# + Redis) ”
-”””—————————————   ”””——————————————   ”””—————————————   ”””—————————————
-                         ”                                      ”
-                  ””————–”——————                    ””———————–”——————
-                  ” RabbitMQ /  ”                    ”  Notification  ”
-                  ” Azure SB    ””————————————————–”  Service       ”
-                  ”””—————————————                    ”””————————————————
+—————————————   ——————————————   —————————————   —————————————
+  API Gateway – Order Service–Catalog Svc     Payment Svc  
+ (YARP/Ocelot)     (C# + PG)     (C# + PG)       (C# + Redis) 
+—————————————   ——————————————   —————————————   —————————————
+                                                               
+                  ————–——————                    ———————–——————
+                   RabbitMQ /                        Notification  
+                   Azure SB    ————————————————–  Service       
+                  —————————————                    ————————————————
 
 Each service:
  - Owns its database (no shared DB)
@@ -29962,15 +29962,15 @@ The **API Gateway** is the single entry point for all clients. It handles routin
 
 ```
 Client (React App / Mobile)
-          ”
+          
           –
-  ””———————————————
-  ”  API Gateway  ”   YARP / Ocelot / Azure API Management
-  ”               ”    - Route /orders ’ OrderService
-  ”  Auth (JWT)   ”    - Route /catalog ’ CatalogService
-  ”  Rate Limit   ”    - Aggregate /dashboard ’ multiple services
-  ”  Load Balance ”    - Strip/add headers
-  ”””———————————————
+  ———————————————
+    API Gateway     YARP / Ocelot / Azure API Management
+                     - Route /orders ’ OrderService
+    Auth (JWT)       - Route /catalog ’ CatalogService
+    Rate Limit       - Aggregate /dashboard ’ multiple services
+    Load Balance     - Strip/add headers
+  ———————————————
      /      |      \
 Order   Catalog  Payment
 Service Service  Service
@@ -30347,7 +30347,7 @@ ordersCreated.Add(1, new("status", "success"));
 When to choose what:
 
 Monolith …                    Microservices …
-”———————————————              ”———————————————————————————————
+———————————————              ———————————————————————————————
 Early-stage startup            Large org with multiple teams
 Small team (<10 devs)          High scale requirements
 Unclear domain boundaries      Well-understood bounded contexts
@@ -30604,36 +30604,36 @@ app.Lifetime.ApplicationStopping.Register(() =>
 ```
 Key Components of a Microservices System:
 
-””—————————————————————————————————————————————————————————————————————
-”  CLIENT (Browser / Mobile / 3rd-party)                              ”
-”””——————————————————————”——————————————————————————————————————————————
-                       ”
-              ””——————–”—————————
-              ”   API Gateway    ”  Routing, Auth, Rate Limit, SSL
-              ”  (YARP / Ocelot) ”
-              ”””————————”—————————
-          ””————————————”————————————
-    ””———–”————— ””——–”———— ””——–”——————
-    ”  Order    ” ”Catalog  ” ” Payment   ”    Individual Services
-    ”  Service  ” ” Service ” ” Service   ”
-    ”””—————”————— ”””————”———— ”””————”——————
-          ”            ”           ”
-    ””———–”——   ””———–”——  ””——–”———
-    ” Orders ”   ”Products”  ”Payments”    Per-service Databases
-    ”  DB    ”   ”   DB   ”  ”   DB   ”
-    ”””————————   ”””————————  ”””————————
-          ”            ”           ”
-          ”””————————————”———————————
-                  ””——–”—————
-                  ” Message  ”    Async Communication (RabbitMQ / Kafka)
-                  ”   Bus    ”
-                  ”””——————————
-                       ”
-         ””—————————————”———————————————
-   ””———–”——————              ””—————–”——————
-   ” Notification”             ”  Audit / Log ”    Event Consumers
-   ”  Service   ”             ”   Service    ”
-   ”””————————————              ”””—————————————
+—————————————————————————————————————————————————————————————————————
+  CLIENT (Browser / Mobile / 3rd-party)                              
+————————————————————————————————————————————————————————————————————
+                       
+              ——————–—————————
+                 API Gateway      Routing, Auth, Rate Limit, SSL
+                (YARP / Ocelot) 
+              —————————————————
+          ————————————————————————
+    ———–————— ——–———— ——–——————
+      Order     Catalog    Payment       Individual Services
+      Service    Service   Service   
+    —————————— ———————— ——————————
+                                 
+    ———–——   ———–——  ——–———
+     Orders    Products  Payments    Per-service Databases
+      DB          DB        DB   
+    ————————   ————————  ————————
+                                 
+          ———————————————————————
+                  ——–—————
+                   Message      Async Communication (RabbitMQ / Kafka)
+                     Bus    
+                  ——————————
+                       
+         ————————————————————————————
+   ———–——————              —————–——————
+    Notification               Audit / Log     Event Consumers
+     Service                   Service    
+   ————————————              —————————————
 ```
 
 | Component | Role |
@@ -30787,7 +30787,7 @@ message StreamRequest    { string customer_id = 1; }
 ```
 
 ```cs
-// ” gRPC SERVER ”——————————————————————————————————————————————————————
+//  gRPC SERVER ——————————————————————————————————————————————————————
 // Services/OrderGrpcService.cs
 using Grpc.Core;
 using OrderGrpcService;
@@ -30862,7 +30862,7 @@ app.Run();
 ```
 
 ```cs
-// ” gRPC CLIENT ”——————————————————————————————————————————————————————
+//  gRPC CLIENT ——————————————————————————————————————————————————————
 // Program.cs (consumer service)
 builder.Services.AddGrpcClient<OrderService.OrderServiceClient>(o =>
 {
@@ -30924,7 +30924,7 @@ dotnet add package MassTransit.EntityFrameworkCore  # for saga persistence
 ```
 
 ```cs
-// ” 1. DEFINE MESSAGES (contracts — shared library) ”—————————————————
+//  1. DEFINE MESSAGES (contracts — shared library) —————————————————
 namespace Contracts;
 
 // Events (past tense — something happened)
@@ -30936,7 +30936,7 @@ public record PaymentProcessed(Guid OrderId, bool Success, string? FailureReason
 public record ProcessPayment(Guid OrderId, decimal Amount, string PaymentToken);
 public record SendOrderConfirmation(Guid OrderId, string CustomerEmail);
 
-// ” 2. PRODUCER — PUBLISH EVENT ”—————————————————————————————————————
+//  2. PRODUCER — PUBLISH EVENT —————————————————————————————————————
 public class OrderService(IPublishEndpoint publishEndpoint, AppDbContext db)
 {
     public async Task<Order> PlaceOrderAsync(PlaceOrderRequest req, CancellationToken ct)
@@ -30954,7 +30954,7 @@ public class OrderService(IPublishEndpoint publishEndpoint, AppDbContext db)
     }
 }
 
-// ” 3. CONSUMER — HANDLE EVENT ”——————————————————————————————————————
+//  3. CONSUMER — HANDLE EVENT ——————————————————————————————————————
 public class OrderPlacedConsumer(IEmailService email, ILogger<OrderPlacedConsumer> logger)
     : IConsumer<OrderPlaced>
 {
@@ -30995,7 +30995,7 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
 
 record PaymentResult(bool Success);
 
-// ” 4. SAGA — COORDINATE LONG-RUNNING WORKFLOW ”—————————————————————
+//  4. SAGA — COORDINATE LONG-RUNNING WORKFLOW —————————————————————
 public class OrderStateMachine : MassTransitStateMachine<OrderSagaState>
 {
     public State Placed    { get; private set; } = null!;
@@ -31040,7 +31040,7 @@ public class OrderSagaState : SagaStateMachineInstance
     public string CustomerId    { get; set; } = null!;
 }
 
-// ” 5. REGISTRATION ”—————————————————————————————————————————————————
+//  5. REGISTRATION —————————————————————————————————————————————————
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<OrderPlacedConsumer>();
@@ -31086,7 +31086,7 @@ builder.Services.AddMassTransit(x =>
 **Distributed patterns** address the fundamental challenges of reliability and consistency when services communicate over a network.
 
 ```cs
-// ” 1. OUTBOX PATTERN — guaranteed event delivery ”———————————————————
+//  1. OUTBOX PATTERN — guaranteed event delivery ———————————————————
 // Problem: DB save and message publish can fail independently ’ lost messages
 // Solution: Write event to outbox table in SAME transaction as domain changes
 
@@ -31146,7 +31146,7 @@ public class OutboxProcessor(AppDbContext db, IPublishEndpoint bus) : Background
     }
 }
 
-// ” 2. CIRCUIT BREAKER — stop cascading failures ”————————————————————
+//  2. CIRCUIT BREAKER — stop cascading failures ————————————————————
 // Using Microsoft.Extensions.Http.Resilience (.NET 8+)
 builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
     .AddResilienceHandler("catalog-pipeline", p =>
@@ -31173,7 +31173,7 @@ builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
         p.AddTimeout(TimeSpan.FromSeconds(10));
     });
 
-// ” 3. IDEMPOTENCY KEY — safe retries ”———————————————————————————————
+//  3. IDEMPOTENCY KEY — safe retries ———————————————————————————————
 // Ensure duplicate requests produce the same result
 public class IdempotentOrderService(AppDbContext db)
 {
@@ -31204,7 +31204,7 @@ public class IdempotentOrderService(AppDbContext db)
     }
 }
 
-// ” 4. CORRELATION ID — trace requests across services ”——————————————
+//  4. CORRELATION ID — trace requests across services ——————————————
 public class CorrelationIdMiddleware(RequestDelegate next)
 {
     public async Task InvokeAsync(HttpContext ctx)
@@ -31241,51 +31241,51 @@ builder.Services.AddHttpClient<ICatalogClient, CatalogClient>()
 **Clean Architecture** (Robert C. Martin) organizes code into concentric layers where inner layers define abstractions and outer layers provide implementations. Dependencies always point inward.
 
 ```
-””—————————————————————————————————————————————————
-”  Infrastructure  (EF Core, HTTP, Serilog, etc.) ”
-”  ””———————————————————————————————————————————  ”
-”  ”  Application  (use cases, CQRS handlers)  ”  ”
-”  ”  ””—————————————————————————————————————  ”  ”
-”  ”  ”  Domain  (entities, value objects,  ”  ”  ”
-”  ”  ”  domain events, business rules)     ”  ”  ”
-”  ”  ”””—————————————————————————————————————  ”  ”
-”  ”””———————————————————————————————————————————  ”
-”  Presentation  (API Controllers / Minimal API)  ”
-”””—————————————————————————————————————————————————
+—————————————————————————————————————————————————
+  Infrastructure  (EF Core, HTTP, Serilog, etc.) 
+  ———————————————————————————————————————————  
+    Application  (use cases, CQRS handlers)    
+    —————————————————————————————————————    
+      Domain  (entities, value objects,      
+      domain events, business rules)         
+    —————————————————————————————————————    
+  ———————————————————————————————————————————  
+  Presentation  (API Controllers / Minimal API)  
+—————————————————————————————————————————————————
          Dependencies flow INWARD only ’
 ```
 
 ```
 MyApp.sln
-”” src/
-”   ”” MyApp.Domain/           # No external dependencies
-”   ”   ”” Entities/
-”   ”   ”” ValueObjects/
-”   ”   ”” Enums/
-”   ”   ”” Events/
-”   ”   ””” Exceptions/
-”   ”” MyApp.Application/      # Depends only on Domain
-”   ”   ”” Interfaces/         # IOrderRepository, IEmailService
-”   ”   ”” Commands/
-”   ”   ”” Queries/
-”   ”   ”” DTOs/
-”   ”   ””” Behaviors/          # MediatR pipeline behaviors
-”   ”” MyApp.Infrastructure/   # Implements Application interfaces
-”   ”   ”” Persistence/        # EF Core, repositories
-”   ”   ”” Messaging/          # RabbitMQ, SendGrid
-”   ”   ””” Identity/
-”   ””” MyApp.Api/              # ASP.NET Core host
-”       ”” Controllers/
-”       ”” Middleware/
-”       ””” Program.cs
-””” tests/
-    ”” MyApp.Domain.Tests/
-    ”” MyApp.Application.Tests/
-    ””” MyApp.Api.Tests/
+ src/
+    MyApp.Domain/           # No external dependencies
+       Entities/
+       ValueObjects/
+       Enums/
+       Events/
+       Exceptions/
+    MyApp.Application/      # Depends only on Domain
+       Interfaces/         # IOrderRepository, IEmailService
+       Commands/
+       Queries/
+       DTOs/
+       Behaviors/          # MediatR pipeline behaviors
+    MyApp.Infrastructure/   # Implements Application interfaces
+       Persistence/        # EF Core, repositories
+       Messaging/          # RabbitMQ, SendGrid
+       Identity/
+    MyApp.Api/              # ASP.NET Core host
+        Controllers/
+        Middleware/
+        Program.cs
+ tests/
+     MyApp.Domain.Tests/
+     MyApp.Application.Tests/
+     MyApp.Api.Tests/
 ```
 
 ```cs
-// ” Domain Layer — pure business logic, no framework dependencies ”———
+//  Domain Layer — pure business logic, no framework dependencies ———
 namespace MyApp.Domain.Entities;
 
 public sealed class Order : AggregateRoot
@@ -31325,7 +31325,7 @@ public sealed class Order : AggregateRoot
     }
 }
 
-// ” Application Layer — use case orchestration ”—————————————————————
+//  Application Layer — use case orchestration —————————————————————
 namespace MyApp.Application.Interfaces;
 
 public interface IOrderRepository
@@ -31335,7 +31335,7 @@ public interface IOrderRepository
     Task<IReadOnlyList<Order>> GetByCustomerAsync(string customerId, CancellationToken ct = default);
 }
 
-// ” Infrastructure Layer — concrete implementations ”—————————————————
+//  Infrastructure Layer — concrete implementations —————————————————
 namespace MyApp.Infrastructure.Persistence;
 
 public class OrderRepository(AppDbContext db) : IOrderRepository
@@ -31358,7 +31358,7 @@ public class OrderRepository(AppDbContext db) : IOrderRepository
              .ContinueWith(t => (IReadOnlyList<Order>)t.Result, ct);
 }
 
-// ” Presentation Layer — thin controllers, delegate to application ”———
+//  Presentation Layer — thin controllers, delegate to application ———
 [ApiController, Route("api/orders")]
 public class OrdersController(ISender mediator) : ControllerBase
 {
@@ -31393,7 +31393,7 @@ dotnet add package FluentValidation.DependencyInjectionExtensions
 ```
 
 ```cs
-// ” 1. COMMANDS — change state, return minimal result ”———————————————
+//  1. COMMANDS — change state, return minimal result ———————————————
 // Command DTO
 public sealed record CreateOrderCommand(
     string CustomerId,
@@ -31421,7 +31421,7 @@ public sealed class CreateOrderHandler(
     }
 }
 
-// ” 2. QUERIES — read state, never mutate ”———————————————————————————
+//  2. QUERIES — read state, never mutate ———————————————————————————
 // Query DTO
 public sealed record GetOrderQuery(Guid OrderId) : IRequest<OrderDetailDto?>;
 
@@ -31454,7 +31454,7 @@ public sealed class GetOrderHandler(AppDbContext db) : IRequestHandler<GetOrderQ
     }
 }
 
-// ” 3. PIPELINE BEHAVIORS — cross-cutting concerns ”——————————————————
+//  3. PIPELINE BEHAVIORS — cross-cutting concerns ——————————————————
 // Validation behavior — run FluentValidation before every command
 public sealed class ValidationBehavior<TRequest, TResponse>(
     IEnumerable<IValidator<TRequest>> validators)
@@ -31517,7 +31517,7 @@ public sealed class CreateOrderCommandValidator : AbstractValidator<CreateOrderC
     }
 }
 
-// ” 4. REGISTRATION ”—————————————————————————————————————————————————
+//  4. REGISTRATION —————————————————————————————————————————————————
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssemblyContaining<CreateOrderHandler>();
@@ -31536,7 +31536,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateOrderCommandValidator
 **DDD** (Eric Evans) is a software design approach that focuses on modeling complex business domains. The code structure mirrors the business language (Ubiquitous Language).
 
 ```cs
-// ” 1. VALUE OBJECT — defined by its attributes, immutable ”——————————
+//  1. VALUE OBJECT — defined by its attributes, immutable ——————————
 public sealed class Money : IEquatable<Money>
 {
     public decimal Amount   { get; }
@@ -31567,7 +31567,7 @@ public sealed class Money : IEquatable<Money>
     public override string ToString() => $"{Amount:F2} {Currency}";
 }
 
-// ” 2. ENTITY — defined by identity, mutable state ”——————————————————
+//  2. ENTITY — defined by identity, mutable state ——————————————————
 public abstract class Entity
 {
     public Guid Id { get; protected set; } = Guid.NewGuid();
@@ -31578,7 +31578,7 @@ public abstract class Entity
     public void ClearDomainEvents() => _domainEvents.Clear();
 }
 
-// ” 3. AGGREGATE ROOT — consistency boundary, only accessible entry ”—
+//  3. AGGREGATE ROOT — consistency boundary, only accessible entry —
 public sealed class Order : Entity
 {
     private readonly List<OrderLine> _lines = [];
@@ -31614,7 +31614,7 @@ public sealed class Order : Entity
     }
 }
 
-// ” 4. DOMAIN EVENTS — something significant happened ”——————————————
+//  4. DOMAIN EVENTS — something significant happened ——————————————
 public interface IDomainEvent { }
 public sealed record OrderCreatedEvent(Guid OrderId, string CustomerId, DateTime OccurredAt) : IDomainEvent;
 public sealed record OrderSubmittedEvent(Guid OrderId, decimal Total, DateTime OccurredAt) : IDomainEvent;
@@ -31641,14 +31641,14 @@ public class DomainEventPublisher(IPublishEndpoint bus) : SaveChangesInterceptor
     }
 }
 
-// ” 5. REPOSITORY — abstracts persistence for aggregates only ”———————
+//  5. REPOSITORY — abstracts persistence for aggregates only ———————
 public interface IOrderRepository
 {
     Task<Order?> FindAsync(Guid id, CancellationToken ct = default);
     Task SaveAsync(Order order, CancellationToken ct = default);
 }
 
-// ” 6. DOMAIN SERVICE — logic that doesn\'t belong to a single entity ”
+//  6. DOMAIN SERVICE — logic that doesn\'t belong to a single entity 
 public class PricingService(IProductRepository products)
 {
     public async Task<Money> CalculateDiscountedPriceAsync(
@@ -31662,17 +31662,17 @@ public class PricingService(IProductRepository products)
     }
 }
 
-// ” 7. BOUNDED CONTEXT MAP ”——————————————————————————————————————————
+//  7. BOUNDED CONTEXT MAP ——————————————————————————————————————————
 /*
- ””——————————————————         ””——————————————————
- ”  Order Context   ””ACL”—–”  Catalog Context  ”
- ”  (Order, Line)   ”         ”  (Product, Stock) ”
- ”””——————————————————         ”””——————————————————
-        ” Domain Events
+ ——————————————————         ——————————————————
+   Order Context   ACL—–  Catalog Context  
+   (Order, Line)              (Product, Stock) 
+ ——————————————————         ——————————————————
+         Domain Events
         –
- ””——————————————————
- ” Shipping Context ”
- ”””——————————————————
+ ——————————————————
+  Shipping Context 
+ ——————————————————
 
  ACL = Anti-Corruption Layer (translates between contexts)
 */
@@ -31687,7 +31687,7 @@ public class PricingService(IProductRepository products)
 **Enterprise Integration Patterns (EIP)** (Hohpe & Woolf) provide a vocabulary for designing messaging systems. Key patterns: Message Channel, Message Router, Aggregator, Saga, and Dead Letter Queue.
 
 ```cs
-// ” 1. MESSAGE ROUTER — route messages by content ”———————————————————
+//  1. MESSAGE ROUTER — route messages by content ———————————————————
 public class OrderPriorityRouter(
     IMessageChannel standardQueue,
     IMessageChannel priorityQueue) : IConsumer<OrderPlaced>
@@ -31700,7 +31700,7 @@ public class OrderPriorityRouter(
     }
 }
 
-// ” 2. AGGREGATOR — collect related messages, emit combined result ”———
+//  2. AGGREGATOR — collect related messages, emit combined result ———
 // Collect all items for an order, then process when complete
 public class OrderAggregatorSaga : MassTransitStateMachine<OrderAggregatorState>
 {
@@ -31745,7 +31745,7 @@ public class OrderAggregatorSaga : MassTransitStateMachine<OrderAggregatorState>
     }
 }
 
-// ” 3. DEAD LETTER QUEUE — handle unprocessable messages ”————————————
+//  3. DEAD LETTER QUEUE — handle unprocessable messages ————————————
 public class FaultConsumer<T> : IConsumer<Fault<T>> where T : class
 {
     private readonly IDeadLetterStore _store;
@@ -31778,7 +31778,7 @@ public class FaultConsumer<T> : IConsumer<Fault<T>> where T : class
 x.AddConsumer(typeof(FaultConsumer<OrderPlaced>));
 x.AddConsumer(typeof(FaultConsumer<ProcessPayment>));
 
-// ” 4. REQUEST-REPLY — synchronous over async messaging ”—————————————
+//  4. REQUEST-REPLY — synchronous over async messaging —————————————
 // Requester
 public class InventoryCheckService(IRequestClient<CheckInventory> client)
 {
@@ -32096,26 +32096,26 @@ services:
 ```dockerfile
 # Dockerfile — production-grade .NET 10 Web API
 
-# ” Stage 1: Restore ”————————————————————————————————————————
+#  Stage 1: Restore ————————————————————————————————————————
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS restore
 WORKDIR /src
 COPY ["MyApi/MyApi.csproj", "MyApi/"]
 COPY ["MyApi.Core/MyApi.Core.csproj", "MyApi.Core/"]
 RUN dotnet restore "MyApi/MyApi.csproj"
 
-# ” Stage 2: Build ”——————————————————————————————————————————
+#  Stage 2: Build ——————————————————————————————————————————
 FROM restore AS build
 COPY . .
 RUN dotnet build "MyApi/MyApi.csproj" -c Release --no-restore
 
-# ” Stage 3: Publish ”————————————————————————————————————————
+#  Stage 3: Publish ————————————————————————————————————————
 FROM build AS publish
 RUN dotnet publish "MyApi/MyApi.csproj" \
     -c Release \
     --no-build \
     -o /app/publish
 
-# ” Stage 4: Runtime (final, smallest image) ”————————————————
+#  Stage 4: Runtime (final, smallest image) ————————————————
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 
 # Security: non-root user
@@ -32316,7 +32316,7 @@ env:
   AZURE_WEBAPP_NAME: 'my-dotnet-api'
 
 jobs:
-  # ” CI: Build & Test ”————————————————————————————————————
+  #  CI: Build & Test ————————————————————————————————————
   build-and-test:
     runs-on: ubuntu-latest
     steps:
@@ -32353,7 +32353,7 @@ jobs:
         name: app
         path: ./publish
 
-  # ” CD: Deploy (main branch only) ”——————————————————————
+  #  CD: Deploy (main branch only) ——————————————————————
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
@@ -32397,7 +32397,7 @@ variables:
   dotnetVersion: '10.0.x'
 
 stages:
-# ” Stage 1: Build & Test ”————————————————————————————————
+#  Stage 1: Build & Test ————————————————————————————————
 - stage: Build
   jobs:
   - job: BuildAndTest
@@ -32431,7 +32431,7 @@ stages:
         PathtoPublish: $(Build.ArtifactStagingDirectory)/publish
         ArtifactName: drop
 
-# ” Stage 2: Deploy to Staging ”——————————————————————————
+#  Stage 2: Deploy to Staging ——————————————————————————
 - stage: DeployStaging
   dependsOn: Build
   jobs:
@@ -32447,7 +32447,7 @@ stages:
               appName: 'my-api-staging'
               package: $(Pipeline.Workspace)/drop
 
-# ” Stage 3: Deploy to Production (with approval) ”———————
+#  Stage 3: Deploy to Production (with approval) ———————
 - stage: DeployProd
   dependsOn: DeployStaging
   jobs:
@@ -32866,7 +32866,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # ” 1. BUILD & TEST ”————————————————————————————————————————————————
+  #  1. BUILD & TEST ————————————————————————————————————————————————
   build-and-test:
     name: Build and Test
     runs-on: ubuntu-latest
@@ -32934,7 +32934,7 @@ jobs:
           directory: ./test-results
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  # ” 2. CODE QUALITY ”————————————————————————————————————————————————
+  #  2. CODE QUALITY ————————————————————————————————————————————————
   code-quality:
     name: Code Analysis
     runs-on: ubuntu-latest
@@ -32953,7 +32953,7 @@ jobs:
       - name: Run Roslyn analyzers
         run: dotnet build -c Release -p:TreatWarningsAsErrors=true
 
-  # ” 3. BUILD DOCKER IMAGE ”——————————————————————————————————————————
+  #  3. BUILD DOCKER IMAGE ——————————————————————————————————————————
   build-image:
     name: Build Docker Image
     runs-on: ubuntu-latest
@@ -32994,7 +32994,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # ” 4. DEPLOY TO STAGING ”———————————————————————————————————————————
+  #  4. DEPLOY TO STAGING ———————————————————————————————————————————
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
@@ -33016,7 +33016,7 @@ jobs:
           resourceGroup: myapp-staging-rg
           imageToDeploy: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
 
-  # ” 5. DEPLOY TO PRODUCTION ”————————————————————————————————————————
+  #  5. DEPLOY TO PRODUCTION ————————————————————————————————————————
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
@@ -33047,7 +33047,7 @@ jobs:
 A **multi-stage Dockerfile** uses separate build and runtime images, keeping the final image small and free of SDK tools.
 
 ```dockerfile
-# ” Dockerfile ”——————————————————————————————————————————————————————
+#  Dockerfile ——————————————————————————————————————————————————————
 # Stage 1: Restore dependencies (cached unless .csproj changes)
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS restore
 WORKDIR /src
@@ -33153,7 +33153,7 @@ docker images myapp:latest   # SDK: ~800MB ’ Runtime: ~220MB ’ Trimmed: ~80M
 .NET Core uses a **layered configuration** system where later sources override earlier ones. Environment-specific overrides are applied automatically.
 
 ```cs
-// ” Configuration loading order (last wins) ”—————————————————————————
+//  Configuration loading order (last wins) —————————————————————————
 // 1. appsettings.json                    (all environments)
 // 2. appsettings.{Environment}.json      (env-specific)
 // 3. User Secrets (Development only)
@@ -33162,7 +33162,7 @@ docker images myapp:latest   # SDK: ~800MB ’ Runtime: ~220MB ’ Trimmed: ~80M
 
 // WebApplication.CreateBuilder() sets this up automatically
 
-// ” appsettings.json ”————————————————————————————————————————————————
+//  appsettings.json ————————————————————————————————————————————————
 {
   "Logging": { "LogLevel": { "Default": "Information" } },
   "ConnectionStrings": {
@@ -33172,14 +33172,14 @@ docker images myapp:latest   # SDK: ~800MB ’ Runtime: ~220MB ’ Trimmed: ~80M
   "EmailSettings": { "SmtpHost": "localhost", "Port": 1025 }
 }
 
-// ” appsettings.Production.json ”—————————————————————————————————————
+//  appsettings.Production.json —————————————————————————————————————
 {
   "Logging": { "LogLevel": { "Default": "Warning" } },
   "FeatureFlags": { "NewCheckout": true }
   // ConnectionStrings come from environment variable, not file
 }
 
-// ” Binding configuration to strongly-typed classes ”—————————————————
+//  Binding configuration to strongly-typed classes —————————————————
 public class EmailSettings
 {
     public string SmtpHost { get; init; } = null!;
@@ -33210,16 +33210,16 @@ public class EmailService(IOptions<EmailSettings> opts)
     }
 }
 
-// ” User Secrets (Development only — not committed to source control) ”
+//  User Secrets (Development only — not committed to source control) 
 // dotnet user-secrets init
 // dotnet user-secrets set "EmailSettings:Password" "mysecretpassword"
 // Stored in: %APPDATA%\Microsoft\UserSecrets\{userSecretsId}\secrets.json
 
-// ” Environment Variables — override any key ”————————————————————————
+//  Environment Variables — override any key ————————————————————————
 // Flat key: EMAILSETTINGS__PASSWORD=secret   (double underscore = section separator)
 // Connection string: ConnectionStrings__Default=Host=prod-db;...
 
-// ” Azure Key Vault (production secrets) ”————————————————————————————
+//  Azure Key Vault (production secrets) ————————————————————————————
 if (builder.Environment.IsProduction())
 {
     builder.Configuration.AddAzureKeyVault(
@@ -33229,7 +33229,7 @@ if (builder.Environment.IsProduction())
 
 // Key Vault maps: "EmailSettings--SmtpHost" ’ EmailSettings:SmtpHost
 
-// ” Feature flags ”———————————————————————————————————————————————————
+//  Feature flags ———————————————————————————————————————————————————
 builder.Services.AddFeatureManagement(builder.Configuration.GetSection("FeatureFlags"));
 
 // Controller
@@ -33244,7 +33244,7 @@ public class CheckoutController(IFeatureManager features) : ControllerBase
     }
 }
 
-// ” IConfiguration direct access ”————————————————————————————————————
+//  IConfiguration direct access ————————————————————————————————————
 public class StartupInfo(IConfiguration config)
 {
     public void Log()
@@ -35385,12 +35385,12 @@ public class FileSizeTagHelper : TagHelper
 The **middleware pipeline** is a chain of components that process HTTP requests and responses in order. Each middleware can call `next()` to pass control to the next component or short-circuit the pipeline.
 
 ```cs
-// ” Request flow ”————————————————————————————————————————————————————
+//  Request flow ————————————————————————————————————————————————————
 // Request ’ Middleware1 ’ Middleware2 ’ Middleware3 ’ Endpoint
 //                                                         “
 // Response  Middleware1  Middleware2  Middleware3  (response built)
 
-// ” Built-in middleware order matters ”——————————————————————————————
+//  Built-in middleware order matters ——————————————————————————————
 var app = builder.Build();
 
 app.UseExceptionHandler("/error"); // 1. Catch unhandled exceptions first
@@ -35404,7 +35404,7 @@ app.UseAuthorization();            // 8. Enforce permissions
 app.UseOutputCache();              // 9. Cache responses
 app.MapControllers();              // 10. Execute controller endpoints
 
-// ” Writing custom middleware ”———————————————————————————————————————
+//  Writing custom middleware ———————————————————————————————————————
 // Option A: Middleware class (recommended for reusability)
 public class RequestTimingMiddleware(RequestDelegate next, ILogger<RequestTimingMiddleware> logger)
 {
@@ -35445,7 +35445,7 @@ app.Run(async ctx =>
 // Registration
 app.UseMiddleware<RequestTimingMiddleware>();
 
-// ” Conditional middleware ”———————————————————————————————————————————
+//  Conditional middleware ———————————————————————————————————————————
 // Map — branch by path prefix
 app.Map("/admin", adminApp =>
 {
@@ -35463,7 +35463,7 @@ app.UseWhen(
     ctx => ctx.Request.Path.StartsWithSegments("/api"),
     apiApp => apiApp.UseMiddleware<ApiRateLimiterMiddleware>());
 
-// ” Middleware with scoped dependencies ”—————————————————————————————
+//  Middleware with scoped dependencies —————————————————————————————
 // Inject scoped services via InvokeAsync parameters (not constructor)
 public class AuditMiddleware(RequestDelegate next)
 {
@@ -35486,7 +35486,7 @@ public class AuditMiddleware(RequestDelegate next)
 The built-in **IoC container** (`IServiceCollection` / `IServiceProvider`) supports three service lifetimes and provides constructor injection throughout the application.
 
 ```cs
-// ” Service lifetimes ”———————————————————————————————————————————————
+//  Service lifetimes ———————————————————————————————————————————————
 // Singleton  — one instance for the entire application lifetime
 // Scoped     — one instance per HTTP request (or explicit scope)
 // Transient  — new instance every time it is requested
@@ -35495,7 +35495,7 @@ builder.Services.AddSingleton<IMemoryCacheService, MemoryCacheService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 
-// ” Registering with factory / implementation instance ”——————————————
+//  Registering with factory / implementation instance ——————————————
 // Factory — called once (Singleton) or per request (Scoped/Transient)
 builder.Services.AddScoped<IDbConnection>(sp =>
     new NpgsqlConnection(sp.GetRequiredService<IConfiguration>()
@@ -35504,7 +35504,7 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 // Pre-created instance (always Singleton)
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
-// ” Registering multiple implementations ”———————————————————————————
+//  Registering multiple implementations ———————————————————————————
 builder.Services.AddScoped<INotificationHandler, EmailNotificationHandler>();
 builder.Services.AddScoped<INotificationHandler, SmsNotificationHandler>();
 builder.Services.AddScoped<INotificationHandler, PushNotificationHandler>();
@@ -35519,7 +35519,7 @@ public class NotificationService(IEnumerable<INotificationHandler> handlers)
     }
 }
 
-// ” Keyed services (.NET 8+) ”————————————————————————————————————————
+//  Keyed services (.NET 8+) ————————————————————————————————————————
 builder.Services.AddKeyedScoped<IPaymentGateway, StripeGateway>("stripe");
 builder.Services.AddKeyedScoped<IPaymentGateway, PayPalGateway>("paypal");
 
@@ -35529,7 +35529,7 @@ public class CheckoutService(
     [FromKeyedServices("paypal")] IPaymentGateway paypal)
 { }
 
-// ” Options pattern with DI ”——————————————————————————————————————————
+//  Options pattern with DI ——————————————————————————————————————————
 builder.Services.AddOptions<SmtpOptions>()
     .Bind(builder.Configuration.GetSection("Smtp"))
     .Validate(o => o.Port > 0 && o.Port < 65536, "Invalid SMTP port")
@@ -35540,7 +35540,7 @@ public class SmtpEmailSender(IOptions<SmtpOptions> opts)
     private readonly SmtpOptions _opts = opts.Value;
 }
 
-// ” Avoiding captive dependency anti-pattern ”————————————————————————
+//  Avoiding captive dependency anti-pattern ————————————————————————
 //  WRONG: Singleton captures Scoped service — Scoped lives too long
 builder.Services.AddSingleton<OrderService>(sp =>
     new OrderService(sp.GetRequiredService<IOrderRepository>())); // scoped repo in singleton!
@@ -35560,7 +35560,7 @@ public class BackgroundOrderProcessor(IServiceScopeFactory scopeFactory) : Backg
     }
 }
 
-// ” Manual resolution (avoid — prefer constructor injection) ”————————
+//  Manual resolution (avoid — prefer constructor injection) ————————
 using var scope = app.Services.CreateScope();
 var dbContext   = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 await dbContext.Database.MigrateAsync();
@@ -35575,7 +35575,7 @@ await dbContext.Database.MigrateAsync();
 `IHostedService` runs code when the host starts/stops. `BackgroundService` is a base class that simplifies long-running background work.
 
 ```cs
-// ” Option 1: Simple IHostedService ”—————————————————————————————————
+//  Option 1: Simple IHostedService —————————————————————————————————
 public class DatabaseMigrationService(IServiceScopeFactory scopeFactory)
     : IHostedService
 {
@@ -35590,7 +35590,7 @@ public class DatabaseMigrationService(IServiceScopeFactory scopeFactory)
     public Task StopAsync(CancellationToken ct) => Task.CompletedTask;
 }
 
-// ” Option 2: BackgroundService — long-running loop ”—————————————————
+//  Option 2: BackgroundService — long-running loop —————————————————
 public class OrderOutboxProcessor(
     IServiceScopeFactory scopeFactory,
     ILogger<OrderOutboxProcessor> logger) : BackgroundService
@@ -35643,7 +35643,7 @@ public class OrderOutboxProcessor(
     }
 }
 
-// ” Option 3: Timed background service ”——————————————————————————————
+//  Option 3: Timed background service ——————————————————————————————
 public class CacheWarmupService(IServiceScopeFactory scopeFactory) : BackgroundService
 {
     private readonly PeriodicTimer _timer = new(TimeSpan.FromMinutes(5));
@@ -35671,12 +35671,12 @@ public class CacheWarmupService(IServiceScopeFactory scopeFactory) : BackgroundS
     }
 }
 
-// ” Registration ”————————————————————————————————————————————————————
+//  Registration ————————————————————————————————————————————————————
 builder.Services.AddHostedService<DatabaseMigrationService>(); // runs at startup
 builder.Services.AddHostedService<OrderOutboxProcessor>();
 builder.Services.AddHostedService<CacheWarmupService>();
 
-// ” Worker Service — standalone background process ”——————————————————
+//  Worker Service — standalone background process ——————————————————
 // dotnet new worker -n MyWorker
 // Generates a minimal Host with BackgroundService — no HTTP stack
 var builder = Host.CreateApplicationBuilder(args);
@@ -37172,7 +37172,7 @@ Console.WriteLine("--- Key Difference ---");
 ```cs
 using System.Reflection;
 
-// ” 1. Inspect a type ”———————————————————————————————————————————————
+//  1. Inspect a type ———————————————————————————————————————————————
 Type type = typeof(string);
 
 Console.WriteLine(type.FullName);          // System.String
@@ -37184,7 +37184,7 @@ Console.WriteLine(type.BaseType?.Name);    // Object
 foreach (MethodInfo method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
     Console.WriteLine($"  {method.Name}({string.Join(", ", method.GetParameters().Select(p => p.ParameterType.Name))})");
 
-// ” 2. Create instance and invoke method dynamically ”————————————————
+//  2. Create instance and invoke method dynamically ————————————————
 public class Calculator
 {
     public int Add(int a, int b) => a + b;
@@ -37210,7 +37210,7 @@ Console.WriteLine(secretField?.GetValue(calc));   // hidden
 secretField?.SetValue(calc, "modified");
 Console.WriteLine(secretField?.GetValue(calc));   // modified
 
-// ” 3. Read attributes via reflection ”———————————————————————————————
+//  3. Read attributes via reflection ———————————————————————————————
 foreach (MethodInfo method in calcType.GetMethods())
 {
     var obsolete = method.GetCustomAttribute<ObsoleteAttribute>();
@@ -37218,7 +37218,7 @@ foreach (MethodInfo method in calcType.GetMethods())
         Console.WriteLine($"{method.Name} is obsolete: {obsolete.Message}");
 }
 
-// ” 4. Generic reflection ”———————————————————————————————————————————
+//  4. Generic reflection ———————————————————————————————————————————
 // Create List<int> dynamically
 Type listType = typeof(List<>).MakeGenericType(typeof(int));
 object list = Activator.CreateInstance(listType)!;
@@ -37227,7 +37227,7 @@ addItem.Invoke(list, [42]);
 addItem.Invoke(list, [99]);
 Console.WriteLine(listType.GetProperty("Count")?.GetValue(list)); // 2
 
-// ” 5. Property access and setting ”——————————————————————————————————
+//  5. Property access and setting ——————————————————————————————————
 public class Person { public string Name { get; set; } = ""; public int Age { get; set; } }
 
 var person = new Person();
@@ -37242,7 +37242,7 @@ foreach (var (key, value) in values)
 }
 Console.WriteLine($"{person.Name}, {person.Age}"); // Alice, 30
 
-// ” 6. Cached reflection with compiled expressions (fast path) ”——————
+//  6. Cached reflection with compiled expressions (fast path) ——————
 // Raw reflection is ~100-300x slower than direct calls
 // Cache with compiled delegates for hot paths
 var compiled = CreateSetter<Person, string>(p => p.Name);
@@ -37276,7 +37276,7 @@ Action<T, TProp> CreateSetter<T, TProp>(System.Linq.Expressions.Expression<Func<
 using System;
 using System.Reflection;
 
-// ” 1. Define a custom attribute ”———————————————————————————————————
+//  1. Define a custom attribute ———————————————————————————————————
 [AttributeUsage(
     AttributeTargets.Class | AttributeTargets.Method,  // where it can be applied
     AllowMultiple = false,                             // one per target
@@ -37290,7 +37290,7 @@ public class AuditAttribute : Attribute
     public AuditAttribute(string action) => Action = action;
 }
 
-// ” 2. Apply the attribute ”——————————————————————————————————————————
+//  2. Apply the attribute ——————————————————————————————————————————
 [Audit("Order", Category = "Commerce")]
 public class OrderController
 {
@@ -37298,7 +37298,7 @@ public class OrderController
     public Task<Order> PlaceOrderAsync(PlaceOrderRequest req) => Task.FromResult(new Order());
 }
 
-// ” 3. Read attributes at runtime via reflection ”————————————————————
+//  3. Read attributes at runtime via reflection ————————————————————
 Type type = typeof(OrderController);
 
 // Class-level attribute
@@ -37313,7 +37313,7 @@ foreach (MethodInfo method in type.GetMethods())
         Console.WriteLine($"{method.Name}: {methodAudit.Action}, LogArgs={methodAudit.LogArgs}");
 }
 
-// ” 4. Validation attribute (like DataAnnotations) ”——————————————————
+//  4. Validation attribute (like DataAnnotations) ——————————————————
 [AttributeUsage(AttributeTargets.Property)]
 public class MustBePastAttribute : ValidationAttribute
 {
@@ -37341,7 +37341,7 @@ bool valid  = Validator.TryValidateObject(request, ctx, results, validateAllProp
 Console.WriteLine(valid);        // False
 Console.WriteLine(results[0].ErrorMessage); // The date must be in the past.
 
-// ” 5. Parameter attribute ”——————————————————————————————————————————
+//  5. Parameter attribute ——————————————————————————————————————————
 [AttributeUsage(AttributeTargets.Parameter)]
 public class NotEmptyAttribute : Attribute { }
 
@@ -37388,7 +37388,7 @@ dotnet add MySourceGenerator package Microsoft.CodeAnalysis.Analyzers
 ```
 
 ```cs
-// ” 1. Incremental Source Generator (recommended — .NET 6+) ”—————————
+//  1. Incremental Source Generator (recommended — .NET 6+) —————————
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
@@ -37481,11 +37481,11 @@ public class ToStringGenerator : IIncrementalGenerator
 
 }
 
-// ” 2. Attribute trigger (add to generator project) ”—————————————————
+//  2. Attribute trigger (add to generator project) —————————————————
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class GenerateToStringAttribute : Attribute { }
 
-// ” 3. Consumer project ”—————————————————————————————————————————————
+//  3. Consumer project —————————————————————————————————————————————
 // Add reference to generator:
 // <ProjectReference Include="../MySourceGenerator/MySourceGenerator.csproj"
 //                   OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
@@ -37523,7 +37523,7 @@ The `dynamic` keyword bypasses compile-time type checking. Member resolution hap
 using System.Dynamic;
 using Microsoft.CSharp.RuntimeBinder;
 
-// ” 1. Basic dynamic usage ”——————————————————————————————————————————
+//  1. Basic dynamic usage ——————————————————————————————————————————
 dynamic value = 42;
 Console.WriteLine(value + 8);   // 50 — resolved as int addition at runtime
 
@@ -37533,7 +37533,7 @@ Console.WriteLine(value.Length); // 5 — string.Length resolved at runtime
 value = new DateTime(2026, 1, 1);
 Console.WriteLine(value.Year);   // 2026 — DateTime.Year at runtime
 
-// ” 2. COM Interop (primary use case) ”———————————————————————————————
+//  2. COM Interop (primary use case) ———————————————————————————————
 // Without dynamic (verbose)
 var excel = (Microsoft.Office.Interop.Excel.Application)
     Activator.CreateInstance(Type.GetTypeFromProgID("Excel.Application")!);
@@ -37546,7 +37546,7 @@ dynamic workbook = excelDyn.Workbooks.Add();
 dynamic sheet = workbook.Worksheets[1];
 sheet.Cells[1, 1] = "Hello from C#!";
 
-// ” 3. Working with JSON / dictionary structures ”—————————————————————
+//  3. Working with JSON / dictionary structures —————————————————————
 // ExpandoObject — dynamic dictionary that works like an object
 dynamic person = new ExpandoObject();
 person.Name = "Alice";
@@ -37559,7 +37559,7 @@ var dict = (IDictionary<string, object?>)person;
 dict["Email"] = "alice@example.com";
 Console.WriteLine(dict.ContainsKey("Email")); // True
 
-// ” 4. DynamicObject — custom dynamic behavior ”——————————————————————
+//  4. DynamicObject — custom dynamic behavior ——————————————————————
 public class DynamicConfig : DynamicObject
 {
     private readonly Dictionary<string, object?> _data = new();
@@ -37587,13 +37587,13 @@ config.MaxRetries = 3;
 Console.WriteLine(config.ConnectionString); // Server=localhost;Database=mydb
 Console.WriteLine(config.DoSomething("a", "b")); // Invoked: DoSomething(a, b)
 
-// ” 5. Calling private/internal members (advanced) ”——————————————————
+//  5. Calling private/internal members (advanced) ——————————————————
 // Use reflection with dynamic for cleaner syntax on legacy APIs
 var internalObj = CreateInternalInstance();
 dynamic d = internalObj;
 // d.InternalMethod(); // Works if member exists — RuntimeBinderException if not
 
-// ” 6. Pitfalls ”————————————————————————————————————————————————————
+//  6. Pitfalls ————————————————————————————————————————————————————
 dynamic x = "hello";
 try
 {
