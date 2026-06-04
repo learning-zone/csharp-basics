@@ -6,17 +6,14 @@
 
 ## Related Topics
 
-* *[HTML Basics](https://github.com/learning-zone/html-basics)*
-* *[CSS Basics](https://github.com/learning-zone/css-basics)*
+* *[ADO.NET](https://github.com/learning-zone/csharp-basics/blob/main/ado.net.md)*
+* *[ASP.NET Core](https://github.com/learning-zone/csharp-basics/blob/main/asp-net-core.md)*
+* *[C# Multiple Choice Questions](https://github.com/learning-zone/csharp-basics/blob/main/dotnet-mcq.md)*
+* *[C# Unit Testing](https://github.com/learning-zone/csharp-basics/blob/main/csharp-unit-test.md)*
+* *[C# Design Patterns](https://github.com/learning-zone/csharp-basics/blob/main/csharp-dp.md)*
+* *[C# Data Structures and Algorithms](https://github.com/learning-zone/csharp-basics/blob/main/csharp-ds.md)*
 * *[React Basics](https://github.com/learning-zone/react-basics)*
-* *[Angular Basics](https://github.com/learning-zone/angular-basics)*
 * *[SQL Basics](https://github.com/learning-zone/sql-basics)*
-* *[ASP.NET Core](asp-net-core.md)*
-* *[ADO.NET](ado.net.md)*
-* *[.NET Multiple Choice Questions](dotnet-mcq.md)*
-* *[Unit Testing](dotnet-unit-test.md)*
-* *[Design Patterns](dotnet-dp.md)*
-* *[Data Structures and Algorithms](dotnet-ds.md)*
 
 <br>
 
