@@ -26,7 +26,7 @@ Focus: Syntax, basic language constructs, and core type system.
 * [Operators](#-2-operators): Arithmetic, comparison, logical, bitwise, and null-coalescing operators.
 * [Control Flow](#-3-control-flow): Conditional statements (if/else, switch expressions) and loops (for, foreach, while).
 
-## L2: [Intermediate (Junior-Mid / Developer)](files/Intermediate.md)
+## [L2: Intermediate (Junior-Mid / Developer)](files/Intermediate.md)
 Focus: Object-oriented programming, collections, and common language features.
 
 * **Classes and Structs**: Fields, properties, constructors, methods, access modifiers, and records.
@@ -672,27 +672,27 @@ The primary purpose of the `using` statement in C# is to **ensure automatic reso
 
 It guarantees that unmanaged resources (like file handles, database connections, or network sockets) are properly released as soon as the execution block exits, even if an unhandled exception occurs.
 
-**1. Traditional `using` block (all .NET versions):**
+**1. Traditional `using` block:**
 
 ```cs
-using (var file = new StreamReader("example.txt"))
+using (StreamReader file = new StreamReader("file.txt"))
 {
     string content = file.ReadToEnd();
     // file is automatically disposed when the block exits
 }
 ```
 
-**2. `using` declaration (C# 8+, .NET Core 3+):**
+**2. `using` declaration:**
 
 No braces needed — the object is disposed at the end of the enclosing scope. This is the preferred modern style.
 
 ```cs
-using var file = new StreamReader("example.txt");
+using var file = new StreamReader("file.txt");
 string content = file.ReadToEnd();
 // file is automatically disposed here (end of method/block)
 ```
 
-**3. `await using` for async disposal (C# 8+):**
+**3. `await using` for async disposal:**
 
 For objects implementing `IAsyncDisposable` (e.g., async streams, `HttpClient`, `DbContext`):
 
@@ -706,7 +706,7 @@ await connection.OpenAsync();
 
 * Applies to any type implementing `IDisposable` or `IAsyncDisposable`.
 * Prevents resource leaks for files, streams, database connections, HTTP clients, etc.
-* `using` declarations (C# 8+) reduce nesting and are generally preferred in modern .NET code.
+* `using` declarations reduce nesting and are generally preferred in modern .NET code.
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
@@ -1143,7 +1143,7 @@ The primary difference between `ref` and `out` parameters is who is responsible 
 
 Both keywords allow you to pass arguments by reference rather than by value. 
 
-## At-a-Glance Comparison
+**At-a-Glance Comparison**
 
 | Feature | ref Parameter | out Parameter |
 |---|---|---|
@@ -1296,9 +1296,9 @@ Console.WriteLine(a); // Output: 10 (original value unchanged)
 
 **By Reference (byref):**
 
-The method receives a reference to the original variable.
-Changes made to the parameter affect the original variable.
-In C#, use the ref or out keyword to pass by reference.
+- The method receives a reference to the original variable.
+- Changes made to the parameter affect the original variable.
+- In C#, use the ref or out keyword to pass by reference.
 
 **Example:**
 
@@ -1332,6 +1332,7 @@ An **immutable string** in C# is a string whose value cannot be changed after it
 ```cs
 string s1 = "Hello";
 string s2 = s1;
+
 s1 = s1 + " World"; // Creates a new string, s1 now points to "Hello World"
 Console.WriteLine(s2); // Output: Hello (s2 is unchanged)
 ```
@@ -1342,48 +1343,61 @@ Console.WriteLine(s2); // Output: Hello (s2 is unchanged)
 
 ## Q. What is the JIT compiler process?
 
-The JIT (Just-In-Time) compiler is a core component of the .NET runtime (CLR/CoreCLR) that converts Intermediate Language (IL) code into native machine code at runtime, just before execution.
+The **JIT Compiler** (Just-In-Time) is a core component of the `.NET` CLR (Common Language Runtime) that converts Intermediate Language (IL) code into native machine code at runtime, just before the code execution.
+
+**JIT Compilation Flow in .NET**
+
+```
+C# Source Code
+        |
+C# Complier (cs.exe)
+        |
+MSIL (Intermediate Language)
+        |
+Assembly (.exe/dll)
+        |
+CLR Loads Assembly
+        |
+JIT Compiler
+        |
+Native Machine Code
+        |
+CPU Executes Code
+```
 
 **JIT Compilation Process:**
 
-1. **Source ’ IL:** The C# compiler (`csc` / `dotnet build` using **Roslyn**) compiles source code into **Intermediate Language (IL)** and stores it in assemblies (`.dll` / `.exe`).
+1. **Source Compiler IL:** The C# compiler (`csc` / `dotnet build` using **Roslyn**) compiles source code into **Intermediate Language (IL)** and stores it in assemblies (`.dll` / `.exe`).
 2. **Assembly Loading:** The CoreCLR loads the required assemblies at startup.
 3. **JIT Compilation:** When a method is called for the first time, the JIT compiler translates its IL to **native machine code** optimized for the current CPU (x64, Arm64, etc.).
 4. **Caching:** The native code is cached in memory so subsequent calls execute directly without re-compilation.
 5. **Execution:** The CPU runs the native code.
 
-**.NET JIT improvements (.NET 8/9/10):**
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
 
-* **Tiered Compilation (default on):** Methods start with quick-tier-0 code, then are recompiled with full optimizations (tier-1) if called frequently.
-* **Dynamic PGO (Profile-Guided Optimization):** The JIT uses runtime profiling data to make smarter inlining and de-virtualization decisions automatically.
-* **AVX-512 / SIMD support:** On .NET 9+, the JIT emits SIMD vector instructions for hardware-accelerated math.
+## Q. What are types of JIT compiler available in .NET?
 
-**Alternative: Native AOT (Ahead-of-Time Compilation, .NET 7+):**
+In .NET, JIT compilation is commonly categorized into these types:
 
-Native AOT compiles the entire application to a **self-contained native binary** at build time — no JIT, no .NET runtime required at deployment.
+**1. Normal JIT**
 
-```bash
-dotnet publish -r linux-x64 -p:PublishAot=true
-```
+Compiles a method the first time it is called, then caches the native code for later calls. This is the standard behavior.
 
-**Benefits of Native AOT:**
-* Instant startup (no JIT warm-up)
-* Smaller memory footprint
-* Suitable for serverless functions, CLI tools, and containers
+**2. Pre-JIT**
 
-```cs
-// Program.cs — minimal Native AOT app (.NET 10)
-Console.WriteLine("Hello from Native AOT!");
-```
+Compiles IL to native code ahead of execution (historically via NGen; in modern .NET, ReadyToRun and Native AOT are the relevant ahead-of-time approaches).
 
-**When to use JIT vs. Native AOT:**
+**3. Econo JIT (historical)**
 
-| Scenario                   | JIT (Default)     | Native AOT              |
-|----------------------------|-------------------|-------------------------|
-| Long-running services      | Preferred       | Supported             |
-| Cold-start sensitive apps  | Warm-up delay  | Instant start         |
-| Reflection-heavy code      | Full support    | Limited              |
-| Smallest binary size       | Runtime needed | Single file           |
+Used limited memory by compiling methods on demand and discarding compiled code when possible. This is obsolete in modern .NET.
+
+**Note:**
+In modern .NET (Core/.NET 5+), the main runtime JIT engine is **RyuJIT**, and it uses tiered compilation:
+
+- Tier 0: quick initial code generation
+- Tier 1: optimized recompilation for hot methods (often with Dynamic PGO)
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
@@ -1429,51 +1443,100 @@ DateTime today = DateTime.Now; // Struct (user-defined value type)
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## Q. What is a parameter? Explain the new types of parameters introduced in C# 4.0.
+## Q. What is a parameter? Explain the new types of parameters introduced in C#?
 
 A **parameter** in C# is a variable defined in a method, constructor, or indexer declaration that receives a value (called an argument) when the method is called. Parameters allow you to pass data into methods so they can operate on different values.
 
-C# 4.0 introduced two important features related to method parameters:
+C# introduced specialized parameter modifiers aimed at optimizing memory and performance, particularly when passing value types
 
-**1. Optional Parameters:**
+* **`in` Parameters**: Passes an argument by reference but makes it strictly read-only. It prevents copying large struct variables while guaranteeing the method cannot modify the original data. 
 
-* You can specify default values for parameters in a method declaration.
-* If the caller omits an argument, the default value is used
+* **`out` Variables**: Allows you to declare an output parameter directly inside the method call argument list (e.g., `int.TryParse("123", out int result)`), eliminating the need for separate variable declarations. 
 
-**Example:**
+* **`ref` readonly Parameters**: Combines reference passing with read-only constraints, allowing methods to accept both references and values (like literals or constants) without creating unnecessary copies. 
 
-```cs
-void PrintMessage(string message, int repeat = 1)
-{
-    for (int i = 0; i < repeat; i++)
-        Console.WriteLine(message);
-}
+* **Optional Parameters**: Allows you to assign a default value to a parameter inside the method signature (e.g., `void Log(string msg, int level = 1)`). Callers can omit this argument entirely.  
 
-PrintMessage("Hello");      // Uses default repeat = 1
-PrintMessage("Hi", 3);      // repeat = 3
+* **Named Parameters**: Allows you to pass arguments by matching their explicit name followed by a colon (e.g., `Log(msg: "Error", level: 3)`). This lets you pass arguments in any order or skip certain optional parameters.  
 
-// Output
-// Hello
-// Hi Hi Hi
-```
+* **Dynamic Parameters**: Uses the dynamic keyword to bypass compile-time type checking. The exact type and operations are resolved at runtime, which is highly useful for interoperability. 
 
-**2. Named Parameters**
-
-* You can specify arguments by parameter name, regardless of their position.
-* This improves readability and allows you to skip optional parameters.
+* **Primary Constructor Parameters**: Introduced for standard classes and structs (extending C# 9 records), these let you define parameters directly in the class declaration line. They automatically map to fields and are visible throughout the entire scope of the class. 
 
 **Example:**
 
 ```cs
-void PrintMessage(string name, int age = 0, string city = "Unknown")
+using System;
+
+namespace ParameterDemo
 {
-    Console.WriteLine($"{name}, {age}, {city}");
+    // C# 12 Primary Constructor Parameter
+    // 'id' and 'name' are available throughout the entire class scope
+    public class User(int id, string name)
+    {
+        public void DisplayUser() => Console.WriteLine($"User {id}: {name}");
+    }
+
+    // A large struct to demonstrate performance optimization
+    public struct LargeDataPoint
+    {
+        public double X;
+        public double Y;
+        public double Z;
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // 1. Primary Constructor Example
+            User newUser = new User(101, "Alice");
+            newUser.DisplayUser();
+
+            // 2. Named and Optional Parameters Example
+            // We omit 'prefix', so it uses the default value "LOG:"
+            // We use named parameters to pass 'message' and 'level' out of order
+            WriteLog(level: 3, message: "System initialized.");
+
+            // 3. Inline 'out' Parameter Example
+            // The variable 'parsedValue' is declared right inside the method call
+            if (int.TryParse("456", out int parsedValue))
+            {
+                Console.WriteLine($"Successfully parsed out value: {parsedValue}");
+            }
+
+            // 4. 'in' Parameter Example
+            LargeDataPoint point = new LargeDataPoint { X = 1.0, Y = 2.0, Z = 3.0 };
+            // Passed by reference (no copy made), but read-only
+            ProcessCoordinates(in point);
+
+            // 5. Dynamic Parameter Example
+            // Bypasses compile-time checking; resolved at runtime
+            dynamic dynamicString = "Hello Dynamic World!";
+            PrintLength(dynamicString);
+        }
+
+        // Method with an optional parameter (prefix)
+        static void WriteLog(string message, int level, string prefix = "LOG:")
+        {
+            Console.WriteLine($"{prefix} [{level}] {message}");
+        }
+
+        // 'in' modifier guarantees 'data' cannot be modified inside this method
+        static void ProcessCoordinates(in LargeDataPoint data)
+        {
+            // data.X = 10.0; // ERROR: This line would fail to compile!
+            Console.WriteLine($"Processing coordinate X: {data.X}");
+        }
+
+        // Dynamic parameter resolves operations at runtime
+        static void PrintLength(dynamic item)
+        {
+            // The compiler does not check if '.Length' exists until this runs
+            Console.WriteLine($"The length of the item is: {item.Length}");
+        }
+    }
 }
-
-PrintMessage("Pradeep", city: "Bengaluru"); // age uses default value 0
-
-// Output
-// Pradeep, 0, Bengaluru
 ```
 
 <div align="right">
@@ -1552,7 +1615,7 @@ object obj = null;           // Null literal
 
 ## Q. What is the main difference between sub-procedure and function?
 
-In C#, the main difference between a subroutine (which can be a Sub procedure in some languages) and a function is that a function returns a value, while a subroutine (or sub procedure) does not. 
+In C#, the equivalent of a **sub-procedure** (from languages like VB/VBA) is a **method with void return type**, while a **function** is a method that **returns a value.**
 
 Both perform actions, but functions allow you to use their result elsewhere in your code, while subroutines/sub procedures simply execute and return control. 
 
@@ -1583,7 +1646,7 @@ void PrintSum(int a, int b)
 
 ## Q. What is the difference between string and StringBuilder in C#?
 
-In C#, `string` and `StringBuilder` both handle text, but string is immutable, and StringBuilder is mutable. This means that when you modify a string, a new string object is created, while with StringBuilder, you can modify the object in place without creating new objects. 
+In C#, `string` and `StringBuilder` both handle text, but string is **immutable**, and StringBuilder is **mutable**. This means that when you modify a string, a new string object is created, while with StringBuilder, you can modify the object in place without creating new objects. 
 
 **1. string:**
 
@@ -1620,8 +1683,8 @@ string result = sb.ToString();
 
 **When to use which?**
 
-* Use `string` for simple, infrequent changes.
-* Use `StringBuilder` for complex or repeated string manipulations, especially in loops.
+* Use `string` when you have a fixed set of text data, perform very few modifications, or are simply concatenating a small, known number of strings.
+* Use `StringBuilder` when you are modifying text an unknown number of times, such as inside a for or foreach loop, or when building massive blocks of text dynamically.
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
@@ -1653,13 +1716,65 @@ obj.MyMethod(); // Compiler knows about MyMethod at compile time
 * **Type Safety:** Less type safety, more flexible, but slower due to runtime checks.
 * **Performance:** Potentially slower due to runtime lookups and potential overhead, especially with reflection. 
 
-**Example:**
+**Example 1: Late binding using `dynamic`:**
 
 ```cs
-// Late binding using dynamic
-dynamic obj = GetSomeObject();
-obj.MyMethod(); // Resolved at runtime
+using System;
+
+public class Greeter
+{
+    public void SayHello(string name)
+    {
+        Console.WriteLine($"Hello, {name}!");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        dynamic obj = new Greeter();
+        obj.SayHello("Pradeep"); // Method resolved at runtime
+        // Output: Hello, Pradeep!
+
+        // The type can change at runtime
+        obj = 42;
+        Console.WriteLine(obj + 8); // Output: 50
+    }
+}
 ```
+
+**Example 2: Late binding using Reflection:**
+
+```cs
+using System;
+using System.Reflection;
+
+public class Calculator
+{
+    public int Add(int a, int b) => a + b;
+}
+
+class Program
+{
+    static void Main()
+    {
+        // Load type and invoke method at runtime — no compile-time knowledge needed
+        Type type = typeof(Calculator);
+        object instance = Activator.CreateInstance(type);
+
+        MethodInfo method = type.GetMethod("Add");
+        object result = method.Invoke(instance, new object[] { 10, 20 });
+
+        Console.WriteLine($"Result: {result}"); // Output: Result: 30
+    }
+}
+```
+
+**Real-World Usage**
+
+* **Early Binding**: Business applications, APIs, enterprise applications(.NET Core, ASP.NET Core)
+* **Late Binding**: Plugin architectures, loading external assemblies, COM Interop, dependency discovery at runtime.
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
@@ -1669,10 +1784,18 @@ obj.MyMethod(); // Resolved at runtime
 
 An indexer in C# is a special type of property that allows objects of a class or struct to be indexed just like arrays, using the square bracket `[]` syntax. Indexers enable you to access elements in an object using an index, making custom classes behave like collections.
 
+**Key Benefits:**
+
+* **Intuitive Syntax**: Users can access internal collections using familiar `obj[index]` brackets instead of calling explicit methods.
+* **Simplified Data Access**: They abstract away the underlying data structure, making your custom collection feel like a native array.
+* **Property-Like Flexibility**: Indexers can use get and set accessors, allowing you to validate data or run logic during access.
+* **Overloading Support**: You can define multiple indexers on the same class if they use different data types for the index (e.g., indexing by int vs. indexing by string).
+* **Multi-Dimensional Indexing**: They support multiple parameters, enabling clean access to grid-like or matrix data structures. 
+
 **Example:**
 
 ```cs
-public class SampleCollection
+public class MyCollection
 {
     private string[] data = new string[5];
 
@@ -1685,7 +1808,7 @@ public class SampleCollection
 }
 
 // Usage
-var collection = new SampleCollection();
+var collection = new MyCollection();
 collection[0] = "Hello";
 Console.WriteLine(collection[0]); // Output: Hello
 ```
@@ -1696,7 +1819,9 @@ Console.WriteLine(collection[0]); // Output: Hello
 
 ## Q. What are the differences between Object, Var and Dynamic type?
 
-In C#, object, var and dynamic are three different ways to declare variables, each with distinct behaviors and use cases.
+In C#, `object` is the ultimate base class checked at compile-time, `var` is shorthand for a specific compile-time type, and `dynamic` bypasses compile-time checking entirely until runtime..
+
+**Key Differences**
 
 **1. `object`**
 
@@ -1741,7 +1866,7 @@ value = 123;
 // Console.WriteLine(value.Length); // Runtime error: 'int' does not contain 'Length'
 ```
 
-**Differences:** 
+**Detailed Comparison:** 
 
 | Feature         | object           | var                | dynamic           |
 |-----------------|------------------|--------------------|-------------------|
@@ -1859,31 +1984,16 @@ IEnumerable<int> GetNumbers()
 - **Pros:** Improves performance and resource usage when the value may not be needed.
 - **Cons:** Can make debugging harder; deferred exceptions.
 
-**Difference**
+**Comparison:**
 
-| Aspect           | Eager Evaluation           | Lazy Evaluation                |
+| Feature           | Eager Evaluation           | Lazy Evaluation             |
 |------------------|---------------------------|-------------------------------|
-| When evaluated   | Immediately               | On first use (on demand)      |
-| Example          | `int x = GetValue();`     | `Lazy<int> x = ...;`          |
+| Execution Time   | Immediately               | On demand                     |
 | Use cases        | Always-needed values      | Expensive/optional values     |
-| LINQ             | `.ToList()` (immediate)   | `.Where()` (deferred)         |
+| LINQ Examples    | `.ToList()`, `ToArray()`, `Count()`| `.Where()`, `Select()`, `Skip()`|
+| Memory Usage     | Higher                    | Lower                         |
+| Performance      | Better when results are needed repeatedly| Better for large datasets|
 
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. Mention the two major categories that distinctly classify the variables of C# programs.
-
-In C# programs, variables are primarily categorized into **value types** and **reference types**. Value types directly store the variable\'s value in memory, while reference types store a memory address (reference) to the value\'s location. 
-
-**Value Types:**
-
-These store the actual data directly in the memory location of the variable (Stack). Examples include `int`, `bool`, `float`, `enum`, and `struct` types. When a value type variable is copied, a new copy of the data is created, so changes to one variable don\'t affect others.
-
-**Reference Types:**
-
-These store a memory address to the location where the actual data is stored (Heap). Examples include `string`, `object`, `array`, and `class` types. When a reference type variable is copied, the copy contains the same memory address, meaning both variables point to the same data. Therefore, changes to the data through one reference will be reflected in the other. 
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
@@ -1914,7 +2024,9 @@ catch (OverflowException)
 {
     Console.WriteLine("Overflow detected!");
 }
+```
 
+```cs
 // Unchecked block: will not throw, wraps around
 unchecked
 {
@@ -1941,7 +2053,7 @@ int result2 = unchecked(max + 1); // Wraps around
 
 ## Q. What is the difference between typeOf() and sizeOf()?
 
-In C#, `typeof()` and `sizeof()` are two different operators used for different purposes:
+The primary difference is that `typeof` returns a `System.Type` object representing metadata about a type, whereas `sizeof` returns an integer indicating the memory footprint (in bytes) of an unmanaged type
 
 **1. `typeof()` Operator:**
 
@@ -1949,11 +2061,13 @@ In C#, `typeof()` and `sizeof()` are two different operators used for different 
 - Used to get metadata information about a type at compile time.
 - Commonly used with reflection.
 
-**Example:**
+**Example:** `typeof()` is commonly used with Reflection
 
 ```cs
-Type t = typeof(int); // Gets the Type object for int
-Console.WriteLine(t.FullName); // Output: System.Int32
+if(obj.GetType() == typeof(Employee))
+{
+    Console.WriteLine("Employee Object");
+}
 ```
 
 **2. `sizeof()` Operator:**
@@ -1965,8 +2079,11 @@ Console.WriteLine(t.FullName); // Output: System.Int32
 **Example:**
 
 ```cs
-int size = sizeof(int); 
-Console.WriteLine(size); // Output: 4
+Console.WriteLine(sizeof(byte));  // Output: 1
+Console.WriteLine(sizeof(short)); // Output: 2
+Console.WriteLine(sizeof(int));   // Output: 4
+Console.WriteLine(sizeof(long));  // Output: 8
+Console.WriteLine(sizeof(char));  // Output: 2
 ```
 
 **Summary Table:**
@@ -1987,9 +2104,9 @@ Console.WriteLine(size); // Output: 4
 
 ## Q. What is widening and Narrowing conversion in C#?
 
-Widening and narrowing conversions in C# refer to how values are converted between different data types, especially numeric types.
+Widening conversion (Implicit) converts a smaller data type into a larger data type without losing data. Narrowing conversion (Explicit) converts a larger data type into a smaller data type, which can cause data loss.
 
-**Widening Conversion (Implicit Conversion):**
+**1. Widening Conversion (Implicit Conversion):**
 
 - Converts a value to a larger or more general type.
 - No data loss; safe and automatic.
@@ -1997,15 +2114,24 @@ Widening and narrowing conversions in C# refer to how values are converted betwe
 **Example:** `int` to `long`, `float` to `double`.
 
 ```cs
-int a = 100;
-long b = a;      // Widening: int to long (implicit)
-float f = a;     // Widening: int to float (implicit)
+int num = 100;
+long result = num;      // Widening: int to long (implicit)
+float flt = num;       // Widening: int to float (implicit)
 
-Console.WriteLine(b); // Output: 100
-Console.WriteLine(f); // Output: 100
+Console.WriteLine(result); // Output: 100
+Console.WriteLine(flt);    // Output: 100
 ```
 
-**Narrowing Conversion (Explicit Conversion):**
+Common Widening Conversions
+
+| From          | To               |
+|---------------|------------------|
+| byte          | short, int, long, float, double, decimal|
+| short         | int, long, float, double, decimal|
+| int           | long, double, decimal |
+| float         | double |
+
+**2. Narrowing Conversion (Explicit Conversion):**
 
 - Converts a value to a smaller or more specific type.
 - May cause data loss or overflow; requires explicit cast.
@@ -2029,11 +2155,11 @@ Console.WriteLine(small); // Output: -31072
 
 ## Q. How to view an Assembly?
 
-To view an assembly in C#, you can inspect its metadata, types, and IL code using several tools:
+To view a compiled .NET Assembly (a `.dll` or `.exe` file), you must decompile it using an assembly inspector tool to reconstruct the original C# code or read its Intermediate Language (IL) metadata. Because C# compiles into a standardized byte-code, these tools can instantly deconstruct an assembly back into readable source code.
 
-**1. Using ILDASM (IL Disassembler):**
+**1. Using IL Disassembler:**
 
-ILDASM is a tool provided with the .NET SDK to view the contents of an assembly (DLL or EXE).
+IL Disassembler is a tool provided with the .NET SDK to view the contents of an assembly (DLL or EXE).
 
 **Steps:**
 
@@ -2042,17 +2168,27 @@ ILDASM is a tool provided with the .NET SDK to view the contents of an assembly 
 ```cs
 ildasm YourAssembly.dll
 ```
-3. The ILDASM window will open, allowing you to browse namespaces, classes, methods, and view IL code.
+3. The IL Disassembler window will open, allowing you to browse namespaces, classes, methods, and view IL code.
 
-**2. Using dotPeek or ILSpy (Third-Party Tools):**
+**2. Using ILSpy (Third-Party Tools):**
 
-- [dotPeek](https://www.jetbrains.com/decompiler/) and [ILSpy](https://github.com/icsharpcode/ILSpy) are free .NET decompilers.
+- [ILSpy](https://github.com/icsharpcode/ILSpy) are free .NET decompilers.
 - Open your `.dll` or `.exe` file in these tools to view C# code, metadata, and resources.
+
+**Example:**
+
+```
+MyLibrary.dll
+  |-------Services
+            |-------EmployeeService
+                      |------GetEmployee()
+                      |------SaveEmployee()   
+```
 
 **3. Using Visual Studio:**
 
-- Right-click on a reference in Solution Explorer ’ "Go to Definition" to view metadata.
-- Use "Object Browser" (View ’ Object Browser) to explore assemblies.
+- Right-click on a reference in Solution Explorer -> "Go to Definition" to view metadata.
+- Use "Object Browser" (View -> Object Browser) to explore assemblies.
 
 **4. Using Reflection in Code:**
 
@@ -2081,7 +2217,7 @@ class Program
 
 ## Q. What are MultiLingual Applications?
 
-MultiLingual Applications are software applications designed to support multiple languages, allowing users to interact with the application in their preferred language. In C#, this is typically achieved using resource files (.resx) and the .NET localization framework.
+In C#, multilingual applications are software programs that leverage the built-in `System.Globalization` namespace to dynamically adapt their user interface, text, and formatting based on a user\'s language and region. This is typically achieved using resource files (`.resx`) and the .NET localization framework.
 
 **Key Points:**
 
@@ -2117,36 +2253,51 @@ string greeting = rm.GetString("Greeting", ci);
 Console.WriteLine(greeting); // Output depends on selected culture
 ```
 
+**Common .NET Classes Used**
+
+|Class | Purpose  |
+|-----------------|-------------------------|
+|CultureInfo      |Language and region information|
+|Resource Manager |Load localized resources |
+|IStringLocalizer |ASP.NET Core localization |
+|CurrentCulture   |Date/number formatting    |
+|CurrentUICulture |UI Language selection     |
+
+
+
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
 </div>
 
-## Q. Can you describe the process of code compilation in .NET?
+## Q. Describe the process of code compilation in .NET?
 
-In .NET, code compilation involves several stages, including translating source code into Common Intermediate Language (CIL) and then executing it using the Common Language Runtime (CLR) with the Just-In-Time (JIT) compiler.
+The .NET compilation process uses a two-stage compilation model to transform source code into machine-executable instructions. It converts high-level code (like C# or F#) into **Common Intermediate Language (CIL)**, which the **Just-In-Time (JIT)** compiler then translates into native machine code at runtime. 
+Here is the step-by-step breakdown of how the .NET compilation process works:
 
-The compiler (like Roslyn for C#) initially converts the high-level source code into CIL, a CPU-independent set of instructions. This CIL code, along with metadata, is stored in an assembly (PE format). When the program runs, the CLR uses the JIT compiler to convert the CIL into machine code, which is then executed on the specific CPU. 
+**1. Compile Source Code to Intermediate Language (Compile Time)**
 
-**Process of Code Compilation**
+* **Language Compiler**: You write code in a .NET-compliant language like C#, VB.NET, or F#.  
+* **Source Translation**: When you build the project, a language-specific compiler (like csc for C#) compiles the source code.  
+* **CIL Generation**: The compiler outputs Common Intermediate Language (CIL), also known as Microsoft Intermediate Language (MSIL) or simply IL.  
+* **Metadata Creation**: The compiler simultaneously generates metadata, which contains descriptions of your code's types, members, and dependencies.  
+* **Assembly Packaging**: The CIL and metadata are packaged into a portable executable (PE) file, typically an `.exe` or `.dll` file, known as a **.NET Assembly**. 
 
-1. **Source Code to Intermediate Language (IL):**
-   - The **Roslyn compiler** (`dotnet build` / `csc`) compiles C# source code into **Common Intermediate Language (CIL/IL)**.
-   - The compiled IL, along with metadata, is stored in assemblies (`.dll` or `.exe`).
-   - In .NET 10, the compiler supports C# 14 features such as the `field` keyword, extension members, and `params` enhancements.
+**2. Load the Assembly (Runtime)**
 
-2. **Assembly Loading:**
-   - The **CoreCLR** runtime loads required assemblies when the application starts.
+* **Execution Trigger**: The user or a system process executes the .NET Assembly.
+* **CLR Initialization**: The operating system starts the Common Language Runtime (CLR), which is the virtual machine engine of .NET.
+* **Assembly Loading**: The CLR reads the assembly\'s metadata to understand its dependencies and structure, preparing the environment for execution. 
 
-3. **Just-In-Time (JIT) Compilation:**
-   - The JIT compiler translates IL to native machine code method-by-method on first call.
-   - **.NET 8/9/10 improvements:** Tiered Compilation and Dynamic PGO recompile hot methods with full optimizations at runtime automatically.
+**3. Just-In-Time (JIT) Compilation (Runtime execution)**
 
-4. **Native AOT (Ahead-of-Time, .NET 7+):**
-   - With `PublishAot=true`, the entire app is compiled to a self-contained native binary at build time — no JIT or runtime required at deployment.
+* **On-Demand Compilation**: The CLR does not compile the entire assembly at once. Instead, the JIT Compiler (**RyuJIT**) compiles individual methods only when they are called for the first time.  
+* **Native Code Translation**: The JIT compiler takes the platform-independent CIL from the assembly and translates it into highly optimized native machine code (CPU instructions) specific to the host operating system and hardware architecture (e.g., `x64`, `ARM64`). 
+* **Caching**: The compiled native code is saved in memory. Subsequent calls to the same method bypass the JIT compiler and execute the native code directly, maximizing performance. 
 
-5. **Execution:**
-   - The CPU executes the native code. JIT-compiled code is cached for subsequent calls.
 
+**Alternative: Ahead-Of-Time (AOT) Compilation**
+
+Modern .NET also supports **Native AOT compilation**. If enabled, this alternative process completely bypasses the runtime JIT stage. It compiles the source code directly into a single, platform-specific native binary during development. This results in faster startup times and a smaller memory footprint, though it removes certain dynamic runtime capabilities. 
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
@@ -2156,24 +2307,25 @@ The compiler (like Roslyn for C#) initially converts the high-level source code 
 
 Yes, you can return multiple values from a function in C#. There are several common ways to achieve this:
 
-**1. Using Tuples (preferred, C# 7+):**
+**1. Using Tuples:**
 
 Tuples allow you to return multiple values of different types in a single return statement.
 
 ```cs
+// Definition using named tuple elements
 (string Name, int Age) GetPerson()
 {
-    return ("Pradeep", 30);
+    return ("Pradeep", 20);
 }
 
 // Usage
 var person = GetPerson();
 Console.WriteLine(person.Name); // Pradeep
-Console.WriteLine(person.Age);  // 30
+Console.WriteLine(person.Age);  // 20
 
-// Deconstruction (C# 7+)
+// Usage with Deconstruction (splitting directly into individual variables)
 var (name, age) = GetPerson();
-Console.WriteLine($"{name} is {age}"); // Pradeep is 30
+Console.WriteLine($"{name} is {age}"); // Pradeep is 20
 ```
 
 **2. Using Out Parameters:**
@@ -2181,6 +2333,7 @@ Console.WriteLine($"{name} is {age}"); // Pradeep is 30
 The Out parameters allow a function to modify the values of variables passed as arguments. This is a way to "return" additional values indirectly.
 
 ```cs
+// Definition
 void GetValues(out int a, out int b)
 {
     a = 10;
@@ -2189,6 +2342,7 @@ void GetValues(out int a, out int b)
 
 int x, y;
 GetValues(out x, out y);
+
 Console.WriteLine(x); // 10
 Console.WriteLine(y); // 20
 ```
@@ -2399,24 +2553,36 @@ int a = 1, b = 2, c = 3; // declare and initialize multiple variables
 
 ## Q. What is the basic structure of a C# program?
 
-A C# program is built around **classes** and **methods**. With C# 9+ **Top-Level Statements**, you can also write programs without explicit class or `Main` boilerplate.
+The basic structure of a C# program consists of five core organizational building blocks: **Namespaces**, **Classes**, the **Main Method**, **Statements**, and **Directives**. With C# 9+ **Top-Level Statements**, you can also write programs without explicit class or `Main` boilerplate.
 
 **1. Traditional program structure (all versions):**
 
 ```cs
-using System; // Import namespace
+using System; 
 
-namespace MyApp
+namespace MyFirstApplication 
 {
-    class Program
+    class Program 
     {
-        static void Main(string[] args) // Entry point
+        static void Main(string[] args) 
         {
-            Console.WriteLine("Hello, World!");
+            Console.WriteLine("Hello, World!"); 
         }
     }
 }
 ```
+
+**The 5 Structural Building Blocks**
+
+* **`using System;` (Directive)**: Imports the System namespace so you can use built-in classes (like Console) without typing their full paths.
+
+* **`namespace MyFirstApplication` (Container)**: Organizes your code and prevents naming conflicts by grouping related classes together.
+
+* **`class Program` (Blueprint)**: All executable C# code must live inside a class. Classes act as containers for data (fields) and actions (methods).
+
+* **`static void Main(string[] args)` (Entry Point)**: The critical starting point where the operating system begins executing your application.
+
+* **`Console.WriteLine(...)` (Statement)**: An individual instruction that performs an action. Every standalone statement in C# must end with a semicolon (;).  
 
 **2. Top-level statements (C# 9+) — preferred for small programs:**
 
@@ -2457,7 +2623,7 @@ class Program
 
 ## Q. What are access modifiers in C# and how do they control visibility?
 
-Access modifiers in C# control the visibility and accessibility of types and their members. C# has six access modifiers:
+Access modifiers are keywords used to set the **accessibility (visibility) level** of classes, methods, fields, and properties in C#. They enforce encapsulation by restricting which parts of your program can see or interact with specific code blocks. C# has six access modifiers:
 
 | Modifier                    | Accessibility                                                      |
 |-----------------------------|--------------------------------------------------------------------|
@@ -2471,27 +2637,20 @@ Access modifiers in C# control the visibility and accessibility of types and the
 **Example:**
 
 ```cs
-public class BankAccount
+public class Account
 {
-    public string Owner { get; set; }        // accessible everywhere
-    private decimal _balance;               // accessible only inside this class
-    protected string AccountType = "Savings"; // accessible in derived classes
-    internal int BranchCode = 101;           // accessible within the same assembly
+    // Accessible anywhere
+    public string AccountNumber;
 
-    public void Deposit(decimal amount)
-    {
-        if (amount > 0)
-            _balance += amount; // private field accessed within the class
-    }
+    // Accessible only within this Account class
+    private decimal balance;
 
-    public decimal GetBalance() => _balance;
+    // Accessible in Account and any child class (e.g., SavingsAccount)
+    protected string OwnerName;
+
+    // Accessible anywhere inside this specific project file/assembly
+    internal string BankBranch;
 }
-
-var account = new BankAccount();
-account.Owner = "Pradeep";   // OK — public
-// account._balance = 100;   // Error — private
-account.Deposit(500);
-Console.WriteLine(account.GetBalance()); // Output: 500
 ```
 
 <div align="right">
@@ -2500,32 +2659,42 @@ Console.WriteLine(account.GetBalance()); // Output: 500
 
 ## Q. What is string interpolation in C# and how is it used?
 
-String interpolation (introduced in C# 6) provides a concise syntax to embed expressions directly inside string literals using the `$` prefix. It is the preferred way to format strings in modern C#.
+String interpolation provides a concise syntax to embed expressions directly inside string literals using the `$` prefix. It is the preferred way to format strings in modern C#.
 
-**1. Basic interpolation:**
+**1. Basic Interpolation:**
 
 ```cs
 string name = "Pradeep";
 int age = 28;
 
+// Using string interpolation
 string message = $"Name: {name}, Age: {age}";
 Console.WriteLine(message); // Output: Name: Pradeep, Age: 28
 ```
 
-**2. Expressions inside `{}`:**
+**2. Expressions Inside `{}`:**
 
 ```cs
 int a = 10, b = 5;
+
 Console.WriteLine($"Sum: {a + b}, Product: {a * b}"); // Output: Sum: 15, Product: 50
 ```
 
-**3. Format specifiers:**
+**3. Format Specifiers:**
 
 ```cs
 double price = 1234.567;
+
 Console.WriteLine($"Price: {price:C2}");  // Output: Price: $1,234.57 (currency)
 Console.WriteLine($"Price: {price:F1}");  // Output: Price: 1234.6 (1 decimal)
 Console.WriteLine($"Hex: {255:X}");       // Output: Hex: FF
+
+// Formatting Numbers and Dates
+decimal price = 19.99m;
+DateTime today = DateTime.Now;
+
+string formattedPrice = $"Price: {price:C}";            // Outputs: Price: $19.99 (based on local currency)
+string formattedDate  = $"Today is {today:yyyy-MM-dd}"; // Outputs: Today is 2026-07-17
 ```
 
 **4. Multi-line with `$@` or `@$` (verbatim interpolated string):**
@@ -2534,10 +2703,11 @@ Console.WriteLine($"Hex: {255:X}");       // Output: Hex: FF
 string path = "C:\\Users";
 string msg = $@"Hello {name},
 Your path is: {path}";
+
 Console.WriteLine(msg);
 ```
 
-**5. Raw interpolated string (C# 11+):**
+**5. Raw Interpolated String:**
 
 ```cs
 string json = $$"""{ "name": {{name}},  "age": {{age}} }""";
@@ -2572,13 +2742,13 @@ The different types of operators in C# are:
 
 These operators perform standard arithmetic operations on numeric values.
 
-- `+` (Addition)
-- `-` (Subtraction)
-- `*` (Multiplication)
-- `/` (Division)
-- `%` (Modulus)
-- `++` (Increment)
-- `--` (Decrement)
+* `+`  : Addition (also used for string concatenation).
+* `-`  : Subtraction (or unary negation).
+* `*`  : Multiplication.
+* `/`  : Division.
+* `%`  : Modulus (returns the remainder of division).
+* `++` : Increment (increases a value by 1).
+* `--` : Decrement (decreases a value by 1). 
 
 **Example:**
 ```cs
@@ -2591,16 +2761,16 @@ Console.WriteLine(a / b); // Output: 3
 Console.WriteLine(a % b); // Output: 1
 ```
 
-**2. Relational (Comparison) Operators**
+**2. Relational and Comparison Operators**
 
-These operators compare two values and return a boolean result (true or false).
+These operators compare two values and return a boolean result (`true` or `false`).
 
-- `==` (Equal to)
-- `!=` (Not equal to)
-- `>` (Greater than)
-- `<` (Less than)
-- `>=` (Greater than or equal to)
-- `<=` (Less than or equal to)
+- `==` : Equal to
+- `!=` : Not equal to
+- `>`  : Greater than
+- `<`  : Less than
+- `>=` : Greater than or equal to
+- `<=` : Less than or equal to
 
 **Example:**
 ```cs
@@ -2610,13 +2780,16 @@ Console.WriteLine(a == b) // Output: False
 Console.WriteLine(a < b) // Output: True
 ```
 
-**3. Logical Operators**
+**3. Boolean Logical and Conditional Operators**
 
 These operators perform logical operations on boolean expressions.
 
-- `&&` (Logical AND)
-- `||` (Logical OR)
-- `!` (Logical NOT)
+* `&&` : Conditional logical AND (short-circuiting evaluation).
+* `||` : Conditional logical OR (short-circuiting evaluation).
+* `!`  : Logical NOT (inverts a Boolean state).
+* `&`  : Logical AND (evaluates both sides regardless).
+* `|`  : Logical OR (evaluates both sides regardless).
+* `^`  : Logical XOR (exclusive OR). 
 
 **Example:**
 ```cs
@@ -2631,8 +2804,12 @@ Console.WriteLine(isAdult || hasID); // Output: True
 
 These operators assign values to variables.
 
-- `=` (Simple assignments)
-- `+=`, `-=`, `*=`, `/=`, `%=` (Compound assignments)
+* `=` : Simple assignment.
+* `+=` , `-=` : Add/Subtract and assign.
+* `*=` , `/=` , `%=` : Multiply/Divide/Modulus and assign.
+* `&=` , `|=` , `^=` : Bitwise/Logical operations and assign.
+* `<<=` , `>>=` , `>>>=` : Shift and assign.
+* `??=` : Null-coalescing assignment (assigns only if the left-hand variable is null).  
 
 **Example:**
 ```cs
@@ -2642,7 +2819,7 @@ x += 3; // x = x + 3
 Console.WriteLine(x); // Output: 8
 ```
 
-**5. Bitwise Operators**
+**5. Bitwise and Shift Operators**
 
 These operators work directly on the binary representation of numbers.
 
@@ -4634,115 +4811,6 @@ string result = numbers switch
 };
 Console.WriteLine(result); // Output: Exact match
 ```
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the `goto` statement in C# and when should it be used?
-
-The `goto` statement transfers control to a labeled statement elsewhere in the same method. Its most common and accepted use in C# is within `switch` statements to fall through to another case.
-
-**Syntax:**
-
-```cs
-goto labelName;
-// ...
-labelName:
-    // code
-```
-
-**Example — `goto` in a `switch` statement:**
-
-```cs
-int option = 1;
-
-switch (option)
-{
-    case 1:
-        Console.WriteLine("Option 1 selected");
-        goto case 3; // falls through to case 3
-    case 2:
-        Console.WriteLine("Option 2 selected");
-        break;
-    case 3:
-        Console.WriteLine("Common handler");
-        break;
-}
-// Output:
-// Option 1 selected
-// Common handler
-```
-
-**Example — `goto` to exit nested loops:**
-
-```cs
-for (int i = 0; i < 3; i++)
-{
-    for (int j = 0; j < 3; j++)
-    {
-        if (i == 1 && j == 1)
-            goto done;
-        Console.WriteLine($"i={i}, j={j}");
-    }
-}
-done:
-Console.WriteLine("Exited loops");
-```
-
-**Note:** Avoid `goto` for general control flow as it reduces readability. Prefer `break`, `continue`, or refactoring into methods.
-
-<div align="right">
-    <b><a href="#table-of-contents">↥ back to top</a></b>
-</div>
-
-## Q. What is the difference between `while` and `do-while` loops?
-
-Both loops repeat a block of code while a condition is true, but they differ in **when the condition is checked**.
-
-- **`while` loop:** Checks the condition **before** each iteration. The body may never execute if the condition is false from the start.
-- **`do-while` loop:** Checks the condition **after** each iteration. The body **always executes at least once**.
-
-**Example — condition is false from the start:**
-
-```cs
-int x = 10;
-
-// while: body never executes
-while (x < 5)
-{
-    Console.WriteLine("while: " + x);
-}
-// (no output)
-
-// do-while: body executes once regardless
-do
-{
-    Console.WriteLine("do-while: " + x);
-} while (x < 5);
-// Output: do-while: 10
-```
-
-**Practical use case — input validation:**
-
-```cs
-string input;
-do
-{
-    Console.Write("Enter a non-empty value: ");
-    input = Console.ReadLine();
-} while (string.IsNullOrWhiteSpace(input));
-
-Console.WriteLine($"You entered: {input}");
-```
-
-**Summary:**
-
-| Feature             | `while`                        | `do-while`                         |
-|---------------------|--------------------------------|------------------------------------||
-| Condition check     | Before each iteration          | After each iteration               |
-| Minimum executions  | 0 (may never run)              | 1 (always runs at least once)      |
-| Best for            | Condition may fail from start  | Must run at least once (e.g., menus, validation) |
 
 <div align="right">
     <b><a href="#table-of-contents">↥ back to top</a></b>
